@@ -104,14 +104,18 @@ if ($rawfrom != '') $cond .= " AND (`time` >= '".esc_sql( date("Y-m-d",strtotime
 if ($rawto != '') $cond .= " AND (`time` <= '".esc_sql(date("Y-m-d",strtotime($rawto)))." 23:59:59')";
 if ($this->item != 0) $cond .= " AND formid=".intval($this->item);
 
-$events_query = "SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC";
+
+$events_query = "SELECT count(id) as ck FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC";
+$events = $wpdb->get_results( $events_query );
+$total_pages = ceil($events[0]->ck / $records_per_page);
+
+$events_query = "SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC LIMIT ".intval(($current_page-1)*$records_per_page).",".intval($records_per_page);
 /**
  * Allows modify the query of messages, passing the query as parameter
  * returns the new query
  */
 $events_query = apply_filters( 'cpappb_messages_query', $events_query );
 $events = $wpdb->get_results( $events_query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-$total_pages = ceil(count($events) / $records_per_page);
 
 
 if ($message) echo "<div id='setting-error-settings_updated' class='updated'><h2>".esc_html($message)."</h2></div>";
@@ -170,8 +174,8 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
  function cp_markall()
  {
      var ischecked = document.getElementById("cpcontrolck").checked;
-     <?php for ($i=($current_page-1)*$records_per_page; $i<$current_page*$records_per_page; $i++) if (isset($events[$i])) { ?>
-     document.forms.dex_table_form.c<?php echo intval($i-($current_page-1)*$records_per_page); ?>.checked = ischecked;
+     <?php for ($i=0; $i<$records_per_page; $i++) if (isset($events[$i])) { ?>
+     document.forms.dex_table_form.c<?php echo intval($i); ?>.checked = ischecked;
      <?php } ?>
  }
 </script>
@@ -262,7 +266,7 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 	</tr>
 	</thead>
 	<tbody id="the-list">
-	 <?php for ($i=($current_page-1)*$records_per_page; $i<$current_page*$records_per_page; $i++) if (isset($events[$i])) {
+	 <?php for ($i=0; $i<$records_per_page; $i++) if (isset($events[$i])) {
               $posted_data = unserialize($events[$i]->posted_data);
               $cancelled = 0;
               $status = '';
@@ -280,7 +284,7 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
                  $status = '';                    
      ?>
 	  <tr class='<?php if ( $cancelled && $cancelled == count( $posted_data["apps"] ) && $status != 'Attended') { ?>cpappb_cancelled <?php } ?><?php if (($i%2)) { ?>alternate <?php } ?>author-self status-draft format-default iedit' valign="top">
-        <th><input type="checkbox" name="c<?php echo intval($i-($current_page-1)*$records_per_page); ?>" value="<?php echo intval($events[$i]->id); ?>" /></th>
+        <th><input type="checkbox" name="c<?php echo intval($i); ?>" value="<?php echo intval($events[$i]->id); ?>" /></th>
         <th><?php echo intval($events[$i]->id); ?></th>
 		<td><?php echo esc_html($this->format_date(substr($events[$i]->time,0,16)).date(" H:i",strtotime($events[$i]->time))); ?></td>
 		<td><?php echo esc_html(sanitize_email($events[$i]->notifyto)); ?></td>
