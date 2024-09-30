@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 global $wpdb;
 
 $this->item = intval($_GET["cal"]);
@@ -63,73 +65,119 @@ foreach($rows as $item)
         }    
 }
 
-function getStatsBy($arr)
+
+function getMonthly($arr, $is_incoming = false)
 {
-    foreach($arr as $key => $value)
-       echo '<div><b>'.esc_html(substr($key,1)).'</b> '.esc_html($value.' '.__('appointments','appointment-hour-booking')).' </div>';
-}
-function getStatsByMonthly($arr, $is_incoming = false)
-{
+    $str = '';
     $dt = ($is_incoming ? strtotime("-11 months") : time());
     $dt = strtotime(date("Y-m-01", $dt));
+    $x = []; $y = [];
     for ($i=0;$i<12;$i++)
     {
+        $x[] = date("Ym",$dt);
         $key = "x".date("Ym",$dt);
-        echo '<div><b>'.esc_html(date("Y M",$dt)).'</b> '.esc_html((isset($arr[$key])?$arr[$key]:0).' '.__('appointments','appointment-hour-booking')).' </div>'; 
+        $y[] = (isset($arr[$key])?$arr[$key]:'0'); 
         $dt = strtotime( "+1 month" ,$dt);    
-    }    
+    }   
+    echo ' x="'.esc_html(join(",", $x)).'" y="'.esc_html(join(",", $y)).'" '; 
 }
-function getStatsByWeekly($arr, $is_incoming = false)
+function getWeekly($arr, $is_incoming = false)
 {
+    $str = '';
     $dt = ($is_incoming ? strtotime("-11 weeks") : time());
+    $x = []; $y = [];
     for ($i=0;$i<12;$i++)
     {
+        $x[] = date("YW",$dt);
         $key = "x".date("YW",$dt);
-        echo '<div><b>'.esc_html(date("Y W",$dt)).'</b> '.esc_html((isset($arr[$key])?$arr[$key]:'0').' '.__('appointments','appointment-hour-booking')).' </div>';         
+        $y[] = (isset($arr[$key])?$arr[$key]:'0');         
         $dt = strtotime("+1 week",$dt);    
-    }     
+    }   
+    echo ' x="'.esc_html(join(",", $x)).'" y="'.esc_html(join(",", $y)).'" ';
 }
-function getStatsByDaily($arr, $is_incoming = false)
+function getDaily($arr, $is_incoming = false)
 {
+    $str = '';
     $dt = ($is_incoming ? strtotime("-29 days") : time());
+    $x = []; $y = [];
     for ($i=0;$i<30;$i++)
     {
-        $key = "x".date("Ymd",$dt);
-        echo '<div><b>'.esc_html(date("Y M d",$dt)).'</b> '.esc_html((isset($arr[$key])?$arr[$key]:'0').' '.__('appointments','appointment-hour-booking')).' </div>'; 
+        $x[] = date("Ymd",$dt);
+        $key = "x".date("Ymd",$dt); 
+        $y[] = (isset($arr[$key])?$arr[$key]:'0'); 
         $dt = strtotime("+1 day",$dt);    
-    }    
+    }
+    echo ' x="'.esc_html(join(",", $x)).'" y="'.esc_html(join(",", $y)).'" ';
 }
 
-echo '<div class="ahb-section-container"><table id="cTable" width="100%">';
-echo '<tr><th colspan="4" style="background-color:#b0b0b0">'.__('Submission time stats (date in which the appointment request was received)','appointment-hour-booking').'</th></tr>';
-echo '<tr><th>'.__('Incoming- Yearly Stats','appointment-hour-booking').'</th><th>'.__('Incoming - Monthly Stats (lastest 12 months)','appointment-hour-booking').'</th><th>'.__('Incoming - Weekly Stats (lastest 12 weeks)','appointment-hour-booking').'</th><th>'.__('Incoming - Daily Stats (lastest 30 days)','appointment-hour-booking').'</th></tr>';
-echo '<tr><td>';
-getStatsBy($yearly_incoming);
-echo '</td><td>';
-getStatsByMonthly($monthly_incoming, true);
-echo '</td><td>';
-getStatsByWeekly($weekly_incoming, true);
-echo '</td><td>';
-getStatsByDaily($daily_incoming, true);
-echo '</td></tr>';
-echo '</table></div>';
-
-echo '<div class="ahb-section-container"><table id="cTable" width="100%">';
-echo '<tr><th colspan="4" style="background-color:#b0b0b0">'.__('Booked times stats (appointment date)','appointment-hour-booking').'</th></tr>';
-echo '<tr><th>'.__('Yearly Stats','appointment-hour-booking').'</th><th>'.__('Monthly Stats (next 12 months)','appointment-hour-booking').'</th><th>'.__('Weekly Stats (next 12 weeks)','appointment-hour-booking').'</th><th>'.__('Daily Stats(next 30 days)','appointment-hour-booking').'</th></tr>';
-echo '<tr><td>';
-getStatsBy($yearly);
-echo '</td><td>';
-getStatsByMonthly($monthly);
-echo '</td><td>';
-getStatsByWeekly($weekly);
-echo '</td><td>';
-getStatsByDaily($daily);
-echo '</td></tr>';
-echo '</table></div>';
-
-
 ?>
+<div class="ahb-statssection-header"><h2><?php esc_html_e('Submission time stats (date in which the appointment request was received)','appointment-hour-booking')?></h2></div>
+<div class="container">  
+  <div class="col4">  
+    <div class="ahb-graphs" >
+    	<div class="ahb-statssection-header">
+    		<h3><?php esc_html_e('Incoming - Monthly Stats (lastest 12 months)','appointment-hour-booking'); ?></h3>
+    	</div>
+    	<div class="ahb-statssection">
+            <canvas id="chartMonthlyIncoming" label="<?php esc_html_e('Submissions','appointment-hour-booking'); ?>" <?php (getMonthly($monthly_incoming, true)); ?> ></canvas>
+    	</div>
+    </div> 
+  </div>
+  <div class="col4">  
+    <div class="ahb-graphs" >
+    	<div class="ahb-statssection-header">
+    		<h3><?php esc_html_e('Incoming - Weekly Stats (lastest 12 weeks)','appointment-hour-booking'); ?></h3>
+    	</div>
+    	<div class="ahb-statssection">
+            <canvas id="chartWeeklyIncoming" label="<?php esc_html_e('Submissions','appointment-hour-booking'); ?>" <?php (getWeekly($weekly_incoming, true)); ?> ></canvas>
+    	</div>
+    </div> 
+  </div>
+  <div class="col4">  
+    <div class="ahb-graphs" >
+    	<div class="ahb-statssection-header">
+    		<h3><?php esc_html_e('Daily Stats(next 30 days)','appointment-hour-booking'); ?></h3>
+    	</div>
+    	<div class="ahb-statssection">
+            <canvas id="chartDailyIncoming" label="<?php esc_html_e('Submissions','appointment-hour-booking'); ?>" <?php (getDaily($daily_incoming, true)); ?>  ></canvas>
+    	</div>
+    </div> 
+  </div> 
+</div>
+
+<div class="ahb-statssection-header margin-top-15"><h2><?php esc_html_e('Booked times stats (appointment date)','appointment-hour-booking')?></h2></div>
+<div class="container">
+  <div class="col4">  
+    <div class="ahb-graphs" >
+    	<div class="ahb-statssection-header">
+    		<h3><?php esc_html_e('Monthly Stats (next 12 months)','appointment-hour-booking'); ?></h3>
+    	</div>
+    	<div class="ahb-statssection">
+            <canvas id="chartMonthly" label="<?php esc_html_e('Booked times','appointment-hour-booking'); ?>" <?php (getMonthly($monthly)); ?> ></canvas>
+    	</div>
+    </div> 
+  </div>
+  <div class="col4">  
+    <div class="ahb-graphs" >
+    	<div class="ahb-statssection-header">
+    		<h3><?php esc_html_e('Weekly Stats (next 12 weeks)','appointment-hour-booking'); ?></h3>
+    	</div>
+    	<div class="ahb-statssection">
+            <canvas id="chartWeekly" label="<?php esc_html_e('Booked times','appointment-hour-booking'); ?>" <?php (getWeekly($weekly)); ?> ></canvas>
+    	</div>
+    </div> 
+  </div>
+  <div class="col4">  
+    <div class="ahb-graphs" >
+    	<div class="ahb-statssection-header">
+    		<h3><?php esc_html_e('Daily Stats(next 30 days)','appointment-hour-booking'); ?></h3>
+    	</div>
+    	<div class="ahb-statssection">
+            <canvas id="chartDaily" label="<?php esc_html_e('Booked times','appointment-hour-booking'); ?>" <?php (getDaily($daily)); ?>  ></canvas>
+    	</div>
+    </div> 
+  </div> 
+</div>
 <style>
 #cTable th{background:#ccc}
 #cTable td{vertical-align:top}

@@ -262,3 +262,37 @@ label {font-weight:600;}
 }
 #facceptance span{padding-left: 0; padding-right:0;}
 */
+
+.ahb-graphs {
+		border: 1px solid #e6e6e6;
+		padding:0px;
+		border-radius: 3px;
+		margin:0px;
+		min-width: 200px;
+		background: #ffffff;
+		position:relative;
+}
+.container {
+    display: flex; /* Use flexbox */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+     /*  margin: -10px; Negative margin to offset padding */
+}
+.col3,.col4,.col6 {
+    padding: 0px; /* Padding around each column */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+.col3 {flex: 0 0 25%;}
+.col44 {flex: 0 0 33.33%;width:100%}
+.col4 {-webkit-box-flex:0;-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}
+.col6 {flex: 0 0 50%;}
+
+@media (max-width: 768px) {
+    .col3,.col4,.col6 {-webkit-box-flex:0;-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}
+}
+.margin-top-15{margin-top:15px}
+
+canvas {
+            min-width: 200px; /* Minimum width */
+            max-width: 100%; /* Responsive */
+            height: 200px; /* Fixed height */
+        }
