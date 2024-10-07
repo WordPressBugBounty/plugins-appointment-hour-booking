@@ -120,6 +120,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                  vs_text_quantity TEXT,
                  vs_text_cancel TEXT,
                  vs_text_cost TEXT,
+				 vs_text_nomore TEXT,
                  vs_text_nmore TEXT,
 
                  cp_user_access text,
@@ -198,6 +199,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                                       'vs_text_quantity' => $this->get_option_not_empty('vs_text_quantity', 'Quantity'),
                                       'vs_text_cancel' => $this->get_option_not_empty('vs_text_cancel', 'Cancel'),
                                       'vs_text_cost' => $this->get_option_not_empty('vs_text_cost', 'Cost'),
+									  'vs_text_nomore' => $this->get_option_not_empty('vs_text_nomore', 'No more slots available.'),
                                       'vs_text_nmore' => $this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.'),
 
                                       'rep_enable' => $this->get_option('rep_enable', 'no'),
@@ -627,8 +629,8 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
          var cp_hourbk_cancel_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_cancel', 'Cancel') ,'appointment-hour-booking')); ?>';
          var cp_hourbk_quantity_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_quantity', 'Quantity') ,'appointment-hour-booking')); ?>';
          var cp_hourbk_cost_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_cost', 'Cost') ,'appointment-hour-booking')); ?>';
-         var cp_hourbk_overlapping_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.') ,'appointment-hour-booking')); ?>';
-         var cp_hourbk_nomore_label = '<?php echo esc_js( __("No more slots available.",'appointment-hour-booking')); ?>';
+         var cp_hourbk_overlapping_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.') ,'appointment-hour-booking')); ?>';         
+		 var cp_hourbk_nomore_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nomore', 'No more slots available.'),'appointment-hour-booking')); ?>';
          var cp_hourbk_avoid_overlapping = 0;
          var apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> = false;
          function <?php echo esc_html($this->prefix); ?>_pform_doValidate<?php echo '_'.esc_html($this->print_counter); ?>(form)
@@ -2308,10 +2310,11 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
         $this->verify_nonce (sanitize_text_field($_POST["anonce"]), 'cpappb_actions_admin');
 
-        if (false == get_option('AHB_ONE_TIME_2UPDATE',false))
+        if (false == get_option('AHB_ONE_TIME_3UPDATE',false))
         {
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'fp_from_name');
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_nmore');
+			$this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_nomore');
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_cost');
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_cancel');
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_quantity');
@@ -2322,7 +2325,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'defaultpaidstatus');
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'cp_user_access_settings');
             $this->add_field_verify($wpdb->prefix.$this->table_items, 'display_emails_endtime');
-            update_option('AHB_ONE_TIME_2UPDATE',true);
+            update_option('AHB_ONE_TIME_3UPDATE',true);
         }
         $_pdata = $_POST;
         while ((substr_count($_pdata['form_structure'],"\\") > 30) || substr_count($_pdata['form_structure'],"\\\"title\\\":"))
@@ -2376,6 +2379,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                       'vs_text_quantity' => sanitize_text_field($_pdata['vs_text_quantity']),
                       'vs_text_cancel' => sanitize_text_field($_pdata['vs_text_cancel']),
                       'vs_text_cost' => sanitize_text_field($_pdata['vs_text_cost']),
+					  'vs_text_nomore' => sanitize_text_field($_pdata['vs_text_nomore']),   
                       'vs_text_nmore' => sanitize_text_field($_pdata['vs_text_nmore']),
 
                       'cp_user_access' => serialize($this->sanitize( ( isset($_pdata["cp_user_access"]) ? $_pdata["cp_user_access"] : array() ) )),

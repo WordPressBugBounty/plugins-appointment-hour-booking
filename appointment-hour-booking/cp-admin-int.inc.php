@@ -327,6 +327,12 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
              <input type="text" name="vs_text_cost" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_cost', 'Cost')); ?>" />
             </td>
             <td scope="row">
+             <strong><?php _e('"No more slots available." text','appointment-hour-booking'); ?>:</strong><br />
+             <input type="text" name="vs_text_nomore" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_nomore', 'No more slots available.')); ?>" />
+            </td>
+            </tr>  
+            <tr> 			
+            <td scope="row">
              <strong><?php _e('"Selected time is no longer available..." text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_nmore" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.')); ?>" /></td>
             </tr>              
