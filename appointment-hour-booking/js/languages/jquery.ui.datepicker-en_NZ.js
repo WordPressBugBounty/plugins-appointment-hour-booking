@@ -1,7 +1,7 @@
 /* English/NZ initialisation for the jQuery UI date picker plugin. */
 /* Based on the en-GB initialisation. */
 myjQuery = (typeof myjQuery != 'undefined' ) ? myjQuery : jQuery;myjQuery(function(){ (function($) {
-	$.datepicker.regional['en-NZ'] = {
+	$.datepicker.regional['en_NZ'] = {
 		closeText: 'Close',
 		prevText: 'Previous',
 		nextText: 'Next',

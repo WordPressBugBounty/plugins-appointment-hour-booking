@@ -1,6 +1,6 @@
 /* English/UK initialisation for the jQuery UI date picker plugin. */
 myjQuery = (typeof myjQuery != 'undefined' ) ? myjQuery : jQuery;myjQuery(function(){ (function($) {
-	$.datepicker.regional['en-GB'] = {
+	$.datepicker.regional['en_GB'] = {
 		closeText: 'Close',
 		prevText: 'Previous',
 		nextText: 'Next',
