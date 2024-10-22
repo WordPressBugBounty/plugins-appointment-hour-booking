@@ -91,7 +91,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                    <hr />
                    <table class="form-table">
                     <tr valign="top">
-                    <th scope="row"><?php _e('iCal timezone difference', 'appointment-hour-booking');  ?></th>
+                    <th scope="row"><?php esc_html_e('iCal timezone difference', 'appointment-hour-booking');  ?></th>
                     <td><select name="cal_time_zone_modify">
                           <option value="">- none -</option>
                           <?php
@@ -112,7 +112,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
 
 
                     <tr valign="top">
-                    <th scope="row"><?php _e('Include timezone ID in iCal file?', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('Include timezone ID in iCal file?', 'appointment-hour-booking'); ?></th>
                     <td><select name="cal_tzid">
                         <?php $tzone =  wp_timezone_string(); if (substr($tzone,0,1) == "+" || substr($tzone,0,1) == "-") $tzone = "GMT".$tzone; ?>
                           <option value="" <?php if ($row["cal_tzid"] == '') echo ' selected'; ?>>- No, don't include it - (select this if you are not sure)</option>
@@ -126,7 +126,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
 
 
                     <tr valign="top">
-                    <th scope="row"><?php _e('Observe daylight saving time?', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('Observe daylight saving time?', 'appointment-hour-booking'); ?></th>
                     <td><select name="observe_day_light">
                           <option value="true" <?php if ($row["observe_day_light"] == '' || $row["observe_day_light"] == 'true') echo ' selected'; ?>>Yes</option>
                           <option value="false" <?php if ($row["observe_day_light"] == 'false') echo ' selected'; ?>>No</option>
@@ -134,7 +134,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                     </td>
                     </tr>
                     <tr valign="top">
-                    <th scope="row"><?php _e('Daylight saving time zone', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('Daylight saving time zone', 'appointment-hour-booking'); ?></th>
                     <td><select name="ical_daylight_zone">
                           <option value="EUROPE" <?php if ($row["ical_daylight_zone"] == '' || $row["ical_daylight_zone"] == 'EUROPE') echo ' selected'; ?>>Europe</option>
                           <option value="USA" <?php if ($row["ical_daylight_zone"] == 'USA') echo ' selected'; ?>>USA</option>
@@ -144,7 +144,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                     </td>
                     </tr>
                     <tr valign="top">
-                    <th scope="row"><?php _e('Time conversion type', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('Time conversion type', 'appointment-hour-booking'); ?></th>
                     <td><select name="ical_uselocal">
                           <option value="0" <?php if ($row["ical_uselocal"] == '' || $row["ical_uselocal"] == '0') echo ' selected'; ?>>Automatic timezone conversion</option>
                           <option value="1" <?php if ($row["ical_uselocal"] == '1') echo ' selected'; ?>>No timezone conversion (fixed to local time)</option>
@@ -152,7 +152,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                     </td>
                     </tr>
                     <tr valign="top">
-                    <th scope="row"><?php _e('Attach iCal file to notification emails?', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('Attach iCal file to notification emails?', 'appointment-hour-booking'); ?></th>
                     <td><select name="attachical">
                           <option value="0" <?php if ($row["attachical"] == '' || $row["attachical"] == '0') echo ' selected'; ?>>No</option>
                           <option value="1" <?php if ($row["attachical"] == '1') echo ' selected'; ?>>Yes - for all emails (excluding cancelled and rejected items)</option>
@@ -163,14 +163,14 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                     </td>
                     </tr>
                     <tr valign="top">
-                    <th scope="row"><?php _e('iCal entry summary', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('iCal entry summary', 'appointment-hour-booking'); ?></th>
                     <td><textarea name="base_summary"><?php echo esc_textarea($row["base_summary"]); ?></textarea>
                          <br />
                          <em>* Note: You can get the field IDs/tags from the form builder.</em>
                     </td>
                     </tr>
                     <tr valign="top">
-                    <th scope="row"><?php _e('iCal entry description', 'appointment-hour-booking'); ?></th>
+                    <th scope="row"><?php esc_html_e('iCal entry description', 'appointment-hour-booking'); ?></th>
                     <td><textarea name="base_description"><?php echo esc_textarea($row["base_description"]); ?></textarea>
                          <br />
                          <em>* Note: You can get the field IDs/tags from the form builder.</em>

@@ -168,21 +168,21 @@ $nonce = wp_create_nonce( 'cpappb_actions_list' );
 <?php if ($current_user_access) { ?>
  <div class="ahb-section-container">
 	<div class="ahb-section">
-		<label><?php _e('New Calendar','appointment-hour-booking'); ?></label>&nbsp;&nbsp;&nbsp;
+		<label><?php esc_html_e('New Calendar','appointment-hour-booking'); ?></label>&nbsp;&nbsp;&nbsp;
 		<input type="text" name="cp_itemname" id="cp_itemname" placeholder=" - Calendar Name - " class="ahb-new-calendar" />
 		<input type="button" class="button-primary" value="Add New" onclick="cp_addItem();" />
 	</div>
 </div>
 <?php } ?>
 
-<h2><?php _e('Calendars List','appointment-hour-booking'); ?></h2>
+<h2><?php esc_html_e('Calendars List','appointment-hour-booking'); ?></h2>
 
 <div class="ahb-section-container">
 	<div class="ahb-section">
 
   <table cellspacing="10" cellpadding="6" class="ahb-calendars-list">
    <tr>
-    <th align="left"><?php _e('ID','appointment-hour-booking'); ?></th><th align="left"><?php _e('Form Name','appointment-hour-booking'); ?></th><th align="left">&nbsp; &nbsp; <?php _e('Options','appointment-hour-booking'); ?></th><th align="left"><?php _e('Shortcode for Pages and Posts','appointment-hour-booking'); ?></th>
+    <th align="left"><?php esc_html_e('ID','appointment-hour-booking'); ?></th><th align="left"><?php esc_html_e('Form Name','appointment-hour-booking'); ?></th><th align="left">&nbsp; &nbsp; <?php esc_html_e('Options','appointment-hour-booking'); ?></th><th align="left"><?php esc_html_e('Shortcode for Pages and Posts','appointment-hour-booking'); ?></th>
    </tr>
 <?php
 
@@ -202,22 +202,22 @@ $nonce = wp_create_nonce( 'cpappb_actions_list' );
 
     <td>
 <?php if ($current_user_access) { ?>
-                             <input style="margin-bottom:5px;" class="button" type="button" name="calupdate_<?php echo intval($item->id); ?>" value="<?php _e('Rename','appointment-hour-booking'); ?>" onclick="cp_updateItem(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button" type="button" name="calupdate_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Rename','appointment-hour-booking'); ?>" onclick="cp_updateItem(<?php echo intval($item->id); ?>);" />
 <?php } ?>
 <?php if ($current_user_access || @$item->cp_user_access_settings == 'true') { ?>
-                             <input style="margin-bottom:5px;" class="button-primary button" type="button" name="calmanage_<?php echo intval($item->id); ?>" value="<?php _e('Edit','appointment-hour-booking'); ?>" onclick="cp_manageSettings(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button-primary button" type="button" name="calmanage_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Edit','appointment-hour-booking'); ?>" onclick="cp_manageSettings(<?php echo intval($item->id); ?>);" />
 <?php } ?>
 <?php if ($current_user_access) { ?>
-                             <input style="margin-bottom:5px;" class="button-primary button" type="button" name="calpublish_<?php echo intval($item->id); ?>" value="<?php _e('Publish','appointment-hour-booking'); ?>" onclick="cp_publish(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button-primary button" type="button" name="calpublish_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Publish','appointment-hour-booking'); ?>" onclick="cp_publish(<?php echo intval($item->id); ?>);" />
 <?php } ?>
-                             <input style="margin-bottom:5px;" class="button-primary2 button" type="button" name="calmessages_<?php echo intval($item->id); ?>" value="<?php _e('Booking Orders','appointment-hour-booking'); ?>" onclick="cp_viewMessages(<?php echo intval($item->id); ?>);" />
-                             <input style="margin-bottom:5px;" class="button-primary2 button" type="button" name="calschedule_<?php echo intval($item->id); ?>" value="<?php _e('Schedule','appointment-hour-booking'); ?>" onclick="cp_viewSchedule(<?php echo intval($item->id); ?>);" />
-                             <input style="margin-bottom:5px;" class="button-primary3 button" type="button" name="caladdbk_<?php echo intval($item->id); ?>" value="<?php _e('Add Booking','appointment-hour-booking'); ?>" onclick="cp_addbk(<?php echo intval($item->id); ?>);" />
-                             <input style="margin-bottom:5px;" class="button-primary3 button" type="button" name="calblocktimes_<?php echo intval($item->id); ?>" value="<?php _e('Block Times','appointment-hour-booking'); ?>" onclick="cp_blocktimes(<?php echo intval($item->id); ?>);" />
-                             <input style="margin-bottom:5px;" class="button" type="button" name="calreport_<?php echo intval($item->id); ?>" value="<?php _e('Stats','appointment-hour-booking'); ?>" onclick="cp_viewReport(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button-primary2 button" type="button" name="calmessages_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Booking Orders','appointment-hour-booking'); ?>" onclick="cp_viewMessages(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button-primary2 button" type="button" name="calschedule_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Schedule','appointment-hour-booking'); ?>" onclick="cp_viewSchedule(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button-primary3 button" type="button" name="caladdbk_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Add Booking','appointment-hour-booking'); ?>" onclick="cp_addbk(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button-primary3 button" type="button" name="calblocktimes_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Block Times','appointment-hour-booking'); ?>" onclick="cp_blocktimes(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button" type="button" name="calreport_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Stats','appointment-hour-booking'); ?>" onclick="cp_viewReport(<?php echo intval($item->id); ?>);" />
 <?php if ($current_user_access) { ?>
-                             <input style="margin-bottom:5px;" class="button" type="button" name="calclone_<?php echo intval($item->id); ?>" value="<?php _e('Clone','appointment-hour-booking'); ?>" onclick="cp_cloneItem(<?php echo intval($item->id); ?>);" />
-                             <input style="margin-bottom:5px;" class="button" type="button" name="caldelete_<?php echo intval($item->id); ?>" value="<?php _e('Delete','appointment-hour-booking'); ?>" onclick="cp_deleteItem(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button" type="button" name="calclone_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Clone','appointment-hour-booking'); ?>" onclick="cp_cloneItem(<?php echo intval($item->id); ?>);" />
+                             <input style="margin-bottom:5px;" class="button" type="button" name="caldelete_<?php echo intval($item->id); ?>" value="<?php esc_html_e('Delete','appointment-hour-booking'); ?>" onclick="cp_deleteItem(<?php echo intval($item->id); ?>);" />
 <?php } ?>
     </td>
     <td class="lastcol"><nobr>[<?php echo esc_html($this->shorttag); ?> id="<?php echo intval($item->id); ?>"]<nobr></td>
@@ -260,6 +260,6 @@ $nonce = wp_create_nonce( 'cpappb_actions_list' );
 </div>
 
 
-[<a href="https://apphourbooking.dwbooster.com/contact-us" target="_blank"><?php _e('Request Custom Modifications','appointment-hour-booking'); ?></a>] | [<a href="https://wordpress.org/support/plugin/appointment-hour-booking#new-post" target="_blank"><?php _e('Free Support','appointment-hour-booking'); ?></a>] | [<a href="<?php echo esc_attr($this->plugin_URL); ?>" target="_blank"><?php _e('Help','appointment-hour-booking'); ?></a>]
+[<a href="https://apphourbooking.dwbooster.com/contact-us" target="_blank"><?php esc_html_e('Request Custom Modifications','appointment-hour-booking'); ?></a>] | [<a href="https://wordpress.org/support/plugin/appointment-hour-booking#new-post" target="_blank"><?php esc_html_e('Free Support','appointment-hour-booking'); ?></a>] | [<a href="<?php echo esc_attr($this->plugin_URL); ?>" target="_blank"><?php esc_html_e('Help','appointment-hour-booking'); ?></a>]
 </form>
 </div>

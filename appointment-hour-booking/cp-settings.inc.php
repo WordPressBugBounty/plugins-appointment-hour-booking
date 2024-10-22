@@ -120,24 +120,24 @@ jQuery(function(){
 	);
 });
 </script>
-<h1><?php _e('Appointment Hour Booking - General Settings','appointment-hour-booking'); ?></h1>
+<h1><?php esc_html_e('Appointment Hour Booking - General Settings','appointment-hour-booking'); ?></h1>
 
 <?php
     if (isset($message) && $message != '') echo "<div id='setting-error-settings_updated' class='updated'><h2>".esc_html($message)."</h2></div>";
 ?>
 <nav class="nav-tab-wrapper ahb-tab-wrapper">
-	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == '') echo ' nav-tab-active'; ?>" data-tab="1"><?php _e('Email Report Settings','appointment-hour-booking'); ?></a>
-	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'fixarea') echo ' nav-tab-active'; ?>"  data-tab="2"><?php _e('Troubleshoot Area','appointment-hour-booking'); ?></a>
-    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'csvarea') echo ' nav-tab-active'; ?>"  data-tab="5"><?php _e('CSV Settings','appointment-hour-booking'); ?></a>
-    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'schedulecalarea') echo ' nav-tab-active'; ?>"  data-tab="6"><?php _e('Schedule Calendar Contents','appointment-hour-booking'); ?></a>
-    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'miscsettings') echo ' nav-tab-active'; ?>"  data-tab="7"><?php _e('Misc Settings','appointment-hour-booking'); ?></a>
-	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'css') echo ' nav-tab-active'; ?>"  data-tab="3"><?php _e('Edit Styles','appointment-hour-booking'); ?></a>
-	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'js') echo ' nav-tab-active'; ?>"  data-tab="4"><?php _e('Edit Scripts','appointment-hour-booking'); ?></a>
+	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == '') echo ' nav-tab-active'; ?>" data-tab="1"><?php esc_html_e('Email Report Settings','appointment-hour-booking'); ?></a>
+	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'fixarea') echo ' nav-tab-active'; ?>"  data-tab="2"><?php esc_html_e('Troubleshoot Area','appointment-hour-booking'); ?></a>
+    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'csvarea') echo ' nav-tab-active'; ?>"  data-tab="5"><?php esc_html_e('CSV Settings','appointment-hour-booking'); ?></a>
+    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'schedulecalarea') echo ' nav-tab-active'; ?>"  data-tab="6"><?php esc_html_e('Schedule Calendar Contents','appointment-hour-booking'); ?></a>
+    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'miscsettings') echo ' nav-tab-active'; ?>"  data-tab="7"><?php esc_html_e('Misc Settings','appointment-hour-booking'); ?></a>
+	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'css') echo ' nav-tab-active'; ?>"  data-tab="3"><?php esc_html_e('Edit Styles','appointment-hour-booking'); ?></a>
+	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'js') echo ' nav-tab-active'; ?>"  data-tab="4"><?php esc_html_e('Edit Scripts','appointment-hour-booking'); ?></a>
 </nav>
 
 <!-- TAB 1 -->
 <div class="ahb-tab<?php if ($gotab == '') echo ' tab-active'; ?>" data-tab="1">
-	<h2><?php _e('Automatic Email Reports','appointment-hour-booking'); ?></h2>
+	<h2><?php esc_html_e('Automatic Email Reports','appointment-hour-booking'); ?></h2>
 	<p><?php _e('Automatic email reports for <b>ALL forms</b>: Send submissions in CSV format via email.','appointment-hour-booking'); ?></p>
 	<form name="updatereportsettings" action="" method="post">
      <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
@@ -145,16 +145,16 @@ jQuery(function(){
      <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
      <table class="form-table">
         <tr valign="top">
-        <td scope="row" colspan="2"><strong><?php _e('Enable Reports?','appointment-hour-booking'); ?></strong>
+        <td scope="row" colspan="2"><strong><?php esc_html_e('Enable Reports?','appointment-hour-booking'); ?></strong>
           <?php $option = get_option('cp_cpappb_rep_enable', 'no'); ?>
           <select name="cp_cpappb_rep_enable">
-           <option value="no"<?php if ($option == 'no' || $option == '') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
-           <option value="yes"<?php if ($option == 'yes') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
+           <option value="no"<?php if ($option == 'no' || $option == '') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
+           <option value="yes"<?php if ($option == 'yes') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
           </select>
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          <strong><?php _e('Send report every','appointment-hour-booking'); ?>:</strong> <input type="text" name="cp_cpappb_rep_days" size="1" value="<?php echo esc_attr(get_option('cp_cpappb_rep_days', '1')); ?>" /> <?php _e('days','appointment-hour-booking'); ?>
+          <strong><?php esc_html_e('Send report every','appointment-hour-booking'); ?>:</strong> <input type="text" name="cp_cpappb_rep_days" size="1" value="<?php echo esc_attr(get_option('cp_cpappb_rep_days', '1')); ?>" /> <?php esc_html_e('days','appointment-hour-booking'); ?>
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          <strong><?php _e('Send after this hour (server time)','appointment-hour-booking'); ?>:</strong>
+          <strong><?php esc_html_e('Send after this hour (server time)','appointment-hour-booking'); ?>:</strong>
           <select name="cp_cpappb_rep_hour">
            <?php
              $hour = get_option('cp_cpappb_rep_hour', '0');
@@ -164,43 +164,43 @@ jQuery(function(){
           </select>
         </td>
         <tr valign="top">
-        <th scope="row"><?php _e('Send email from','appointment-hour-booking'); ?></th>
+        <th scope="row"><?php esc_html_e('Send email from','appointment-hour-booking'); ?></th>
         <td><input type="text" name="cp_cpappb_fp_from_email" size="70" value="<?php echo esc_attr(get_option('cp_cpappb_fp_from_email', get_the_author_meta('user_email', get_current_user_id()) )); ?>" /></td>
         </tr>
         <tr valign="top">
-        <th scope="row"><?php _e('Send to email(s)','appointment-hour-booking'); ?></th>
+        <th scope="row"><?php esc_html_e('Send to email(s)','appointment-hour-booking'); ?></th>
         <td><input type="text" name="cp_cpappb_rep_emails" size="70" value="<?php echo esc_attr(get_option('cp_cpappb_rep_emails', '')); ?>" /></td>
         </tr>
         <tr valign="top">
-        <th scope="row"><?php _e('Email subject','appointment-hour-booking'); ?></th>
+        <th scope="row"><?php esc_html_e('Email subject','appointment-hour-booking'); ?></th>
         <td><input type="text" name="cp_cpappb_rep_subject" size="70" value="<?php echo esc_attr(get_option('cp_cpappb_rep_subject', 'Submissions report...')); ?>" /></td>
         </tr>
         <tr valign="top">
-        <th scope="row"><?php _e('Email format?','appointment-hour-booking'); ?></th>
+        <th scope="row"><?php esc_html_e('Email format?','appointment-hour-booking'); ?></th>
         <td>
           <?php $option = get_option('cp_cpappb_rep_emailformat', 'text'); ?>
           <select name="cp_cpappb_rep_emailformat">
-           <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php _e('Plain Text (default)','appointment-hour-booking'); ?></option>
-           <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php _e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
+           <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php esc_html_e('Plain Text (default)','appointment-hour-booking'); ?></option>
+           <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php esc_html_e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
           </select>
         </td>
         </tr>
         <tr valign="top">
-        <th scope="row"><?php _e('Email Text (CSV file will be attached','appointment-hour-booking'); ?>)</th>
+        <th scope="row"><?php esc_html_e('Email Text (CSV file will be attached','appointment-hour-booking'); ?>)</th>
         <td><textarea type="text" name="cp_cpappb_rep_message" rows="3" cols="80"><?php echo esc_textarea(get_option('cp_cpappb_rep_message', 'Attached you will find the data from the form submissions.')); ?></textarea></td>
         </tr>
      </table>
-     <input type="submit" value="<?php _e('Update Report Settings','appointment-hour-booking'); ?>" class="button button-primary" />
+     <input type="submit" value="<?php esc_html_e('Update Report Settings','appointment-hour-booking'); ?>" class="button button-primary" />
      </form>
      <div class="clear"></div>
-     <p><?php _e('Note: For setting up a report only for a specific form use the setting area available for that when editing each form settings','appointment-hour-booking'); ?>.</p>
+     <p><?php esc_html_e('Note: For setting up a report only for a specific form use the setting area available for that when editing each form settings','appointment-hour-booking'); ?>.</p>
 
 </div>
 
 <!-- TAB 2 -->
 <div class="ahb-tab<?php if ($gotab == 'fixarea') echo ' tab-active'; ?>" data-tab="2">
-	<h2><?php _e('Troubleshoot Area','appointment-hour-booking'); ?></h2>
-	<p><b><?php _e('Important!','appointment-hour-booking'); ?>:</b> <?php _e('Use this area only if you are experiencing conflicts with third party plugins, with the theme scripts or with the character encoding.','appointment-hour-booking'); ?></p>
+	<h2><?php esc_html_e('Troubleshoot Area','appointment-hour-booking'); ?></h2>
+	<p><b><?php esc_html_e('Important!','appointment-hour-booking'); ?>:</b> <?php esc_html_e('Use this area only if you are experiencing conflicts with third party plugins, with the theme scripts or with the character encoding.','appointment-hour-booking'); ?></p>
     <form  method="post" action="" name="cpformconf2">
         <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
         <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
@@ -209,63 +209,63 @@ jQuery(function(){
             <tbody>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Script load method','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Script load method','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="ccscriptload" name="ccscriptload">
-        <option value="0" <?php if (get_option('CP_APPB_LOAD_SCRIPTS',"1") == "1") echo 'selected'; ?>><?php _e('Classic (Recommended)','appointment-hour-booking'); ?></option>
-        <option value="1" <?php if (get_option('CP_APPB_LOAD_SCRIPTS',"1") != "1") echo 'selected'; ?>><?php _e('Direct','appointment-hour-booking'); ?></option>
+        <option value="0" <?php if (get_option('CP_APPB_LOAD_SCRIPTS',"1") == "1") echo 'selected'; ?>><?php esc_html_e('Classic (Recommended)','appointment-hour-booking'); ?></option>
+        <option value="1" <?php if (get_option('CP_APPB_LOAD_SCRIPTS',"1") != "1") echo 'selected'; ?>><?php esc_html_e('Direct','appointment-hour-booking'); ?></option>
        </select><br>
-	    				<em><?php _e('Change the script load method if the form doesn\'t appear in the public website.','appointment-hour-booking'); ?></em>
+	    				<em><?php esc_html_e('Change the script load method if the form doesn\'t appear in the public website.','appointment-hour-booking'); ?></em>
 	    			</td>
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Character encoding','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Character encoding','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="cccharsets" name="cccharsets">
-	    					<option value=""><?php _e('Keep current charset (Recommended)','appointment-hour-booking'); ?></option>
-                            <option value="utf8_general_ci">UTF-8 (<?php _e('try this first','appointment-hour-booking'); ?>)</option>
+	    					<option value=""><?php esc_html_e('Keep current charset (Recommended)','appointment-hour-booking'); ?></option>
+                            <option value="utf8_general_ci">UTF-8 (<?php esc_html_e('try this first','appointment-hour-booking'); ?>)</option>
                             <option value="latin1_swedish_ci">latin1_swedish_ci</option>
 	    				</select><br>
-	    				<em><?php _e('Update the charset if you are getting problems displaying special/non-latin characters. After updated you need to edit the special characters again.','appointment-hour-booking'); ?></em>
+	    				<em><?php esc_html_e('Update the charset if you are getting problems displaying special/non-latin characters. After updated you need to edit the special characters again.','appointment-hour-booking'); ?></em>
 	    			</td>
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Auto-fix character for CSV files?','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Auto-fix character for CSV files?','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="csvcharautofix" name="csvcharautofix">
-	    					<option <?php if (get_option('CP_APPB_CSV_CHARFIX',"") == "") echo 'selected'; ?> value=""><?php _e('Yes','appointment-hour-booking'); ?></option>
-                            <option <?php if (get_option('CP_APPB_CSV_CHARFIX',"") == "1") echo 'selected'; ?> value="1"><?php _e('No','appointment-hour-booking'); ?></option>
+	    					<option <?php if (get_option('CP_APPB_CSV_CHARFIX',"") == "") echo 'selected'; ?> value=""><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
+                            <option <?php if (get_option('CP_APPB_CSV_CHARFIX',"") == "1") echo 'selected'; ?> value="1"><?php esc_html_e('No','appointment-hour-booking'); ?></option>
 	    				</select><br>
-	    				<em><?php _e('Set to "No" if special characters appear with question marks "?" in the CSV file.','appointment-hour-booking'); ?></em>
+	    				<em><?php esc_html_e('Set to "No" if special characters appear with question marks "?" in the CSV file.','appointment-hour-booking'); ?></em>
 	    			</td>
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Field separator for CSV files?','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Field separator for CSV files?','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="csvseparator" name="csvseparator">
-	    					<option <?php if (get_option('CP_APPB_CSV_SEPARATOR',",") == ",") echo 'selected'; ?> value=","><?php _e('comma: ","','appointment-hour-booking'); ?></option>
-                            <option <?php if (get_option('CP_APPB_CSV_SEPARATOR',",") == ";") echo 'selected'; ?> value=";"><?php _e('semicolon: ";"','appointment-hour-booking'); ?></option>
+	    					<option <?php if (get_option('CP_APPB_CSV_SEPARATOR',",") == ",") echo 'selected'; ?> value=","><?php esc_html_e('comma: ","','appointment-hour-booking'); ?></option>
+                            <option <?php if (get_option('CP_APPB_CSV_SEPARATOR',",") == ";") echo 'selected'; ?> value=";"><?php esc_html_e('semicolon: ";"','appointment-hour-booking'); ?></option>
 	    				</select><br>
-	    				<em><?php _e('Change it if you get the CSV columns mixed','appointment-hour-booking'); ?></em>
+	    				<em><?php esc_html_e('Change it if you get the CSV columns mixed','appointment-hour-booking'); ?></em>
 	    			</td>
 	    		</tr>
 	    	</tbody>
 	    </table>
-	    <input type="submit" value="<?php _e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
+	    <input type="submit" value="<?php esc_html_e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
     </form>
 </div>
 
 
 <!-- TAB 5 -->
 <div class="ahb-tab<?php if ($gotab == 'csvarea') echo ' tab-active'; ?>" data-tab="5">
-	<h2><?php _e('CSV Settings Area','appointment-hour-booking'); ?></h2>
+	<h2><?php esc_html_e('CSV Settings Area','appointment-hour-booking'); ?></h2>
     <form  method="post" action="" name="cpformconf5">
         <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
         <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
@@ -274,7 +274,7 @@ jQuery(function(){
             <tbody>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Exclude fields from "Booking Orders" CSV export','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Exclude fields from "Booking Orders" CSV export','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<input name="bocsvexclude" type="text" value="<?php echo esc_attr(get_option('cp_cpappb_bocsvexclude',"")); ?>" /><br />
@@ -283,7 +283,7 @@ jQuery(function(){
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Exclude fields from "Schedule List View" CSV export','appointment-hour-booking'); ?></label>
+	    				<label><?php  esc_html_e('Exclude fields from "Schedule List View" CSV export','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<input name="schcsvexclude" type="text" value="<?php echo esc_attr(get_option('cp_cpappb_schcsvexclude',"")); ?>" /><br />
@@ -292,14 +292,14 @@ jQuery(function(){
 	    		</tr>
 	    	</tbody>
 	    </table>
-	    <input type="submit" value="<?php _e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
+	    <input type="submit" value="<?php esc_html_e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
     </form>
 </div>
 
 
 <!-- TAB 6 -->
 <div class="ahb-tab<?php if ($gotab == 'schedulecalarea') echo ' tab-active'; ?>" data-tab="6">
-	<h2><?php _e('Schedule Calendar Contents','appointment-hour-booking'); ?></h2>
+	<h2><?php esc_html_e('Schedule Calendar Contents','appointment-hour-booking'); ?></h2>
     <p>In this area you can customize the data displayed in the "<strong>Schedule Calendar View</strong>" of the dashboard accessible through the "<strong>Schedule</strong>" button in the <a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>">calendars list</a>. For the commercial version of the plugin this also allows to customize the data displayed in the schedule calendar view you can publish in the public website.</p>
 	<p>For <strong>help and more configuration options</strong> check "<a href="https://apphourbooking.dwbooster.com/blog/2018/11/01/schedule-calendar-contents-customization/" target="_blank">Customizing the schedule calendar contents and colors</a>".
 	
@@ -311,12 +311,12 @@ jQuery(function(){
             <tbody>
                 <tr valign="top">
 	    	 		<th colspan="2" style="border-top: 1px dotted black">
-	    				<label><?php _e('CONTENTS FOR CALENDAR DISPLAYED ADMIN AREA','appointment-hour-booking'); ?>:</label>
+	    				<label><?php esc_html_e('CONTENTS FOR CALENDAR DISPLAYED ADMIN AREA','appointment-hour-booking'); ?>:</label>
 	    			</th>
                 </tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Event title','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Event title','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<input name="schcaltitle_admin" type="text" value="<?php echo esc_attr(get_option('cp_cpappb_schcaltitle_admin',CP_CPAPPB_SCHCALTITLE_ADMIN)); ?>" /><br />
@@ -326,7 +326,7 @@ jQuery(function(){
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Event Content','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Event Content','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<textarea cols="80" rows="3"  name="schcalcontent_admin"><?php echo esc_textarea(get_option('cp_cpappb_schcalcontent_admin',CP_CPAPPB_SCHCALCONTENT_ADMIN)); ?></textarea><br />
@@ -336,12 +336,12 @@ jQuery(function(){
 	    		</tr>
                 <tr valign="top">
 	    	 		<th colspan="2" style="border-top: 1px dotted black">
-	    				<label><?php _e('CONTENTS FOR CALENDAR DISPLAYED PUBLIC WEBSITE','appointment-hour-booking'); ?>:</label>
+	    				<label><?php esc_html_e('CONTENTS FOR CALENDAR DISPLAYED PUBLIC WEBSITE','appointment-hour-booking'); ?>:</label>
 	    			</th>
                 </tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Event title','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Event title','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<input name="schcaltitle_public" type="text" value="<?php echo esc_attr(get_option('cp_cpappb_schcaltitle_public',CP_CPAPPB_SCHCALTITLE_PUBLIC)); ?>" /><br />
@@ -351,7 +351,7 @@ jQuery(function(){
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Event Content','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Event Content','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<textarea cols="80" rows="3" name="schcalcontent_public"><?php echo esc_textarea(get_option('cp_cpappb_schcalcontent_public',CP_CPAPPB_SCHCALCONTENT_PUBLIC)); ?></textarea><br />
@@ -361,12 +361,12 @@ jQuery(function(){
 	    		</tr>
                 <tr valign="top">
 	    	 		<th colspan="2" style="border-top: 1px dotted black">
-	    				<label><?php _e('ADVANCED SETTINGS','appointment-hour-booking'); ?>:</label>
+	    				<label><?php esc_html_e('ADVANCED SETTINGS','appointment-hour-booking'); ?>:</label>
 	    			</th>
                 </tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Include admin blocked times?','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Include admin blocked times?','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="cp_cpappb_sch_admin_blockedt" name="cp_cpappb_sch_admin_blockedt">
@@ -377,7 +377,7 @@ jQuery(function(){
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Exclude calendar from schedule contents','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Exclude calendar from schedule contents','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<input size="80" name="cp_cpappb_schcalcontent_exclude" value="<?php echo esc_attr(get_option('cp_cpappb_schcalcontent_exclude','')); ?>" /><br />
@@ -386,7 +386,7 @@ jQuery(function(){
 	    		</tr>
 	    		<tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Other parameters','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Other parameters','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
                         <textarea cols="80" rows="3" name="cp_cpappb_schcalcontent_otherparams"><?php echo esc_textarea(get_option('cp_cpappb_schcalcontent_otherparams','')); ?></textarea><br />
@@ -395,7 +395,7 @@ jQuery(function(){
 	    		</tr>
 	    	</tbody>
 	    </table>
-	    <input type="submit" value="<?php _e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
+	    <input type="submit" value="<?php esc_html_e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
     </form>
 </div>
 
@@ -403,7 +403,7 @@ jQuery(function(){
 
 <!-- TAB 6 -->
 <div class="ahb-tab<?php if ($gotab == 'miscsettings') echo ' tab-active'; ?>" data-tab="7">
-	<h2><?php _e('Misc Settings','appointment-hour-booking'); ?></h2>
+	<h2><?php esc_html_e('Misc Settings','appointment-hour-booking'); ?></h2>
     <form  method="post" action="" name="cpformconf7">
         <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
         <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
@@ -412,36 +412,36 @@ jQuery(function(){
             <tbody>
                 <tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Protect the forms against the spam bots','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Protect the forms against the spam bots','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="cp_cpappb_honeypot" name="cp_cpappb_honeypot">
-	    					<option value=""  <?php if (get_option('cp_cpappb_honeypot','') == "") echo 'selected'; ?> ><?php _e('No','appointment-hour-booking'); ?></option>
-                            <option value="Yes"  <?php if (get_option('cp_cpappb_honeypot','') != '') echo 'selected'; ?>  ><?php _e('Yes','appointment-hour-booking'); ?></option>
+	    					<option value=""  <?php if (get_option('cp_cpappb_honeypot','') == "") echo 'selected'; ?> ><?php esc_html_e('No','appointment-hour-booking'); ?></option>
+                            <option value="Yes"  <?php if (get_option('cp_cpappb_honeypot','') != '') echo 'selected'; ?>  ><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
 	    				</select>
                         <br />
-                       <?php _e('* Adds a hidden text field to the forms to trap the spam bots (honeypot feature).','appointment-hour-booking'); ?>
+                       <?php esc_html_e('* Adds a hidden text field to the forms to trap the spam bots (honeypot feature).','appointment-hour-booking'); ?>
 	    			</td>
 	    		</tr>
                 <tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Store user\'s IP address?','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Store user\'s IP address?','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="cp_cpappb_storeip" name="cp_cpappb_storeip">
-	    					<option value=""  <?php if (get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP) == "") echo 'selected'; ?> ><?php _e('No','appointment-hour-booking'); ?></option>
-                            <option value="Yes"  <?php if (get_option('cp_cpappb_storeip',CP_APPBOOK_DEFAULT_track_IP) != '') echo 'selected'; ?>  ><?php _e('Yes','appointment-hour-booking'); ?></option>
+	    					<option value=""  <?php if (get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP) == "") echo 'selected'; ?> ><?php esc_html_e('No','appointment-hour-booking'); ?></option>
+                            <option value="Yes"  <?php if (get_option('cp_cpappb_storeip',CP_APPBOOK_DEFAULT_track_IP) != '') echo 'selected'; ?>  ><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
 	    				</select>
                         <br />
 	    			</td>
 	    		</tr>
                 <tr valign="top">
 	    			<th scope="row">
-	    				<label><?php _e('Language of the dashboard area','appointment-hour-booking'); ?></label>
+	    				<label><?php esc_html_e('Language of the dashboard area','appointment-hour-booking'); ?></label>
 	    			</th>
 	    			<td>
 	    				<select id="cp_cpappb_admin_language" name="cp_cpappb_admin_language">
-	    					<option value=""  <?php if (get_option('cp_cpappb_admin_language', '') == '') echo 'selected'; ?> ><?php _e('Automatically detected from WordPress settings','appointment-hour-booking'); ?></option>
+	    					<option value=""  <?php if (get_option('cp_cpappb_admin_language', '') == '') echo 'selected'; ?> ><?php esc_html_e('Automatically detected from WordPress settings','appointment-hour-booking'); ?></option>
                             <option value="english"  <?php if (get_option('cp_cpappb_admin_language','') == 'english') echo 'selected'; ?>  >English</option>
 	    				</select>     
                         <br />                         
@@ -449,16 +449,16 @@ jQuery(function(){
 	    		</tr> 				
 	    	</tbody>
 	    </table>
-	    <input type="submit" value="<?php _e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
+	    <input type="submit" value="<?php esc_html_e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
     </form>
 </div>
 
 
 <!-- TAB 3 -->
 <div class="ahb-tab<?php if ($gotab == 'css') echo ' tab-active'; ?>" data-tab="3">
-	<h2><?php _e('Edit Styles','appointment-hour-booking'); ?></h2>
-	<p><?php _e('Use this area to add custom CSS styles. These styles will be safe even after updating the plugin.','appointment-hour-booking'); ?></p>
-    <p><?php _e('For commonly used CSS styles please check the following FAQ section:','appointment-hour-booking'); ?> <a href="https://apphourbooking.dwbooster.com/faq#design">https://apphourbooking.dwbooster.com/faq#design</a></p>
+	<h2><?php esc_html_e('Edit Styles','appointment-hour-booking'); ?></h2>
+	<p><?php esc_html_e('Use this area to add custom CSS styles. These styles will be safe even after updating the plugin.','appointment-hour-booking'); ?></p>
+    <p><?php esc_html_e('For commonly used CSS styles please check the following FAQ section:','appointment-hour-booking'); ?> <a href="https://apphourbooking.dwbooster.com/faq#design">https://apphourbooking.dwbooster.com/faq#design</a></p>
     <form method="post" action="" name="cpformconf3">
          <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
          <input name="cfwpp_edit" type="hidden" value="css" />
@@ -467,7 +467,7 @@ jQuery(function(){
 	     <div class="ahb-code-editor-container">
     	    <textarea name="editionarea" id="ahb_styles_container" style="width:100%;min-height:500px;"><?php if (get_option($cpid.'_CSS', '')) echo esc_textarea(base64_decode(get_option($cpid.'_CSS', ''))); else echo '/* Styles definition here */'; ?></textarea>
 	     </div>
-	     <input type="submit" value="<?php _e('Save Styles','appointment-hour-booking'); ?>" class="button button-primary" />
+	     <input type="submit" value="<?php esc_html_e('Save Styles','appointment-hour-booking'); ?>" class="button button-primary" />
     </form>
 
    <br /><hr /><br />
@@ -475,13 +475,13 @@ jQuery(function(){
    <div class="ahb-statssection-container" style="background:#f6f6f6;">
 	<div class="ahb-statssection-header" style="background:white;
 	padding:10px 20px;-webkit-box-shadow: 0px 2px 2px 0px rgba(100, 100, 100, 0.1);-moz-box-shadow:    0px 2px 2px 0px rgba(100, 100, 100, 0.1);box-shadow:         0px 2px 2px 0px rgba(100, 100, 100, 0.1);">
-    <h3><?php _e('Sample Styles','appointment-hour-booking'); ?>:</h3>
+    <h3><?php esc_html_e('Sample Styles','appointment-hour-booking'); ?>:</h3>
 	</div>
 	<div class="ahb-statssection">
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Make the calendar 100% width / responsive:','appointment-hour-booking'); ?>
+           <?php esc_html_e('Make the calendar 100% width / responsive:','appointment-hour-booking'); ?>
          </div>
          <div class="ahb-csssamplecode">
            #fbuilder .ui-datepicker-inline { max-width:none !important; }
@@ -490,7 +490,7 @@ jQuery(function(){
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Hide the service drop-down:','appointment-hour-booking'); ?>
+           <?php esc_html_e('Hide the service drop-down:','appointment-hour-booking'); ?>
          </div>
          <div class="ahb-csssamplecode">
            .ahbfield_service { display: none }
@@ -499,7 +499,7 @@ jQuery(function(){
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Make the send button in a hover format:','appointment-hour-booking'); ?>
+           <?php esc_html_e('Make the send button in a hover format:','appointment-hour-booking'); ?>
          </div>
          <div class="ahb-csssamplecode">
            .pbSubmit:hover {
@@ -511,7 +511,7 @@ jQuery(function(){
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Change the color of all form field labels:','appointment-hour-booking'); ?>
+           <?php esc_html_e('Change the color of all form field labels:','appointment-hour-booking'); ?>
          </div>
          <div class="ahb-csssamplecode">
            #fbuilder, #fbuilder label, #fbuilder span { color: #00f; }
@@ -520,7 +520,7 @@ jQuery(function(){
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Change color of fonts into all fields','appointment-hour-booking'); ?>:
+           <?php esc_html_e('Change color of fonts into all fields','appointment-hour-booking'); ?>:
          </div>
          <div class="ahb-csssamplecode">
            #fbuilder input[type=text],
@@ -533,7 +533,7 @@ jQuery(function(){
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Change the calendar header color:','appointment-hour-booking'); ?>
+           <?php esc_html_e('Change the calendar header color:','appointment-hour-booking'); ?>
          </div>
          <div class="ahb-csssamplecode">
            #fbuilder .ui-datepicker-header { background:#6cc72b ; color:#444; text-shadow:none; }
@@ -542,10 +542,10 @@ jQuery(function(){
 
         <div class="ahb-csssample">
          <div class="ahb-csssampleheader">
-           <?php _e('Other styles:','appointment-hour-booking'); ?>
+           <?php esc_html_e('Other styles:','appointment-hour-booking'); ?>
          </div>
          <div class="ahb-csssamplecode">
-           <?php _e('For other styles check the design section in the FAQ:','appointment-hour-booking'); ?> <a href="https://apphourbooking.dwbooster.com/faq#design">https://apphourbooking.dwbooster.com/faq#design</a>
+           <?php esc_html_e('For other styles check the design section in the FAQ:','appointment-hour-booking'); ?> <a href="https://apphourbooking.dwbooster.com/faq#design">https://apphourbooking.dwbooster.com/faq#design</a>
          </div>
         </div>
 
@@ -556,8 +556,8 @@ jQuery(function(){
 
 <!-- TAB 4 -->
 <div class="ahb-tab<?php if ($gotab == 'js') echo ' tab-active'; ?>" data-tab="4">
-	<h2><?php _e('Edit Scripts','appointment-hour-booking'); ?></h2>
-	<p><?php _e('Use this area to add custom scripts. These scripts will be safe even after updating the plugin.','appointment-hour-booking'); ?></p>
+	<h2><?php esc_html_e('Edit Scripts','appointment-hour-booking'); ?></h2>
+	<p><?php esc_html_e('Use this area to add custom scripts. These scripts will be safe even after updating the plugin.','appointment-hour-booking'); ?></p>
     <form method="post" action="" name="cpformconf4">
          <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
          <input name="cfwpp_edit" type="hidden" value="js" />
@@ -566,6 +566,6 @@ jQuery(function(){
 	     <div class="ahb-code-editor-container">
 		     <textarea name="editionarea" id="ahb_javascript_container" style="width:100%;min-height:500px;"><?php  if (get_option($cpid.'_JS', '')) echo esc_textarea(base64_decode(get_option($cpid.'_JS', ''))); else echo '// Javascript code here'; ?></textarea>
 	     </div>
-	     <input type="submit" value="<?php _e('Save Scripts','appointment-hour-booking'); ?>" class="button button-primary" />
+	     <input type="submit" value="<?php esc_html_e('Save Scripts','appointment-hour-booking'); ?>" class="button button-primary" />
      </form>
 </div>

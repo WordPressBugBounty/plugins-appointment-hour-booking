@@ -50,10 +50,10 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 </style>
 <div class="wrap">
 
-<h1><?php _e('Block Times','appointment-hour-booking'); ?></h1>
+<h1><?php esc_html_e('Block Times','appointment-hour-booking'); ?></h1>
 
 <div class="ahb-buttons-container">
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
     <div class="clear"></div>
 </div>
 
@@ -62,18 +62,18 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 	<div class="ahb-breadcrumb">
 		<div class="ahb-step<?php if (!$opensecond) { ?> ahb-step-active<?php } ?>" data-step="1">
 			<i>A</i>
-			<label><?php _e('Single - Block Existing Time-slot','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Single - Block Existing Time-slot','appointment-hour-booking'); ?></label>
 		</div>
 		<div class="ahb-step<?php if ($opensecond) { ?> ahb-step-active<?php } ?>" data-step="2">
 			<i>B</i>
-			<label><?php _e('Multiple - Block time range','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Multiple - Block time range','appointment-hour-booking'); ?></label>
 		</div>
 	</div>
 
     <div class="ahb-adintsection<?php if (!$opensecond) { ?> ahb-adintsection-active"<?php } ?> data-step="1">
        <div class="inside"> 
 	   
-            <p><?php _e('This page is for <strong>blocking some of the available times</strong>. For services with multiple capacity be sure to select the "quantity" to be blocked.','appointment-hour-booking'); ?> <?php _e('To un-block times, delete the "blocked" entry from the','appointment-hour-booking'); ?> <a href="?page=<?php echo esc_attr($this->menu_parameter.'&cal='.$this->item); ?>&list=1"><?php _e('booking orders list','appointment-hour-booking'); ?></a>.</p> </p>
+            <p><?php _e('This page is for <strong>blocking some of the available times</strong>. For services with multiple capacity be sure to select the "quantity" to be blocked.','appointment-hour-booking'); ?> <?php esc_html_e('To un-block times, delete the "blocked" entry from the','appointment-hour-booking'); ?> <a href="?page=<?php echo esc_attr($this->menu_parameter.'&cal='.$this->item); ?>&list=1"><?php esc_html_e('booking orders list','appointment-hour-booking'); ?></a>.</p> </p>
             
             
             <p><?php _e('If you want to block complete dates please use instead the <a href="https://apphourbooking.dwbooster.com/customdownloads/invalid-dates.png" target="_blank">invalid dates feature</a>.','appointment-hour-booking'); ?></p>
@@ -96,9 +96,9 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
         <form class="cpp_form" name="cp_appbooking_pform_2" id="cp_appbooking_pform_2" action="" method="post" enctype="multipart/form-data" onsubmit="return validateblockedmultiple();">
         <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
         <input type="hidden" name="<?php echo esc_attr($this->prefix); ?>_blockmultiple" value="1" />
-        <strong><?php _e('Booking Form','appointment-hour-booking'); ?>:</strong><br />
+        <strong><?php esc_html_e('Booking Form','appointment-hour-booking'); ?>:</strong><br />
         <select name="selectedcalendar[]" id="selectedcalendar" multiple required>
-         <!--<option value="0">[<?php _e('ALL BOOKING FORMS','appointment-hour-booking'); ?>]</option>-->
+         <!--<option value="0">[<?php esc_html_e('ALL BOOKING FORMS','appointment-hour-booking'); ?>]</option>-->
               <?php
                 $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );                                                                     
                 foreach ($myrows as $item)     
@@ -107,14 +107,14 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
                         echo '<option value="'.intval($item->id).'"'.(!empty($selected) && is_array($selected) && in_array($item->id,$selected)?' selected':'').'>'.esc_html($item->form_name).'</option>';
                     }
               ?>                          
-        </select><br /><em><?php _e('CTRL+click to mark multiple','appointment-hour-booking'); ?></em><br /><br />
+        </select><br /><em><?php esc_html_e('CTRL+click to mark multiple','appointment-hour-booking'); ?></em><br /><br />
         
-        <strong><?php _e('Date','appointment-hour-booking'); ?>:</strong><br />
+        <strong><?php esc_html_e('Date','appointment-hour-booking'); ?>:</strong><br />
         <div id="ahb_bt_datepicker"></div>
-        <em><?php _e('You can select multiple dates','appointment-hour-booking'); ?></em>
+        <em><?php esc_html_e('You can select multiple dates','appointment-hour-booking'); ?></em>
         <input autocomplete="off" type="hidden" id="bdate" name="bdate" required value="" ><br /><br />
         
-        <strong><?php _e('Start time','appointment-hour-booking'); ?>:</strong><br />
+        <strong><?php esc_html_e('Start time','appointment-hour-booking'); ?>:</strong><br />
         <select name="h1"><?php
             for ($i=0;$i<24;$i++)
             {
@@ -128,7 +128,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             ?></select>
         <!--<input type="text" name="starttime" value="08:00" required>--><br /><br />
         
-        <strong><?php _e('End time','appointment-hour-booking'); ?>:</strong><br />
+        <strong><?php esc_html_e('End time','appointment-hour-booking'); ?>:</strong><br />
         <select name="h2"><?php
             for ($i=0;$i<24;$i++)
             {
@@ -141,7 +141,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             }
             ?></select><!--<input type="text" name="endtime" value="17:00" required>--><br /><br />
         
-        <input type="submit" value="<?php _e('Block time','appointment-hour-booking'); ?>" />
+        <input type="submit" value="<?php esc_html_e('Block time','appointment-hour-booking'); ?>" />
         </form>
         
          

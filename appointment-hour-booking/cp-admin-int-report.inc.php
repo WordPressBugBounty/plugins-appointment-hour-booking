@@ -268,7 +268,7 @@ else
           foreach ($arr as $item => $value)
           {
               echo esc_html($value.' times: '.(strlen($item)>50?substr($item,1,50).'...':substr($item,1)));
-              echo '<div style="width:'.round($value/$total*100).'%;border:1px solid white;margin-bottom:3px;font-size:9px;text-align:center;font-weight:bold;background-color:#'.$color_array[$count].'">'.round($value/$total*100,2).'%</div>';
+              echo '<div style="width:'.esc_html(round($value/$total*100)).'%;border:1px solid white;margin-bottom:3px;font-size:9px;text-align:center;font-weight:bold;background-color:#'.esc_html($color_array[$count]).'">'.esc_html(round($value/$total*100,2)).'%</div>';
               $count++;
               if ($count >= count($color_array)) $count = count($color_array)-1;
           }

@@ -180,10 +180,10 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
  }
 </script>
 
-<h1><?php _e('Booking Orders','appointment-hour-booking'); ?> - <?php if ($this->item != 0) echo esc_html($myform[0]->form_name); else echo 'All forms'; ?></h1>
+<h1><?php esc_html_e('Booking Orders','appointment-hour-booking'); ?> - <?php if ($this->item != 0) echo esc_html($myform[0]->form_name); else echo 'All forms'; ?></h1>
 
 <div class="ahb-buttons-container">
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
 	<div class="clear"></div>
 </div>
 
@@ -194,11 +194,11 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
         <input type="hidden" name="cal" value="<?php echo esc_attr($this->item); ?>" />
         <input type="hidden" name="list" value="1" />
         <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
-		<nobr><label><?php _e('Search for','appointment-hour-booking'); ?>:</label> <input type="text" name="search" value="<?php echo esc_attr((!empty($_GET["search"])?sanitize_text_field($_GET["search"]):'')); ?>">&nbsp;&nbsp;</nobr>
-		<nobr><label><?php _e('From','appointment-hour-booking'); ?>:</label> <input autocomplete="off" type="text" id="dfrom" name="dfrom" value="<?php echo esc_attr((!empty($_GET["dfrom"])?sanitize_text_field($_GET["dfrom"]):'')); ?>" >&nbsp;&nbsp;</nobr>
-		<nobr><label><?php _e('To','appointment-hour-booking'); ?>:</label> <input autocomplete="off" type="text" id="dto" name="dto" value="<?php echo esc_attr((!empty($_GET["dto"])?sanitize_text_field($_GET["dto"]):'')); ?>" >&nbsp;&nbsp;</nobr>
-		<nobr><label><?php _e('Item','appointment-hour-booking'); ?>:</label> <select id="cal" name="cal">
-          <?php if ($current_user_access) { ?> <option value="0">[<?php _e('All Items','appointment-hour-booking'); ?>]</option><?php } ?>
+		<nobr><label><?php esc_html_e('Search for','appointment-hour-booking'); ?>:</label> <input type="text" name="search" value="<?php echo esc_attr((!empty($_GET["search"])?sanitize_text_field($_GET["search"]):'')); ?>">&nbsp;&nbsp;</nobr>
+		<nobr><label><?php esc_html_e('From','appointment-hour-booking'); ?>:</label> <input autocomplete="off" type="text" id="dfrom" name="dfrom" value="<?php echo esc_attr((!empty($_GET["dfrom"])?sanitize_text_field($_GET["dfrom"]):'')); ?>" >&nbsp;&nbsp;</nobr>
+		<nobr><label><?php esc_html_e('To','appointment-hour-booking'); ?>:</label> <input autocomplete="off" type="text" id="dto" name="dto" value="<?php echo esc_attr((!empty($_GET["dto"])?sanitize_text_field($_GET["dto"]):'')); ?>" >&nbsp;&nbsp;</nobr>
+		<nobr><label><?php esc_html_e('Item','appointment-hour-booking'); ?>:</label> <select id="cal" name="cal">
+          <?php if ($current_user_access) { ?> <option value="0">[<?php esc_html_e('All Items','appointment-hour-booking'); ?>]</option><?php } ?>
    <?php
     $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
     $saved_id = $this->item;
@@ -213,8 +213,8 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
     </select></nobr>
        <div style="float:right;margin-top:3px;">
 		<nobr>
-            <input type="submit" name="ds" value="<?php _e('Filter','appointment-hour-booking'); ?>" class="button-primary button" style="">
-			<input type="submit" name="<?php echo esc_attr($this->prefix); ?>_csv1" value="<?php _e('Export to CSV','appointment-hour-booking'); ?>" class="button" style="margin-left:10px;">
+            <input type="submit" name="ds" value="<?php esc_html_e('Filter','appointment-hour-booking'); ?>" class="button-primary button" style="">
+			<input type="submit" name="<?php echo esc_attr($this->prefix); ?>_csv1" value="<?php esc_html_e('Export to CSV','appointment-hour-booking'); ?>" class="button" style="margin-left:10px;">
 		</nobr>
        </div>
       </form>
@@ -235,8 +235,8 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
     'end_size'     => 1,
     'mid_size'     => 2,
     'prev_next'    => True,
-    'prev_text'    => esc_html(__('&laquo; Previous')),
-    'next_text'    => esc_html(__('Next &raquo;')),
+    'prev_text'    => esc_html(__('&laquo; Previous', 'appointment-hour-booking')),
+    'next_text'    => esc_html(__('Next &raquo;', 'appointment-hour-booking')),
     'type'         => 'plain',
     'add_args'     => False
     ) );
@@ -257,12 +257,12 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 	<thead>
 	<tr>
       <th width="10"><input type="checkbox" name="cpcontrolck" id="cpcontrolck" value="" onclick="cp_markall();"></th>
-      <th width="30"><?php _e('ID','appointment-hour-booking'); ?></th>
-	  <th style="text-align:left" width="130"><?php _e('Submission Date','appointment-hour-booking'); ?></th>
-	  <th style="text-align:left"><?php _e('Email','appointment-hour-booking'); ?></th>
-	  <th style="text-align:left"><?php _e('Message','appointment-hour-booking'); ?></th>
-      <th width="130"><?php _e('Paid Status','appointment-hour-booking'); ?></th>
-	  <th  class="cpnopr"><?php _e('Options','appointment-hour-booking'); ?></th>
+      <th width="30"><?php esc_html_e('ID','appointment-hour-booking'); ?></th>
+	  <th style="text-align:left" width="130"><?php esc_html_e('Submission Date','appointment-hour-booking'); ?></th>
+	  <th style="text-align:left"><?php esc_html_e('Email','appointment-hour-booking'); ?></th>
+	  <th style="text-align:left"><?php esc_html_e('Message','appointment-hour-booking'); ?></th>
+      <th width="130"><?php esc_html_e('Paid Status','appointment-hour-booking'); ?></th>
+	  <th  class="cpnopr"><?php esc_html_e('Options','appointment-hour-booking'); ?></th>
 	</tr>
 	</thead>
 	<tbody id="the-list">
@@ -289,7 +289,7 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 		<td><?php echo esc_html($this->format_date(substr($events[$i]->time,0,16)).date(" H:i",strtotime($events[$i]->time))); ?></td>
 		<td><?php echo esc_html(sanitize_email($events[$i]->notifyto)); ?></td>
 		<td><?php
-            if ( $cancelled && $cancelled != count( $posted_data["apps"] ) ) echo '<div style="color:#ff0000;font-weight:bold;">* '.__('Contains','appointment-hour-booking').' '.$cancelled.' '.__('non-approved or cancelled dates','appointment-hour-booking').'. <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&schedule=1">'.__('See details in schedule','appointment-hour-booking').'</a>.</div>';
+            if ( $cancelled && $cancelled != count( $posted_data["apps"] ) ) echo '<div style="color:#ff0000;font-weight:bold;">* '.esc_html(__('Contains','appointment-hour-booking')).' '.esc_html($cancelled).' '.esc_html(__('non-approved or cancelled dates','appointment-hour-booking')).'. <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&schedule=1">'.esc_html(__('See details in schedule','appointment-hour-booking')).'</a>.</div>';
           ?><?php
 		        $data = str_replace("\n","<br />",str_replace('<','&lt;',$events[$i]->data));
 		        foreach ($posted_data as $item => $value)
@@ -303,11 +303,11 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 		    ?></td>
         <td align="center"><?php echo '<span style="color:#006799;font-weight:bold;">'.(!empty($posted_data["paid"]) && $posted_data["paid"]=='1'?esc_html(__('Paid','appointment-hour-booking')).'</span><br /><em class="cpappsoft">'.esc_html($posted_data["payment_type"]):'').'</em>'; ?></td>
 		<td class="cpnopr" style="text-align:center;">
-          <input class="button ahbsbutton" type="button" name="caldelete_<?php echo intval($events[$i]->id); ?>" value="<?php _e('Toggle Payment','appointment-hour-booking'); ?>" onclick="cp_updateMessageItem(<?php echo intval($events[$i]->id); ?>,<?php echo (!empty($posted_data["paid"]) && $posted_data["paid"]?'0':'1'); ?>);" />
-		  <input class="button ahbsbutton" type="button" name="calresend_<?php echo intval($events[$i]->id); ?>" value="<?php _e('Resend Emails','appointment-hour-booking'); ?>" onclick="cp_resendMessageItem(<?php echo intval($events[$i]->id); ?>);" />
-		  <input class="button ahbsbutton" type="button" name="caldelete_<?php echo intval($events[$i]->id); ?>" value="<?php _e('Delete','appointment-hour-booking'); ?>" onclick="cp_deleteMessageItem(<?php echo intval($events[$i]->id); ?>);" />
+          <input class="button ahbsbutton" type="button" name="caldelete_<?php echo intval($events[$i]->id); ?>" value="<?php esc_html_e('Toggle Payment','appointment-hour-booking'); ?>" onclick="cp_updateMessageItem(<?php echo intval($events[$i]->id); ?>,<?php echo (!empty($posted_data["paid"]) && $posted_data["paid"]?'0':'1'); ?>);" />
+		  <input class="button ahbsbutton" type="button" name="calresend_<?php echo intval($events[$i]->id); ?>" value="<?php esc_html_e('Resend Emails','appointment-hour-booking'); ?>" onclick="cp_resendMessageItem(<?php echo intval($events[$i]->id); ?>);" />
+		  <input class="button ahbsbutton" type="button" name="caldelete_<?php echo intval($events[$i]->id); ?>" value="<?php esc_html_e('Delete','appointment-hour-booking'); ?>" onclick="cp_deleteMessageItem(<?php echo intval($events[$i]->id); ?>);" />
           <hr />
-          <nobr><?php $this->render_status_box('sb'.intval($events[$i]->id), $status); ?><input class="button" type="button" name="calups_<?php echo intval($events[$i]->id); ?>" value="<?php _e('Update Status','appointment-hour-booking'); ?>" onclick="cp_UpsItem(<?php echo intval($events[$i]->id); ?>);" /></nobr>
+          <nobr><?php $this->render_status_box('sb'.intval($events[$i]->id), $status); ?><input class="button" type="button" name="calups_<?php echo intval($events[$i]->id); ?>" value="<?php esc_html_e('Update Status','appointment-hour-booking'); ?>" onclick="cp_UpsItem(<?php echo intval($events[$i]->id); ?>);" /></nobr>
 		</td>
       </tr>
      <?php } ?>
@@ -319,7 +319,7 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 
 <div class="ahb-buttons-container">
     <input type="button" value="Print" class="button button-primary" onclick="do_dexapp_print();" />
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
 	<div class="clear"></div>
 </div>
 
@@ -328,7 +328,7 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 <div class="ahb-section-container"  style="background-color:#ffffee;">   
 	<div class="ahb-section">
       <?php $this->render_status_box('statusbox_markeditems', ''); ?>
-      <input style="float:none" class="button" type="button" name="pbutton" value="<?php _e('Change status of marked items','appointment-hour-booking'); ?>" onclick="cp_statusmarked();" />
+      <input style="float:none" class="button" type="button" name="pbutton" value="<?php esc_html_e('Change status of marked items','appointment-hour-booking'); ?>" onclick="cp_statusmarked();" />
     </div>  
 </div>    
 <div style="clear:both"></div>
@@ -336,8 +336,8 @@ echo paginate_links(  array(        // phpcs:ignore WordPress.Security.EscapeOut
 <div style="clear:both"></div>
 <div class="ahb-section-container" style="background-color:#ffcccc;">   
 	<div class="ahb-section">
-      <input style="margin-right:40px;" class="button" type="button" name="pbutton" value="<?php _e('Delete marked items','appointment-hour-booking'); ?>" onclick="cp_deletemarked();" /> 
-      <input class="button" type="button" name="pbutton" value="<?php _e('Delete All Bookings','appointment-hour-booking'); ?>" onclick="cp_deleteall();" />
+      <input style="margin-right:40px;" class="button" type="button" name="pbutton" value="<?php esc_html_e('Delete marked items','appointment-hour-booking'); ?>" onclick="cp_deletemarked();" /> 
+      <input class="button" type="button" name="pbutton" value="<?php esc_html_e('Delete All Bookings','appointment-hour-booking'); ?>" onclick="cp_deleteall();" />
       <div style="clear:both"></div>
     </div>  
 </div>   

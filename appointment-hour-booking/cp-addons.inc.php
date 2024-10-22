@@ -150,7 +150,7 @@ a.addonshelp:hover { text-decoration: none; color: #0000ff; }
  ?>
 
 <div class="ahb-buttons-container">
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
 	<div class="clear"></div>
 </div>
 
@@ -190,7 +190,7 @@ foreach ($newlist as $category => $cpappb_addons_objs_list_sublist)
 ?>
 
 
-<?php if (!$printedmsg && $is_commercial) { $printedmsg = true; ?><h2><?php _e('The following Add Ons are included in the commercial versions of the plugin:','appointment-hour-booking'); ?></h2><?php } ?>
+<?php if (!$printedmsg && $is_commercial) { $printedmsg = true; ?><h2><?php esc_html_e('The following Add Ons are included in the commercial versions of the plugin:','appointment-hour-booking'); ?></h2><?php } ?>
 
 <div class="ahb-addons-container">
    <?php if ($is_commercial) { ?><div class="ribbon"><span>Upgrade</span></div><?php } ?>

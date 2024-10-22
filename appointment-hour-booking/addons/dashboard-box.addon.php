@@ -35,27 +35,27 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 					<div class="inside">
 						<table cellspacing="0" style="width:100%;">
 							<tr>
-								<td style="white-space:nowrap;width:200px;" valign="top"><?php _e('Maximum items listed', 'appointment-hour-booking');?>:</td>
+								<td style="white-space:nowrap;width:200px;" valign="top"><?php esc_html_e('Maximum items listed', 'appointment-hour-booking');?>:</td>
 								<td>
 									<input type="text" name="cpappb_dashboard_maxitems" value="<?php echo esc_attr(( ( $key = get_option( 'cpappb_dashboard_maxitems' ) ) !== false ) ? $key : '10'); ?>"   size="10" />
 								</td>
 							</tr>
 							<tr>
-								<td style="white-space:nowrap;width:200px;" valign="top"><?php _e('Columns', 'appointment-hour-booking');?>:</td>
+								<td style="white-space:nowrap;width:200px;" valign="top"><?php esc_html_e('Columns', 'appointment-hour-booking');?>:</td>
 								<td>
 									<input type="text" name="cpappb_dashboard_columns" value="<?php echo esc_attr(( ( $key = get_option( 'cpappb_dashboard_columns' ) ) !== false ) ? $key : 'TIME,SERVICE,data'); ?>"  style="width:80%;" /><br />
                                     <em><?php print esc_html(__('Sample column names', 'appointment-hour-booking')); ?>: final_price,formname,...<a href="https://apphourbooking.dwbooster.com/faq#q507" target="_blank"><?php print esc_html(__('Click for more info about supported column names', 'appointment-hour-booking')); ?></a>.</em>
 								</td>
 							</tr>
                             <tr>
-								<td style="white-space:nowrap;width:200px;" valign="top"><?php _e('Column labels', 'appointment-hour-booking');?>:</td>
+								<td style="white-space:nowrap;width:200px;" valign="top"><?php esc_html_e('Column labels', 'appointment-hour-booking');?>:</td>
 								<td>
 									<input type="text" name="cpappb_dashboard_columnlabels" value="<?php echo esc_attr(( ( $key = get_option( 'cpappb_dashboard_columnlabels' ) ) !== false ) ? $key : 'Time,Service,Data'); ?>"  style="width:80%;" /><br />
                                     <em><?php print esc_html(__('Visual column names at the top of the table', 'appointment-hour-booking')); ?>.</em>
 								</td>
 							</tr>
 						</table>
-						<input type="submit" name="subbtnds" value="<?php _e('Save settings', 'appointment-hour-booking');?>" />
+						<input type="submit" name="subbtnds" value="<?php esc_html_e('Save settings', 'appointment-hour-booking');?>" />
 					</div>
 					<input type="hidden" name="cpappb_dashboard" value="1" />
 					<input type="hidden" name="_cpappb_nonce_dashboard" value="<?php echo esc_attr(wp_create_nonce( 'session_id_ds_'.session_id() )); ?>" />

@@ -471,7 +471,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                         if ( is_admin() && $this->check_current_user_access( intval( $selection[$i][9] ) ) )
                         {
                             echo '<div style="width:100px; zoom:75%; overflow:none">';                            
-                            ?><div style="clear:both;"><nobr><?php $this->render_status_box('sb'.intval($selection[$i][12]).'_'.intval($selection[$i][8]), $selection[$i][6]); ?><br><input style="float:left" class="button" type="button" name="calups_<?php echo intval($selection[$i][12]); ?>" value="<?php _e('Update Status','appointment-hour-booking'); ?>" onclick="cp_UpsItem(<?php echo intval($selection[$i][12]); ?>,<?php echo intval($selection[$i][8]); ?>);" /></nobr></div><?php
+                            ?><div style="clear:both;"><nobr><?php $this->render_status_box('sb'.intval($selection[$i][12]).'_'.intval($selection[$i][8]), $selection[$i][6]); ?><br><input style="float:left" class="button" type="button" name="calups_<?php echo intval($selection[$i][12]); ?>" value="<?php esc_html_e('Update Status','appointment-hour-booking'); ?>" onclick="cp_UpsItem(<?php echo intval($selection[$i][12]); ?>,<?php echo intval($selection[$i][8]); ?>);" /></nobr></div><?php
                             echo '</div>';
                         }
                         else
@@ -1178,7 +1178,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         {
             $this->verify_nonce ( sanitize_text_field($_POST["anonce"]), 'cpappb_actions_pwizard');
             $shortcode = '[CP_APP_HOUR_BOOKING  id="'.$this->item .'"]';
-            $this->postURL = $this->publish_on($this->sanitize(@$_POST["whereto"]), $this->sanitize(@$_POST["publishpage"]), $this->sanitize(@$_POST["publishpost"]), $shortcode, $this->sanitize(@$_POST["posttitle"])); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $this->postURL = $this->publish_on($this->sanitize( (isset($_POST["whereto"]) ? $_POST["whereto"] : '') ), $this->sanitize( (isset($_POST["publishpage"]) ? $_POST["publishpage"] : '') ), $this->sanitize( (isset($_POST["publishpost"]) ? $_POST["publishpost"] : '') ), $shortcode, $this->sanitize( (isset($_POST["posttitle"]) ? $_POST["posttitle"] : '' ) )); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             return;
         }
 

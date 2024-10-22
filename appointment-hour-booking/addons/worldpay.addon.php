@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_WorldPay' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for WorldPay payments", 'cpabc' );
+			$this->description = __("The add-on adds support for WorldPay payments", 'appointment-hour-booking' );
 
         } // End __construct
 

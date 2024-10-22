@@ -49,7 +49,7 @@ if (!class_exists('CP_cpappbk_Elementor'))
       function register_widget_category( $elements_manager ) {
           $elements_manager->add_category(
                                           'codepeople-widgets', array(
-                                          'title' => __('CodePeople', 'codepeople-builder'),
+                                          'title' => __('CodePeople', 'appointment-hour-booking'),
                                           'icon' => 'fa fa-calendar',
                                           ));
       }

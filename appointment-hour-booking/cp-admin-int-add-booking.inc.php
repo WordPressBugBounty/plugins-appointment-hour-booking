@@ -29,14 +29,14 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 </style>
 <div class="wrap">
 
-<h1><?php _e('Add Booking','appointment-hour-booking'); ?></h1>
+<h1><?php esc_html_e('Add Booking','appointment-hour-booking'); ?></h1>
 
 <div class="ahb-buttons-container">
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
     <div class="clear"></div>
 </div>
 
-<p><?php _e('This page is for adding bookings from the administration area. The captcha and payment process are disabled in order to allow the website manager easily adding bookings.','appointment-hour-booking'); ?></p>
+<p><?php esc_html_e('This page is for adding bookings from the administration area. The captcha and payment process are disabled in order to allow the website manager easily adding bookings.','appointment-hour-booking'); ?></p>
 
 <script>var cpapphourbk_in_admin=true;</script>
 

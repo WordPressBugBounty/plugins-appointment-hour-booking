@@ -62,7 +62,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 
 </script>
 <div class="wrap">
-<h1><?php _e('Edit','appointment-hour-booking'); ?> - <?php echo esc_html($this->get_option('form_name','Calendar')); ?></h1>
+<h1><?php esc_html_e('Edit','appointment-hour-booking'); ?> - <?php echo esc_html($this->get_option('form_name','Calendar')); ?></h1>
 
 
 <form method="post" action="" name="cpformconf">
@@ -72,8 +72,8 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 <input type="hidden" name="templates" id="templates" value="<?php echo esc_attr( json_encode( $this->available_templates() ) ); ?>" />
 
 <div id="topadminsection"  class="ahb-buttons-container">
-	<input type="submit" class="button button-primary ahb-save-btn" name="savereturn" value="<?php _e('Save Changes and Return','appointment-hour-booking'); ?>"  />
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<input type="submit" class="button button-primary ahb-save-btn" name="savereturn" value="<?php esc_html_e('Save Changes and Return','appointment-hour-booking'); ?>"  />
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
 	<div class="clear"></div>
 </div>
 
@@ -81,27 +81,27 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 	<div class="ahb-breadcrumb">
 		<div class="ahb-step ahb-step-active" data-step="1">
 			<i>1</i>
-			<label><?php _e('Editor','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Editor','appointment-hour-booking'); ?></label>
 		</div>
 		<div class="ahb-step" data-step="2">
 			<i>2</i>
-			<label><?php _e('General Settings','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('General Settings','appointment-hour-booking'); ?></label>
 		</div>
 		<div class="ahb-step" data-step="3">
 			<i>3</i>
-			<label><?php _e('Notification Emails','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Notification Emails','appointment-hour-booking'); ?></label>
 		</div>
 		<div class="ahb-step" data-step="4">
 			<i>4</i>
-			<label><?php _e('Antispam','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Antispam','appointment-hour-booking'); ?></label>
 		</div>
 		<div class="ahb-step" data-step="5">
 			<i>5</i>
-			<label><?php _e('Reports','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Reports','appointment-hour-booking'); ?></label>
 		</div>
         <div class="ahb-step" data-step="6">
 			<i>6</i>
-			<label><?php _e('Add Ons','appointment-hour-booking'); ?></label>
+			<label><?php esc_html_e('Add Ons','appointment-hour-booking'); ?></label>
 		</div>
 	</div>
 
@@ -183,9 +183,9 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
              <div class="column width50 ctrlsColumn">
                  <div id="tabs">
          			<ul>
-         				<li><a href="#cptabs-1"><?php _e('Add a Field','appointment-hour-booking'); ?></a></li>
-         				<li><a href="#cptabs-2"><?php _e('Field Settings','appointment-hour-booking'); ?></a></li>
-         				<li><a href="#cptabs-3"><?php _e('Form Settings','appointment-hour-booking'); ?></a></li>
+         				<li><a href="#cptabs-1"><?php esc_html_e('Add a Field','appointment-hour-booking'); ?></a></li>
+         				<li><a href="#cptabs-2"><?php esc_html_e('Field Settings','appointment-hour-booking'); ?></a></li>
+         				<li><a href="#cptabs-3"><?php esc_html_e('Form Settings','appointment-hour-booking'); ?></a></li>
          			</ul>
          			<div id="cptabs-1"></div>
          			<div id="cptabs-2"></div>
@@ -202,13 +202,13 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
          </div>
       </div>
       <br  />
-      <input type="submit" value="<?php _e('Save Changes and Continue Editing','appointment-hour-booking'); ?>" class="button-primary" /> 
+      <input type="submit" value="<?php esc_html_e('Save Changes and Continue Editing','appointment-hour-booking'); ?>" class="button-primary" /> 
 <br />      
        <br />
         <div style="padding:10px;background-color:#ffffdd;border:1px dotted black;">
             <p><?php _e('<STRONG>In this version</STRONG> the form builder supports <STRONG>calendar, text, email and acceptance checkbox fields</STRONG>.','appointment-hour-booking'); ?></p>
-            <p><button type="button" onclick="window.open('<?php echo esc_js($this->plugin_download_URL); ?>?src=activatebtn');" style="cursor:pointer;height:35px;color:#20A020;font-weight:bold;"><?php _e('Activate the FULL form builder','appointment-hour-booking'); ?></button>
-               <p style="font-weight:bold"><?php _e('The full set of fields also supports:','appointment-hour-booking'); ?>
+            <p><button type="button" onclick="window.open('<?php echo esc_js($this->plugin_download_URL); ?>?src=activatebtn');" style="cursor:pointer;height:35px;color:#20A020;font-weight:bold;"><?php esc_html_e('Activate the FULL form builder','appointment-hour-booking'); ?></button>
+               <p style="font-weight:bold"><?php esc_html_e('The full set of fields also supports:','appointment-hour-booking'); ?>
                <ul>
                 <li> - <strong>Conditional Logic</strong>: Hide/show fields based in previous selections.</li>
                 <li> - File <strong>uploads</strong>, strong>Multi-page</strong> forms</li>
@@ -220,28 +220,28 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       <br />
       
       <!-- TEXT DEFINITIONS -->
-	  <h2><?php _e('Labels and Texts','appointment-hour-booking'); ?></h2>
+	  <h2><?php esc_html_e('Labels and Texts','appointment-hour-booking'); ?></h2>
 	  <hr />
 
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Button Labels','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Button Labels','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table ahbsmallpadding1">
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('Submit button label (text)','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('Submit button label (text)','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_submitbtn" size="40" value="<?php $label = ($this->get_option('vs_text_submitbtn', 'Submit')); echo esc_attr($label==''?'Submit':$label); ?>" />
             </td>
             <td>
-              <strong><?php _e('Page {0} of {0} (text','appointment-hour-booking'); ?>):</strong><br />
+              <strong><?php esc_html_e('Page {0} of {0} (text','appointment-hour-booking'); ?>):</strong><br />
               <input type="text" name="vs_text_pageof" size="40" value="<?php $label = ($this->get_option('vs_text_pageof', 'Page {0} of {0}')); echo esc_attr($label==''?'Page {0} of {0}':$label); ?>" />
             </td>
             </tr>
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('Previous page button label (text)','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('Previous page button label (text)','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_previousbtn" size="40" value="<?php $label = ($this->get_option('vs_text_previousbtn', 'Previous')); echo esc_attr($label==''?'Previous':$label); ?>" /></td>
             <td scope="row">
-             <strong><?php _e('Next page button label (text)','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('Next page button label (text)','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_nextbtn" size="40" value="<?php $label = $this->get_option('vs_text_nextbtn', 'Next'); echo esc_attr($label==''?'Next':$label); ?>" /></td>
             </tr>
             <tr valign="top">
@@ -252,53 +252,53 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       
       <hr  size="1" />
 
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Error messages for validation rules','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Error messages for validation rules','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table ahbsmallpadding1">
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"is required" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"is required" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_is_required" size="40" value="<?php echo esc_attr($this->get_option('vs_text_is_required', CP_APPBOOK_DEFAULT_vs_text_is_required)); ?>" />
             </td>
             <td scope="row">
-             <strong><?php _e('"is email" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"is email" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_is_email" size="40" value="<?php echo esc_attr($this->get_option('vs_text_is_email', CP_APPBOOK_DEFAULT_vs_text_is_email)); ?>" />
             </td>
             </tr>
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"is valid captcha" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"is valid captcha" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="cv_text_enter_valid_captcha" size="40" value="<?php echo esc_attr($this->get_option('cv_text_enter_valid_captcha', CP_APPBOOK_DEFAULT_cv_text_enter_valid_captcha)); ?>" />
             </td>
-            <td scope="row"><strong><?php _e('"is valid date (mm/dd/yyyy)" text','appointment-hour-booking'); ?>:</strong><br /><input type="text" name="vs_text_datemmddyyyy" size="40" value="<?php echo esc_attr($this->get_option('vs_text_datemmddyyyy', CP_APPBOOK_DEFAULT_vs_text_datemmddyyyy)); ?>" /></td>
+            <td scope="row"><strong><?php esc_html_e('"is valid date (mm/dd/yyyy)" text','appointment-hour-booking'); ?>:</strong><br /><input type="text" name="vs_text_datemmddyyyy" size="40" value="<?php echo esc_attr($this->get_option('vs_text_datemmddyyyy', CP_APPBOOK_DEFAULT_vs_text_datemmddyyyy)); ?>" /></td>
             </tr>
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"is valid date (dd/mm/yyyy)" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"is valid date (dd/mm/yyyy)" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_dateddmmyyyy" size="40" value="<?php echo esc_attr($this->get_option('vs_text_dateddmmyyyy', CP_APPBOOK_DEFAULT_vs_text_dateddmmyyyy)); ?>" />
             </td>
             <td scope="row">
-             <strong><?php _e('"is number" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"is number" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_number" size="40" value="<?php echo esc_attr($this->get_option('vs_text_number', CP_APPBOOK_DEFAULT_vs_text_number)); ?>" />
             </td>
             </tr>
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"only digits" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"only digits" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_digits" size="40" value="<?php echo esc_attr($this->get_option('vs_text_digits', CP_APPBOOK_DEFAULT_vs_text_digits)); ?>" />
             </td>
             <td scope="row">
-             <strong><?php _e('"under maximum" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"under maximum" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_max" size="40" value="<?php echo esc_attr($this->get_option('vs_text_max', CP_APPBOOK_DEFAULT_vs_text_max)); ?>" />
             </td>
             </tr>
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"over minimum" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"over minimum" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_min" size="40" value="<?php echo esc_attr($this->get_option('vs_text_min', CP_APPBOOK_DEFAULT_vs_text_min)); ?>" />
             </td>
             <td scope="row">
-             <strong><?php _e('"Max appointments allowed messsage" text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"Max appointments allowed message" text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_maxapp" size="40" value="<?php echo esc_attr($this->get_option('vs_text_maxapp', CP_APPBOOK_DEFAULT_vs_text_maxapp)); ?>" />
             </td>
             </tr>
@@ -308,32 +308,32 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       
       <hr  size="1" />
 
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Other Texts','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Other Texts','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table ahbsmallpadding1">
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"Quantity" field label','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"Quantity" field label','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_quantity" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_quantity', 'Quantity')); ?>" />
             </td>
             <td>
-              <strong><?php _e('"Cancel" link label','appointment-hour-booking'); ?>):</strong><br />
+              <strong><?php esc_html_e('"Cancel" link label','appointment-hour-booking'); ?>):</strong><br />
               <input type="text" name="vs_text_cancel" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_cancel', 'Cancel')); ?>" />
             </td>
             </tr>
             <tr valign="top">
             <td scope="row">
-             <strong><?php _e('"Cost" label','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"Cost" label','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_cost" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_cost', 'Cost')); ?>" />
             </td>
             <td scope="row">
-             <strong><?php _e('"No more slots available." text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"No more slots available." text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_nomore" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_nomore', 'No more slots available.')); ?>" />
             </td>
             </tr>  
             <tr> 			
             <td scope="row">
-             <strong><?php _e('"Selected time is no longer available..." text','appointment-hour-booking'); ?>:</strong><br />
+             <strong><?php esc_html_e('"Selected time is no longer available..." text','appointment-hour-booking'); ?>:</strong><br />
              <input type="text" name="vs_text_nmore" size="40" value="<?php echo esc_attr($this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.')); ?>" /></td>
             </tr>              
          </table>
@@ -341,9 +341,9 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       
         <hr>
 		<div class="ahb-buttons-container">
-			<input type="button" value="<?php _e('Next Step - General Settings >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(2);" />
-			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php _e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
-			<input type="submit" name="savereturn" value="<?php _e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
+			<input type="button" value="<?php esc_html_e('Next Step - General Settings >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(2);" />
+			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php esc_html_e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
+			<input type="submit" name="savereturn" value="<?php esc_html_e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
 			<div class="clear"></div>
 		</div>
      </div>
@@ -354,35 +354,35 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       <div class="inside">
 
 
-         <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Confirmation / Thank you page','appointment-hour-booking'); ?></span></h3>
+         <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Confirmation / Thank you page','appointment-hour-booking'); ?></span></h3>
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Confirmation / Thank you page','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Confirmation / Thank you page','appointment-hour-booking'); ?></th>
             <td><input type="text" name="fp_return_page" size="70" value="<?php echo esc_attr($this->get_option('fp_return_page', CP_APPBOOK_DEFAULT_fp_return_page)); ?>" />
-            <br /><em><?php _e('Address / URL of the page where the user will be redirected after submiting the booking form','appointment-hour-booking'); ?></em></td>
+            <br /><em><?php esc_html_e('Address / URL of the page where the user will be redirected after submiting the booking form','appointment-hour-booking'); ?></em></td>
             </tr>
           <table> 
          <hr />
          
-         <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Booking Status','appointment-hour-booking'); ?></span></h3>
+         <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Booking Status','appointment-hour-booking'); ?></span></h3>
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Default status of new bookings','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Default status of new bookings','appointment-hour-booking'); ?></th>
             <td><?php $this->render_status_box('defaultstatus',$this->get_option('defaultstatus', ''));  ?>
-            <br /><em><?php _e('Only "Approved" items are taken in account for the availability verification.','appointment-hour-booking'); ?></em></td>
+            <br /><em><?php esc_html_e('Only "Approved" items are taken in account for the availability verification.','appointment-hour-booking'); ?></em></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Default status of paid bookings','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Default status of paid bookings','appointment-hour-booking'); ?></th>
             <td><?php $this->render_status_box('defaultpaidstatus',$this->get_option('defaultpaidstatus', ''));  ?>
-            <br /><em><?php _e('If a payment add-on is enabled the booking will be changed to this status after the payment.','appointment-hour-booking'); ?></em></td>
+            <br /><em><?php esc_html_e('If a payment add-on is enabled the booking will be changed to this status after the payment.','appointment-hour-booking'); ?></em></td>
             </tr>            
           <table> 
          <hr />         
          
-         <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Global Calendar Settings','appointment-hour-booking'); ?></span></h3> 
+         <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Global Calendar Settings','appointment-hour-booking'); ?></span></h3> 
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Date Format','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Date Format','appointment-hour-booking'); ?></th>
             <td><?php $v = $this->get_option('date_format','mm/dd/yy'); ?>
          	   <select name="date_format" id="date_format">
     		   <option <?php if ($v == '' || $v == 'mm/dd/yy') echo 'selected'; ?> value="mm/dd/yy">Default - mm/dd/yyyy</option>
@@ -400,7 +400,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Calendar Language','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Calendar Language','appointment-hour-booking'); ?></th>
             <td><?php $v = $this->get_option('calendar_language',''); ?>
                  <select name="calendar_language" id="calendar_language">
     <option <?php if ($v == '') echo 'selected'; ?> value=""> - auto-detect - </option>
@@ -481,38 +481,38 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
     </td>
             </tr>
            <tr valign="top">
-            <th scope="row"><?php _e('Include appointment end-time in the confirmation emails?','appointment-hour-booking'); ?>:</th>
+            <th scope="row"><?php esc_html_e('Include appointment end-time in the confirmation emails?','appointment-hour-booking'); ?>:</th>
             <td>
               <?php $option = $this->get_option('display_emails_endtime', ''); ?>
               <select name="display_emails_endtime">
-               <option value=""<?php if ($option == '') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
-               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
+               <option value=""<?php if ($option == '') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
+               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
               </select>
             </td>
            </tr>             
          </table>
       </div>
       <hr />
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Payment Integration Settings','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Payment Integration Settings','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Product name at payment page','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Product name at payment page','appointment-hour-booking'); ?></th>
             <td><input type="text" name="product_name" size="40" value="<?php echo esc_attr($this->get_option('product_name', 'Booking')); ?>" /></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Label of "Pay Later" option (if enabled)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Label of "Pay Later" option (if enabled)','appointment-hour-booking'); ?></th>
             <td><input type="text" name="pay_later_label" size="40" value="<?php echo esc_attr($this->get_option('pay_later_label', 'Pay later')); ?>" /></td>
             </tr>
          </table>
-         <em>* <?php _e('Note: To enable a payment method enable first the related addon.','appointment-hour-booking'); ?></em>
+         <em>* <?php esc_html_e('Note: To enable a payment method enable first the related addon.','appointment-hour-booking'); ?></em>
       </div>
       <hr />
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Users with access to the messages list','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Users with access to the messages list','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Select users with access (CTRL+click for multiple selection)','appointment-hour-booking'); ?>:</th>
+            <th scope="row"><?php esc_html_e('Select users with access (CTRL+click for multiple selection)','appointment-hour-booking'); ?>:</th>
             <td>
               <?php
                  $users = $wpdb->get_results( "SELECT user_login,ID FROM ".$wpdb->users." ORDER BY user_login ASC LIMIT 0,500" );
@@ -528,12 +528,12 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             </td>
            </tr>
            <tr valign="top">
-            <th scope="row"><?php _e('Allow selected users access also to the calendar settings?','appointment-hour-booking'); ?>:</th>
+            <th scope="row"><?php esc_html_e('Allow selected users access also to the calendar settings?','appointment-hour-booking'); ?>:</th>
             <td>
               <?php $option = $this->get_option('cp_user_access_settings', ''); ?>
               <select name="cp_user_access_settings">
-               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
-               <option value=""<?php if ($option == '') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
+               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
+               <option value=""<?php if ($option == '') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
               </select>
             </td>
            </tr>            
@@ -541,64 +541,64 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       </div>
       <hr>
 		<div class="ahb-buttons-container">
-			<input type="button" value="<?php _e('Next Step - Notification Emails >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(3);" />
-			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php _e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
-			<input type="submit" name="savereturn" value="<?php _e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
+			<input type="button" value="<?php esc_html_e('Next Step - Notification Emails >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(3);" />
+			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php esc_html_e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
+			<input type="submit" name="savereturn" value="<?php esc_html_e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
 			<div class="clear"></div>
 		</div>
      </div>
 
      <div class="ahb-adintsection" data-step="3">
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('From / To Email Addresses','appointment-hour-booking'); ?>:</span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('From / To Email Addresses','appointment-hour-booking'); ?>:</span></h3>
       <div class="inside">
          <table class="form-table">
 
             <tr valign="top">
-            <th scope="row"><?php _e('Send email "From"','appointment-hour-booking'); ?> </th>
+            <th scope="row"><?php esc_html_e('Send email "From"','appointment-hour-booking'); ?> </th>
             <td>
               <?php $option = $this->get_option('fp_emailfrommethod', "fixed"); ?>
                <select name="fp_emailfrommethod">
-                 <option value="fixed"<?php if ($option == 'fixed') echo ' selected'; ?>><?php _e('From fixed email address indicated below - Recommended option','appointment-hour-booking'); ?></option>
-                 <option value="customer"<?php if ($option == 'customer') echo ' selected'; ?>><?php _e('From the email address indicated by the customer','appointment-hour-booking'); ?></option>
+                 <option value="fixed"<?php if ($option == 'fixed') echo ' selected'; ?>><?php esc_html_e('From fixed email address indicated below - Recommended option','appointment-hour-booking'); ?></option>
+                 <option value="customer"<?php if ($option == 'customer') echo ' selected'; ?>><?php esc_html_e('From the email address indicated by the customer','appointment-hour-booking'); ?></option>
                 </select><br />
                 <span style="font-size:10px;color:#666666">
-                * <?php _e('If you select "from fixed..." the customer email address will appear in the "to" address when you hit "reply", this is the recommended setting to avoid mail server restrictions.','appointment-hour-booking'); ?>
+                * <?php esc_html_e('If you select "from fixed..." the customer email address will appear in the "to" address when you hit "reply", this is the recommended setting to avoid mail server restrictions.','appointment-hour-booking'); ?>
                 <br />
-                * <?php _e('If you select "from customer email" then the customer email will appear also visually when you receive the email, but this isn\'t supported by all hosting services, so this
+                * <?php esc_html_e('If you select "from customer email" then the customer email will appear also visually when you receive the email, but this isn\'t supported by all hosting services, so this
                 option isn\'t recommended in most cases.','appointment-hour-booking'); ?>
                 </span>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('"From" email (for fixed "from" addresses)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('"From" email (for fixed "from" addresses)','appointment-hour-booking'); ?></th>
             <td><input type="text" name="fp_from_email" id="fp_from_email" onkeyup="ahb_checkfromemail();" size="40" value="<?php echo esc_attr($this->get_option('fp_from_email', CP_APPBOOK_DEFAULT_fp_from_email)); ?>" /><div id="ahb_email_warning" style="margin-top:3px;"></div></td>
             </tr>
             
             <tr valign="top">
-            <th scope="row"><?php _e('"From" name (ex: company name)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('"From" name (ex: company name)','appointment-hour-booking'); ?></th>
             <td><input type="text" name="fp_from_name" id="fp_from_name"" size="40" value="<?php echo esc_attr($this->get_option('fp_from_name', '')); ?>" /></td>
             </tr>          
 
-            <th scope="row"><?php _e('Send email "To"','appointment-hour-booking'); ?> </th>
+            <th scope="row"><?php esc_html_e('Send email "To"','appointment-hour-booking'); ?> </th>
             <td>
               <?php $option = $this->get_option('fp_emailtomethod', "fixed"); ?>
                <select name="fp_emailtomethod" onchange="update_cpappb_option();">
-                 <option value="fixed"<?php if ($option == 'fixed') echo ' selected'; ?>><?php _e('To the fixed email(s) address(es) indicated below - Recommended option','appointment-hour-booking'); ?></option>
-                 <option value="customer"<?php if ($option == 'customer') echo ' selected'; ?>><?php _e('To the email address selected in a form field (ex: captcha image enabled is recommended in this case)','appointment-hour-booking'); ?></option>
+                 <option value="fixed"<?php if ($option == 'fixed') echo ' selected'; ?>><?php esc_html_e('To the fixed email(s) address(es) indicated below - Recommended option','appointment-hour-booking'); ?></option>
+                 <option value="customer"<?php if ($option == 'customer') echo ' selected'; ?>><?php esc_html_e('To the email address selected in a form field (ex: captcha image enabled is recommended in this case)','appointment-hour-booking'); ?></option>
                 </select><br />
                 <span style="font-size:10px;color:#666666">
-                * <?php _e('If you select "To fixed..." enter the destination emails in the next field. ','appointment-hour-booking'); ?>
+                * <?php esc_html_e('If you select "To fixed..." enter the destination emails in the next field. ','appointment-hour-booking'); ?>
                 <br />
-                * <?php _e('If you select "To email ...in form field" then add a field like a drop-down, radio-button or checkbox that contains the email address in the field value (not needed in the field text but in the internal value).','appointment-hour-booking'); ?>
+                * <?php esc_html_e('If you select "To email ...in form field" then add a field like a drop-down, radio-button or checkbox that contains the email address in the field value (not needed in the field text but in the internal value).','appointment-hour-booking'); ?>
                 </span>
             </td>
             </tr>
             <tr valign="top" id="cpappb_destemails" <?php if ($option == 'customer') echo ' style="display:none;"'; ?>>
-            <th scope="row"><?php _e('Destination emails (comma separated)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Destination emails (comma separated)','appointment-hour-booking'); ?></th>
             <td><input type="text" name="fp_destination_emails" size="40" value="<?php echo esc_attr($this->get_option('fp_destination_emails', CP_APPBOOK_DEFAULT_fp_destination_emails)); ?>" /></td>
             </tr>
             <tr valign="top" id="cpappb_dropemails" <?php if ($option != 'customer') echo ' style="display:none;"'; ?>>
-            <th scope="row"><?php _e('Field that contains the destination email(s)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Field that contains the destination email(s)','appointment-hour-booking'); ?></th>
             <td>
                 <select id="fp_destination_emails_field" name="fp_destination_emails_field" def="<?php echo esc_attr($this->get_option('fp_destination_emails_field', '')); ?>"></select>
             </td>
@@ -606,118 +606,118 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             </table>
             
             <hr />
-            <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Email Notification to Website Administrator','appointment-hour-booking'); ?>:</span></h3>
+            <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Email Notification to Website Administrator','appointment-hour-booking'); ?>:</span></h3>
             
             <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Email subject','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email subject','appointment-hour-booking'); ?></th>
             <td><input type="text" name="fp_subject" size="70" value="<?php echo esc_attr($this->get_option('fp_subject', CP_APPBOOK_DEFAULT_fp_subject)); ?>" /></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Include additional information?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Include additional information?','appointment-hour-booking'); ?></th>
             <td>
               <?php $option = $this->get_option('fp_inc_additional_info', CP_APPBOOK_DEFAULT_fp_inc_additional_info); ?>
               <select name="fp_inc_additional_info">
-               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
-               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
+               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
+               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email format?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email format?','appointment-hour-booking'); ?></th>
             <td>
               <?php $option = $this->get_option('fp_emailformat', CP_APPBOOK_DEFAULT_email_format); ?>
               <select name="fp_emailformat">
-               <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php _e('Plain Text (default)','appointment-hour-booking'); ?></option>
-               <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php _e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
+               <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php esc_html_e('Plain Text (default)','appointment-hour-booking'); ?></option>
+               <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php esc_html_e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Message','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Message','appointment-hour-booking'); ?></th>
             <td><textarea type="text" name="fp_message" rows="6" cols="80"><?php echo esc_textarea($this->get_option('fp_message', CP_APPBOOK_DEFAULT_fp_message)); ?></textarea></td>
             </tr>
          </table>
       </div>
       <hr />
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Email Copy to the User / Customer','appointment-hour-booking'); ?>:</span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Email Copy to the User / Customer','appointment-hour-booking'); ?>:</span></h3>
       <div class="inside">
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Send confirmation/thank you message to user?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Send confirmation/thank you message to user?','appointment-hour-booking'); ?></th>
             <td>
               <?php $option = $this->get_option('cu_enable_copy_to_user', CP_APPBOOK_DEFAULT_cu_enable_copy_to_user); ?>
               <select name="cu_enable_copy_to_user">
-               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
-               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
+               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
+               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email field on the form','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email field on the form','appointment-hour-booking'); ?></th>
             <td><select id="cu_user_email_field" name="cu_user_email_field" def="<?php echo esc_attr($this->get_option('cu_user_email_field', CP_APPBOOK_DEFAULT_cu_user_email_field)); ?>"></select></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email subject','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email subject','appointment-hour-booking'); ?></th>
             <td><input type="text" name="cu_subject" size="70" value="<?php echo esc_attr($this->get_option('cu_subject', CP_APPBOOK_DEFAULT_cu_subject)); ?>" /></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email format?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email format?','appointment-hour-booking'); ?></th>
             <td>
               <?php $option = $this->get_option('cu_emailformat', CP_APPBOOK_DEFAULT_email_format); ?>
               <select name="cu_emailformat">
-               <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php _e('Plain Text (default)','appointment-hour-booking'); ?></option>
-               <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php _e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
+               <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php esc_html_e('Plain Text (default)','appointment-hour-booking'); ?></option>
+               <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php esc_html_e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Message','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Message','appointment-hour-booking'); ?></th>
             <td><textarea type="text" name="cu_message" rows="6" cols="80"><?php echo esc_textarea($this->get_option('cu_message', CP_APPBOOK_DEFAULT_cu_message)); ?></textarea></td>
             </tr>
          </table>
       </div>
 		<hr>
 		<div class="ahb-buttons-container">
-			<input type="button" value="<?php _e('Next Step - Antispam >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(4);" />
-			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php _e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
-			<input type="submit" name="savereturn" value="<?php _e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
+			<input type="button" value="<?php esc_html_e('Next Step - Antispam >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(4);" />
+			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php esc_html_e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
+			<input type="submit" name="savereturn" value="<?php esc_html_e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
 			<div class="clear"></div>
 		</div>
      </div>
 
 
      <div class="ahb-adintsection" data-step="4">
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Captcha Verification','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Captcha Verification','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Use Captcha Verification?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Use Captcha Verification?','appointment-hour-booking'); ?></th>
             <td colspan="5">
               <?php $option = $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha); ?>
               <select name="cv_enable_captcha">
-               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
-               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
+               <option value="true"<?php if ($option == 'true') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
+               <option value="false"<?php if ($option == 'false') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
 
             <tr valign="top">
-             <th scope="row"><?php _e('Width','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Width','appointment-hour-booking'); ?>:</th>
              <td><input type="text" name="cv_width" size="10" value="<?php echo esc_attr($this->get_option('cv_width', CP_APPBOOK_DEFAULT_cv_width)); ?>"  onblur="generateCaptcha();"  /></td>
-             <th scope="row"><?php _e('Height','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Height','appointment-hour-booking'); ?>:</th>
              <td><input type="text" name="cv_height" size="10" value="<?php echo esc_attr($this->get_option('cv_height', CP_APPBOOK_DEFAULT_cv_height)); ?>" onblur="generateCaptcha();"  /></td>
-             <th scope="row"><?php _e('Chars','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Chars','appointment-hour-booking'); ?>:</th>
              <td><input type="text" name="cv_chars" size="10" value="<?php echo esc_attr($this->get_option('cv_chars', CP_APPBOOK_DEFAULT_cv_chars)); ?>" onblur="generateCaptcha();"  /></td>
             </tr>
 
             <tr valign="top">
-             <th scope="row" valign="top"><?php _e('Min font size','appointment-hour-booking'); ?>:</th>
+             <th scope="row" valign="top"><?php esc_html_e('Min font size','appointment-hour-booking'); ?>:</th>
              <td valign="top"><input type="text" name="cv_min_font_size" size="10" value="<?php echo esc_attr($this->get_option('cv_min_font_size', CP_APPBOOK_DEFAULT_cv_min_font_size)); ?>" onblur="generateCaptcha();"  /></td>
-             <th scope="row" valign="top"><?php _e('Max font size','appointment-hour-booking'); ?>:</th>
+             <th scope="row" valign="top"><?php esc_html_e('Max font size','appointment-hour-booking'); ?>:</th>
              <td valign="top"><input type="text" name="cv_max_font_size" size="10" value="<?php echo esc_attr($this->get_option('cv_max_font_size', CP_APPBOOK_DEFAULT_cv_max_font_size)); ?>" onblur="generateCaptcha();"  /></td>
              <td colspan="2" rowspan="2">
-               <?php _e('Preview','appointment-hour-booking'); ?>:<br />
+               <?php esc_html_e('Preview','appointment-hour-booking'); ?>:<br />
                  <br />
                 <?php if (!function_exists('imagecreatetruecolor')) { ?>
                  <div style="color: #009900;font-weight:normal; border: 1px dotted black; padding:10px;max-width: 390px; background-color:#ffffdd">
@@ -733,19 +733,19 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 
 
             <tr valign="top">
-             <th scope="row"><?php _e('Noise','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Noise','appointment-hour-booking'); ?>:</th>
              <td><input type="text" name="cv_noise" size="10" value="<?php echo esc_attr($this->get_option('cv_noise', CP_APPBOOK_DEFAULT_cv_noise)); ?>" onblur="generateCaptcha();" /></td>
-             <th scope="row"><?php _e('Noise Length','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Noise Length','appointment-hour-booking'); ?>:</th>
              <td><input type="text" name="cv_noise_length" size="10" value="<?php echo esc_attr($this->get_option('cv_noise_length', CP_APPBOOK_DEFAULT_cv_noise_length)); ?>" onblur="generateCaptcha();" /></td>
             </tr>
 
 
             <tr valign="top">
-             <th scope="row"><?php _e('Background','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Background','appointment-hour-booking'); ?>:</th>
              <td><input type="color" name="cv_background" size="10" value="#<?php echo esc_attr($this->get_option('cv_background', CP_APPBOOK_DEFAULT_cv_background)); ?>" onblur="generateCaptcha();" /></td>
-             <th scope="row"><?php _e('Border','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Border','appointment-hour-booking'); ?>:</th>
              <td><input type="color" name="cv_border" size="10" value="#<?php echo esc_attr($this->get_option('cv_border', CP_APPBOOK_DEFAULT_cv_border)); ?>" onblur="generateCaptcha();" /></td>
-             <th scope="row"><?php _e('Font','appointment-hour-booking'); ?>:</th>
+             <th scope="row"><?php esc_html_e('Font','appointment-hour-booking'); ?>:</th>
              <td>
                 <select name="cv_font" onchange="generateCaptcha();" >
                   <option value="font1"<?php if ("font1" == $this->get_option('cv_font', CP_APPBOOK_DEFAULT_cv_font)) echo " selected"; ?>>Font 1</option>
@@ -759,33 +759,33 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
       </div>
 		<hr>
 		<div class="ahb-buttons-container">
-			<input type="button" value="<?php _e('Next Step - Reports >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(5);" />
-			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php _e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
-			<input type="submit" name="savereturn" value="<?php _e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
+			<input type="button" value="<?php esc_html_e('Next Step - Reports >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(5);" />
+			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php esc_html_e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
+			<input type="submit" name="savereturn" value="<?php esc_html_e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
 			<div class="clear"></div>
 		</div>
      </div>
 
      <div class="ahb-adintsection" data-step="5">
-      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php _e('Automatic Reports: Send submissions in CSV format via email','appointment-hour-booking'); ?></span></h3>
+      <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Automatic Reports: Send submissions in CSV format via email','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table">
             <tr valign="top">
-            <th scope="row"><?php _e('Enable Reports?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Enable Reports?','appointment-hour-booking'); ?></th>
             <td>
               <?php $option = $this->get_option('rep_enable', 'no'); ?>
               <select name="rep_enable">
-               <option value="no"<?php if ($option == 'no' || $option == '') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
-               <option value="yes"<?php if ($option == 'yes') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
+               <option value="no"<?php if ($option == 'no' || $option == '') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
+               <option value="yes"<?php if ($option == 'yes') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Send report every','appointment-hour-booking'); ?></th>
-            <td><input type="text" name="rep_days" size="4" value="<?php echo esc_attr($this->get_option('rep_days', '1')); ?>" /> <?php _e('days (Put a 0 to send the report immediately after each submission)','appointment-hour-booking'); ?></td>
+            <th scope="row"><?php esc_html_e('Send report every','appointment-hour-booking'); ?></th>
+            <td><input type="text" name="rep_days" size="4" value="<?php echo esc_attr($this->get_option('rep_days', '1')); ?>" /> <?php esc_html_e('days (Put a 0 to send the report immediately after each submission)','appointment-hour-booking'); ?></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Send report after this hour (server time)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Send report after this hour (server time)','appointment-hour-booking'); ?></th>
             <td>
               <select name="rep_hour">
                <?php
@@ -797,34 +797,34 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Send the report to the following email addresses (comma separated)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Send the report to the following email addresses (comma separated)','appointment-hour-booking'); ?></th>
             <td><input type="text" name="rep_emails" size="70" value="<?php echo esc_attr($this->get_option('rep_emails', '')); ?>" /></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email subject','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email subject','appointment-hour-booking'); ?></th>
             <td><input type="text" name="rep_subject" size="70" value="<?php echo esc_attr($this->get_option('rep_subject', 'Submissions report...')); ?>" /></td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email format?','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email format?','appointment-hour-booking'); ?></th>
             <td>
               <?php $option = $this->get_option('rep_emailformat', 'text'); ?>
               <select name="rep_emailformat">
-               <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php _e('Plain Text (default)','appointment-hour-booking'); ?></option>
-               <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php _e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
+               <option value="text"<?php if ($option != 'html') echo ' selected'; ?>><?php esc_html_e('Plain Text (default)','appointment-hour-booking'); ?></option>
+               <option value="html"<?php if ($option == 'html') echo ' selected'; ?>><?php esc_html_e('HTML (use html in the textarea below)','appointment-hour-booking'); ?></option>
               </select>
             </td>
             </tr>
             <tr valign="top">
-            <th scope="row"><?php _e('Email Text (CSV file will be attached with the submissions)','appointment-hour-booking'); ?></th>
+            <th scope="row"><?php esc_html_e('Email Text (CSV file will be attached with the submissions)','appointment-hour-booking'); ?></th>
             <td><textarea type="text" name="rep_message" rows="3" cols="80"><?php echo esc_textarea($this->get_option('rep_message', 'Attached you will find the data from the form submissions.')); ?></textarea></td>
             </tr>
          </table>
       </div>
         <hr>
 		<div class="ahb-buttons-container">
-			<input type="button" value="<?php _e('Next Step - Add Ons >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(6);" />
-			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php _e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
-			<input type="submit" name="savereturn" value="<?php _e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
+			<input type="button" value="<?php esc_html_e('Next Step - Add Ons >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(6);" />
+			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php esc_html_e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
+			<input type="submit" name="savereturn" value="<?php esc_html_e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
 			<div class="clear"></div>
 		</div>
      </div>
@@ -841,16 +841,16 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
         else
         {
             ?>
-            <p><?php _e('You can optionally','appointment-hour-booking'); ?> <a target="_blank" href="?page=cp_apphourbooking_addons"><?php _e('activate add ons in the add ons section','appointment-hour-booking'); ?></a>.</p>
-            <p><?php _e('The add ons can be enabled to add new features','appointment-hour-booking'); ?>.</p>
+            <p><?php esc_html_e('You can optionally','appointment-hour-booking'); ?> <a target="_blank" href="?page=cp_apphourbooking_addons"><?php esc_html_e('activate add ons in the add ons section','appointment-hour-booking'); ?></a>.</p>
+            <p><?php esc_html_e('The add ons can be enabled to add new features','appointment-hour-booking'); ?>.</p>
             <p><?php _e('If you don\'t want to enable add ons now then <strong>continue saving these settings and publishing the booking form</strong>.','appointment-hour-booking'); ?></p>
             <?php
         }
      ?>
 		<hr>
 		<div class="ahb-buttons-container">
-			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php _e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
-			<input type="submit" name="savereturn" value="<?php _e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
+			<?php if ($current_user_access) { ?><input type="submit" name="savepublish" value="<?php esc_html_e('Save and Publish','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" /><?php } ?>
+			<input type="submit" name="savereturn" value="<?php esc_html_e('Save and Return','appointment-hour-booking'); ?>" class="button button-primary" style="float:right;margin-right:10px" />
 			<div class="clear"></div>
 		</div>
     </div>
@@ -858,14 +858,14 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
  </div>
 
  <div class="ahb-buttons-container">
-	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php _e('Return to the calendars list','appointment-hour-booking'); ?></a>
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;<?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
  </div>
 
 </div>
 
 
 
-[<a href="https://apphourbooking.dwbooster.com/contact-us" target="_blank"><?php _e('Request Custom Modifications','appointment-hour-booking'); ?></a>] | [<a href="https://wordpress.org/support/plugin/appointment-hour-booking#new-post" target="_blank"><?php _e('Free Support','appointment-hour-booking'); ?></a>] | [<a href="<?php echo esc_attr($this->plugin_URL); ?>" target="_blank"><?php _e('Help','appointment-hour-booking'); ?></a>]
+[<a href="https://apphourbooking.dwbooster.com/contact-us" target="_blank"><?php esc_html_e('Request Custom Modifications','appointment-hour-booking'); ?></a>] | [<a href="https://wordpress.org/support/plugin/appointment-hour-booking#new-post" target="_blank"><?php esc_html_e('Free Support','appointment-hour-booking'); ?></a>] | [<a href="<?php echo esc_attr($this->plugin_URL); ?>" target="_blank"><?php esc_html_e('Help','appointment-hour-booking'); ?></a>]
 </form>
 
 <script type="text/javascript">generateCaptcha();</script>

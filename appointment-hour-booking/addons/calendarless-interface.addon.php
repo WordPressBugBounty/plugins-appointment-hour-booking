@@ -77,43 +77,43 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 				<h3 class='hndle' style="padding:5px;"><span><?php print esc_html($this->name); ?></span></h3>
 				<div class="inside">
 				   <input type="hidden" name="CPAPPB_SingleDaysSelection_id" value="1" />
-                     <?php _e('Enable alternative time slot selection interface for this booking form?','appointment-hour-booking'); ?>:<br />
+                     <?php esc_html_e('Enable alternative time slot selection interface for this booking form?','appointment-hour-booking'); ?>:<br />
                         <?php $option = $row['autosel_enable']; ?>
                         <select name="sds_autosel_enable" id="sds_autosel_enable" onchange="sds_autosel_display_option(this)">
-                          <option value="0"<?php if ($option != '1') echo ' selected'; ?>><?php _e('No','appointment-hour-booking'); ?></option>
-                          <option value="1"<?php if ($option == '1') echo ' selected'; ?>><?php _e('Yes','appointment-hour-booking'); ?></option>
+                          <option value="0"<?php if ($option != '1') echo ' selected'; ?>><?php esc_html_e('No','appointment-hour-booking'); ?></option>
+                          <option value="1"<?php if ($option == '1') echo ' selected'; ?>><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
                          </select><br /><br />
 
                    <div id="sds_autoselhide_yes" <?php if ($option != '1') echo ' style="display:none"'; ?>>
 
                      <div style="margin-bottom:10px;">
-                        <?php _e('Number of days to display initially','appointment-hour-booking'); ?>:<br />
+                        <?php esc_html_e('Number of days to display initially','appointment-hour-booking'); ?>:<br />
                         <input type="text" name="sds_numberOfDays" id="sds_numberOfDays" value="<?php echo esc_attr($row["numberOfDays"]); ?>" size="5"><br />
                      </div>
 
                      <div style="margin-bottom:10px;">
-                     <?php _e('Number of slots to display initially','appointment-hour-booking'); ?>:<br />
+                     <?php esc_html_e('Number of slots to display initially','appointment-hour-booking'); ?>:<br />
                         <input type="text" name="sds_numberOfSlots" id="sds_numberOfSlots" value="<?php echo esc_attr($row["numberOfSlots"]); ?>" size="5"><br />
                      </div>
 
                      <div style="display:none">
-                        <?php _e('CSS class for the calendar','appointment-hour-booking'); ?>:<br />
+                        <?php esc_html_e('CSS class for the calendar','appointment-hour-booking'); ?>:<br />
                         <input type="text" name="sds_calendarCSSClass" id="sds_calendarCSSClass" value="<?php echo esc_attr($row["calendarCSSClass"]); ?>"><br />
                      </div>
 
                      <div style="margin-bottom:10px;">
-                        <?php _e('Date format','appointment-hour-booking'); ?>:<br />
+                        <?php esc_html_e('Date format','appointment-hour-booking'); ?>:<br />
                         <input type="text" name="sds_formatDate" id="sds_formatDate" value="<?php echo esc_attr($row["formatDate"]); ?>"><br />
-                        <em><a href="https://api.jqueryui.com/datepicker/#:~:text=into%20a%20string%20value%20with%20a%20specified%20format.-,The%20format%20can%20be%20combinations%20of%20the%20following,-%3A" target="_blank"><?php _e('click for sample date formats'); ?></a></em><br>
+                        <em><a href="https://api.jqueryui.com/datepicker/#:~:text=into%20a%20string%20value%20with%20a%20specified%20format.-,The%20format%20can%20be%20combinations%20of%20the%20following,-%3A" target="_blank"><?php esc_html_e('click for sample date formats','appointment-hour-booking'); ?></a></em><br>
                      </div>
 
                      <div style="margin-bottom:10px;">
-                        <?php _e('Text for "more slots"','appointment-hour-booking'); ?>:<br />
+                        <?php esc_html_e('Text for "more slots"','appointment-hour-booking'); ?>:<br />
                         <input type="text" name="sds_str_more_slots" id="sds_str_more_slots" value="<?php echo esc_attr($row["str_more_slots"]); ?>"><br />
                      </div>
 
                      <div style="margin-bottom:10px;">
-                        <?php _e('Text for "more days"','appointment-hour-booking'); ?>:<br />
+                        <?php esc_html_e('Text for "more days"','appointment-hour-booking'); ?>:<br />
                         <input type="text" name="sds_str_more_days" id="sds_str_more_days" value="<?php echo esc_attr($row["str_more_days"]); ?>"><br />
                      </div>
 

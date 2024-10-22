@@ -1,9 +1,9 @@
 <?php if ( ! is_admin() ) { echo 'Direct access not allowed.'; exit; } ?>
 
-<h1><?php _e('Knowledge base and support','appointment-hour-booking'); ?></h1>
+<h1><?php esc_html_e('Knowledge base and support','appointment-hour-booking'); ?></h1>
 
 <p>If the answer to your question doesn't appear in this section (try first the search option below) then contact our support service:</p>
-<input type="button" value="<?php _e('Contact Support Service','appointment-hour-booking'); ?>" onclick="window.open('https://wordpress.org/support/plugin/appointment-hour-booking#new-post');" class="button button-primary ahb-first-button" />
+<input type="button" value="<?php esc_html_e('Contact Support Service','appointment-hour-booking'); ?>" onclick="window.open('https://wordpress.org/support/plugin/appointment-hour-booking#new-post');" class="button button-primary ahb-first-button" />
 
 
 <hr / >
@@ -308,9 +308,9 @@ function highlight(elem, keywords, caseSensitive = false, cls = 'highlight') {
 <!-- END:: help contents area -->
 
 <br />
-<input type="button" value="<?php _e('Commom Cases of Use','appointment-hour-booking'); ?>" onclick="window.open('https://apphourbooking.dwbooster.com/blog');" class="button button-primary ahb-first-button" />
-<input type="button" value="<?php _e('Complete FAQ','appointment-hour-booking'); ?>" onclick="window.open('https://apphourbooking.dwbooster.com/faq');" class="button button-primary ahb-first-button" />
-<input type="button" value="<?php _e('General Documentation','appointment-hour-booking'); ?>" onclick="window.open('https://apphourbooking.dwbooster.com/documentation');" class="button button-primary ahb-first-button" />
-<input type="button" value="<?php _e('Contact Support Service','appointment-hour-booking'); ?>" onclick="window.open('https://wordpress.org/support/plugin/appointment-hour-booking#new-post');" class="button button-primary ahb-first-button" />
+<input type="button" value="<?php esc_html_e('Commom Cases of Use','appointment-hour-booking'); ?>" onclick="window.open('https://apphourbooking.dwbooster.com/blog');" class="button button-primary ahb-first-button" />
+<input type="button" value="<?php esc_html_e('Complete FAQ','appointment-hour-booking'); ?>" onclick="window.open('https://apphourbooking.dwbooster.com/faq');" class="button button-primary ahb-first-button" />
+<input type="button" value="<?php esc_html_e('General Documentation','appointment-hour-booking'); ?>" onclick="window.open('https://apphourbooking.dwbooster.com/documentation');" class="button button-primary ahb-first-button" />
+<input type="button" value="<?php esc_html_e('Contact Support Service','appointment-hour-booking'); ?>" onclick="window.open('https://wordpress.org/support/plugin/appointment-hour-booking#new-post');" class="button button-primary ahb-first-button" />
 <hr />
-<a href="https://wordpress.org/support/plugin/appointment-hour-booking#new-post"><?php _e('Further questions? Contact our support service.','appointment-hour-booking'); ?></a>
+<a href="https://wordpress.org/support/plugin/appointment-hour-booking#new-post"><?php esc_html_e('Further questions? Contact our support service.','appointment-hour-booking'); ?></a>
