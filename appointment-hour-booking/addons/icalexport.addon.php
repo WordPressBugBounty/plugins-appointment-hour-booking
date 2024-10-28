@@ -27,6 +27,10 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
             $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'base_description');
             $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'cal_tzid');
             $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'ical_uselocal');
+            
+            $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'ical_organizer');
+            $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'ical_organizername');
+            $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'ical_organizeremail');
 
 			// Insertion in database
 			if(
@@ -46,10 +50,13 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                                     'base_summary'	 => stripslashes_deep($cp_appb_plugin->sanitize($_REQUEST["base_summary"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
                                     'base_description'	 => stripslashes_deep($cp_appb_plugin->sanitize($_REQUEST["base_description"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
                                     'cal_tzid'	 => stripslashes_deep(sanitize_text_field($_REQUEST["cal_tzid"])),
-                                    'ical_uselocal'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_uselocal"]))
+                                    'ical_uselocal'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_uselocal"])),
+                                    'ical_organizer'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_organizer"])),
+                                    'ical_organizername'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_organizername"])),
+                                    'ical_organizeremail'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_organizeremail"]))
 
 								),
-								array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+								array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 							);
 			}
 
@@ -66,6 +73,9 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                 $row["base_summary"] = 'Booking for %email%';
                 $row["base_description"] = 'Booking for %email%';
                 $row["ical_uselocal"] = '0';
+                $row["ical_organizer"] = '0';
+                $row["ical_organizername"] = sanitize_text_field($_SERVER["HTTP_HOST"]);
+                $row["ical_organizeremail"] = sanitize_email($cp_appb_plugin->get_option('fp_from_email'));
 			} else {
 			    $row["observe_day_light"] = $rows[0]->observe_day_light;
 			    $row["ical_daylight_zone"] = $rows[0]->ical_daylight_zone;
@@ -75,6 +85,9 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                 $row["base_summary"] = $rows[0]->base_summary;
                 $row["base_description"] = $rows[0]->base_description;
                 $row["ical_uselocal"] = $rows[0]->ical_uselocal;
+                $row["ical_organizer"] = $rows[0]->ical_organizer;
+                $row["ical_organizername"] = $rows[0]->ical_organizername;
+                $row["ical_organizeremail"] = $rows[0]->ical_organizeremail;
 			}
 			?>
 			<div id="metabox_basic_settings" class="postbox" >
@@ -176,10 +189,31 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                          <em>* Note: You can get the field IDs/tags from the form builder.</em>
                     </td>
                     </tr>
+
+                    <tr valign="top">
+                    <th scope="row"><?php esc_html_e('Include Organizer info?', 'appointment-hour-booking'); ?></th>
+                    <td><select name="ical_organizer" id="ical_organizer"onchange="javascript:ahb_icalexp_checkorg();">
+                          <option value="0" <?php if ($row["ical_organizer"] == '0' || $row["attachical"] == '0') echo ' selected'; ?>>No</option>
+                          <option value="1" <?php if ($row["ical_organizer"] == '1') echo ' selected'; ?>>Yes</option>
+                         </select>
+                         <div id="ahb_ical_organizerdata" style="margin-top:10px;">
+                           <strong><?php esc_html_e('Organizer name', 'appointment-hour-booking'); ?>:</strong><br />
+                           <input name="ical_organizername" type="text" size="40" value="<?php echo esc_attr($row["ical_organizername"]); ?>" /><br /><br />
+                           <strong><?php esc_html_e('Organizer email', 'appointment-hour-booking'); ?>:</strong><br />
+                           <input name="ical_organizeremail" type="text" size="40" value="<?php echo esc_attr($row["ical_organizeremail"]); ?>" />
+                           
+                           
+                         </div>
+                    </td>
+                    </tr>                    
+                    
                   </table>
 				</div>
 			</div>
             <script>
+function ahb_icalexp_checkorg() {
+    document.getElementById("ahb_ical_organizerdata").style.display = (document.getElementById("ical_organizer").options.selectedIndex == 0 ? 'none' : '');
+}
 function ahbstartTime() {
   var today = new Date();
   var diff = -1*parseInt(today.getTimezoneOffset()/60);
@@ -187,6 +221,7 @@ function ahbstartTime() {
   document.getElementById("ahbrectime").innerHTML = diff;
 }
 ahbstartTime();
+ahb_icalexp_checkorg();
             </script>
 			<?php
 		} // end get_addon_form_settings
@@ -368,6 +403,8 @@ ahbstartTime();
                             echo "LOCATION:\n";
                             echo "SEQUENCE:0\n";
                             echo "STATUS:CONFIRMED\n";
+                            if ($icalSettings[0]->ical_organizer == '1')
+                                echo "ORGANIZER;CN=\"".esc_html($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizername, $data, false, $ct-1))."\":MAILTO:".sanitize_email($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizeremail, $data, false, $ct-1))."\r\n";                            
                             echo "SUMMARY:".esc_html(wp_strip_all_tags($base_summary))."\n";
                             echo "TRANSP:OPAQUE\n";
                             echo "END:VEVENT\n";
@@ -468,7 +505,9 @@ ahbstartTime();
                     $buffer .= "LOCATION:\n";
                     $buffer .= "SEQUENCE:0\n";
                     $buffer .= "STATUS:CONFIRMED\n";
-                    $buffer .= "ORGANIZER;CN=\"".sanitize_url($_SERVER["HTTP_HOST"])."\":MAILTO:".sanitize_email($cp_appb_plugin->get_option('fp_from_email'))."\r\n";
+                    
+                    if ($icalSettings[0]->ical_organizer == '1')
+                        $buffer .= "ORGANIZER;CN=\"".esc_html($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizername, $data, false, $ct-1))."\":MAILTO:".sanitize_email($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizeremail, $data, false, $ct-1))."\r\n";
                     $buffer .= "SUMMARY:".wp_strip_all_tags($base_summary)."\n";
                     $buffer .= "TRANSP:OPAQUE\n";
                     $buffer .= "END:VEVENT\n";

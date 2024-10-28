@@ -2102,6 +2102,10 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                         $content_type.
                         "X-Mailer: PHP/" . phpversion(), $attachments);
         }
+        
+        foreach ($attachments as $item)
+            if (substr($item,0,strlen(WP_CONTENT_DIR . '/uploads/')) == WP_CONTENT_DIR . '/uploads/' && pathinfo($item, PATHINFO_EXTENSION) == 'ics')
+                @unlink($item);
 
     }
 
