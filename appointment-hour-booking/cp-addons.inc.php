@@ -144,7 +144,7 @@ a.addonshelp:hover { text-decoration: none; color: #0000ff; }
 
 <a id="top"></a>
 
-<h1><?php _e('Appointment Hour Booking - Add Ons','appointment-hour-booking'); ?></h1>
+<h1><?php esc_html_e('Appointment Hour Booking - Add Ons','appointment-hour-booking'); ?></h1>
 
 <?php if ($message) echo "<div id='setting-error-settings_updated' class='updated' style='margin:0px;'><h2>".esc_html($message)."</h2></div> <br />";
  ?>
@@ -160,7 +160,7 @@ a.addonshelp:hover { text-decoration: none; color: #0000ff; }
 <div class="clear"></div>
 
 <!-- Add Ons -->
-<h2><?php _e('Add Ons','appointment-hour-booking'); ?></h2>
+<h2><?php esc_html_e('Add Ons','appointment-hour-booking'); ?></h2>
 
 <?php
 $printedmsg = false;

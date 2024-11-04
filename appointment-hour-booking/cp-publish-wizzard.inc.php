@@ -131,7 +131,7 @@ if ($this->get_param('cp_apphourbooking_do_action_loaded') == 'wizard') {
                        <br />
                        <h3 style="background:#cccccc; padding:5px;"><?php esc_html_e('Using classic WordPress editor or other editors?','appointment-hour-booking'); ?></h3>
 
-                        <?php esc_html_e('You can also publish the form in a post/page, use the dedicated icon','appointment-hour-booking'); ?> <?php echo '<img hspace="5" src="'.esc_attr(plugins_url('/images/cp_form.gif', __FILE__)).'" alt="'.esc_attr(__('Insert '.$this->plugin_name)).'" /></a>';     ?>
+                        <?php esc_html_e('You can also publish the form in a post/page, use the dedicated icon','appointment-hour-booking'); ?> <?php echo '<img hspace="5" src="'.esc_attr(plugins_url('/images/cp_form.gif', __FILE__)).'" alt="'.esc_attr(__('Insert '.$this->plugin_name,'appointment-hour-booking')).'" /></a>';     ?>
                         <?php esc_html_e('which has been added to your Upload/Insert Menu, just below the title of your Post/Page', 'appointment-hour-booking'); ?>
 
                          <!-- <select name="publishpage">
@@ -213,7 +213,7 @@ function mvpublish_displayoption(sel) {
 <div id="metabox_basic_settings" class="postbox" >
   <h3 class='hndle' style="padding:5px;"><span><?php esc_html_e('Note','appointment-hour-booking'); ?></span></h3>
   <div class="inside">
-   <?php esc_html_e('You can also publish the form in a post/page, use the dedicated icon','appointment-hour-booking'); ?> <?php echo '<img hspace="5" src="'.esc_attr(plugins_url('/images/cp_form.gif', __FILE__)).'" alt="'.esc_attr(__('Insert '.esc_attr($this->plugin_name))).'" /></a>';     ?>
+   <?php esc_html_e('You can also publish the form in a post/page, use the dedicated icon','appointment-hour-booking'); ?> <?php echo '<img hspace="5" src="'.esc_attr(plugins_url('/images/cp_form.gif', __FILE__)).'" alt="'.esc_attr(__('Insert '.esc_attr($this->plugin_name),'appointment-hour-booking')).'" /></a>';     ?>
    <?php esc_html_e('which has been added to your Upload/Insert Menu, just below the title of your Post/Page or under the "+" icon if using the Gutenberg editor.','appointment-hour-booking'); ?>
    <br /><br />
   </div>

@@ -437,7 +437,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                         echo intval($i)+1;
                         break;
                     case 'weekday':
-                        echo esc_html(ucfirst(__(date('l',strtotime($selection[$i][1])))));
+                        echo esc_html(ucfirst(__(date('l',strtotime($selection[$i][1])),'appointment-hour-booking')));
                         break;
                     case 'date':
                         echo esc_html($this->format_date($selection[$i][1]));
@@ -844,11 +844,11 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     /* Code for the admin area */
 
     public function plugin_page_links( $links ) {
-        $customAdjustments_link = '<a href="https://apphourbooking.dwbooster.com/customization">'.__('Request custom changes').'</a>';
+        $customAdjustments_link = '<a href="https://apphourbooking.dwbooster.com/customization">'.__('Request custom changes','appointment-hour-booking').'</a>';
     	array_unshift($links, $customAdjustments_link);
-        $settings_link = '<a href="admin.php?page='.$this->menu_parameter.'">'.__('Settings').'</a>';
+        $settings_link = '<a href="admin.php?page='.$this->menu_parameter.'">'.__('Settings','appointment-hour-booking').'</a>';
     	array_unshift($links, $settings_link);
-    	$help_link = '<a href="'.$this->plugin_URL.'">'.__('Help').'</a>';
+    	$help_link = '<a href="'.$this->plugin_URL.'">'.__('Help','appointment-hour-booking').'</a>';
     	array_unshift($links, $help_link);
     	return $links;
     }
@@ -1945,8 +1945,8 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
         $dconv = date( $format, strtotime($date) );
 
-        $dconv = str_replace( 'K', ucfirst ( __( date( 'l', strtotime( $date ) ) ) ), $dconv );
-        $dconv = str_replace( 'Q', ucfirst ( __( date( 'F', strtotime( $date ) ) ) ), $dconv );
+        $dconv = str_replace( 'K', ucfirst ( __( date( 'l', strtotime( $date ) ) ,'appointment-hour-booking') ), $dconv );
+        $dconv = str_replace( 'Q', ucfirst ( __( date( 'F', strtotime( $date ) ) ,'appointment-hour-booking') ), $dconv );
 
         return $dconv;
     }
