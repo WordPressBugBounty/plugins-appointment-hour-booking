@@ -54,13 +54,13 @@ function cpcff_make_seed() {
     list($usec, $sec) = explode(' ', microtime());
     return (float) $sec + ((float) $usec * 100000);
 }
-mt_srand(cpcff_make_seed());
-$randval = mt_rand();
+//mt_srand(cpcff_make_seed());
+$randval = wp_rand();
 
 $str = "";
 $length = 0;
 for ($i = 0; $i < $letter_count; $i++) {
-	 $str .= chr(mt_rand(97, 122))." ";
+	 $str .= chr(wp_rand(97, 122))." ";
 }
 $_SESSION['rand_code'.sanitize_key($_GET["ps"])] = str_replace(" ", "", $str);
 
@@ -78,7 +78,7 @@ if ($random_text_color)
 {
   do 
   {
-     $selcolor = mt_rand(0,256*256*256);
+     $selcolor = wp_rand(0,256*256*256);
   } while ( cpcff_similarColors(cpcff_decodeColor($selcolor), $bcolor) );
   $tcolor = cpcff_decodeColor($selcolor);
 }    
@@ -90,12 +90,12 @@ imagerectangle($image, 0, 0, $imgX-1, $imgY-1, $border_col);
 for ($i=0;$i<$noise;$i++)
 {
   if ($random_noise_color)
-      $color = mt_rand(0, 256*256*256);
+      $color = wp_rand(0, 256*256*256);
   else
       $color = $noisecolor;
-  $x1 = mt_rand(2,$imgX-2);
-  $y1 = mt_rand(2,$imgY-2);
-  imageline ( $image, $x1, $y1, mt_rand($x1-$noiselength,$x1+$noiselength), mt_rand($y1-$noiselength,$y1+$noiselength), $color);
+  $x1 = wp_rand(2,$imgX-2);
+  $y1 = wp_rand(2,$imgY-2);
+  imageline ( $image, $x1, $y1, wp_rand($x1-$noiselength,$x1+$noiselength), wp_rand($y1-$noiselength,$y1+$noiselength), $color);
 }  
 
 if (empty($_GET["font"]))
@@ -122,9 +122,9 @@ else
  
 $font = dirname( __FILE__ ) . "/". $selected_font;
 
-$font_size = rand($min_size, $max_size);
+$font_size = wp_rand($min_size, $max_size);
   
-$angle = rand(-15, 15);
+$angle = wp_rand(0, 30) - 15;
 
 if (function_exists("imagettfbbox") && function_exists("imagettftext"))
 {
