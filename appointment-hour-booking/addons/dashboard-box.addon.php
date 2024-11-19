@@ -25,8 +25,8 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 			{
 				check_admin_referer( 'session_id_ds_'.session_id(), '_cpappb_nonce_dashboard' );
 				update_option( 'cpappb_dashboard_maxitems', trim( intval($_REQUEST[ 'cpappb_dashboard_maxitems' ]) ) );
-                update_option( 'cpappb_dashboard_columns', trim( sanitize_text_field($_REQUEST[ 'cpappb_dashboard_columns' ]) ) );
-                update_option( 'cpappb_dashboard_columnlabels', trim( sanitize_text_field($_REQUEST[ 'cpappb_dashboard_columnlabels' ]) ) );
+                update_option( 'cpappb_dashboard_columns', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columns' ])) ) );
+                update_option( 'cpappb_dashboard_columnlabels', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) ) );
 			}
 			?>
 			<form method="post">
@@ -114,7 +114,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 	        ), $atts ) );
 
             $columns = str_replace('>','',str_replace('<','',str_replace('%','',get_option( 'cpappb_dashboard_columns', $columns))));
-            $columnlabels = strip_tags(get_option( 'cpappb_dashboard_columnlabels', $columnlabels));
+            $columnlabels = wp_strip_all_tags(get_option( 'cpappb_dashboard_columnlabels', $columnlabels));
 
             $maxitems = get_option( 'cpappb_dashboard_maxitems' );
             if ($maxitems == '')

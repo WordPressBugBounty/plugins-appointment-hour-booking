@@ -369,27 +369,6 @@ jQuery(document).one('showHideDepEvent', function(){
 		} // End insert_recaptcha
 
 
-		/**
-		 * mark the item as paid
-		 */
-		private function _log($adarray = array())
-		{
-			$h = fopen( __DIR__.'/logs.txt', 'a' );
-			$log = "";
-			foreach( $_REQUEST as $KEY => $VAL )
-			{
-				$log .= $KEY.": ".$VAL."\n";
-			}
-			foreach( $adarray as $KEY => $VAL )
-			{
-				$log .= $KEY.": ".$VAL."\n";
-			}
-			$log .= "================================================\n";
-			fwrite( $h, $log );
-			fclose( $h );
-		}
-
-
 
     } // End Class
 
