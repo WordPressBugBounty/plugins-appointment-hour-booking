@@ -2792,33 +2792,35 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
     public function admin_process_json( $str ) {
         $form_data = json_decode($this->cleanJSON($str));
-
-        $form_data[1][0]->title = $this->filter_allowed_tags( $form_data[1][0]->title );
-        $form_data[1][0]->description = $this->filter_allowed_tags( $form_data[1][0]->description );
-
-        for ( $i=0; $i < count($form_data[0]); $i++ )
+        if (is_array($form_data))
         {
-            if ( isset( $form_data[0][$i]->title ) )
-                $form_data[0][$i]->title = $this->filter_allowed_tags(($form_data[0][$i]->title));
-            $form_data[0][$i]->userhelpTooltip = $this->filter_allowed_tags(($form_data[0][$i]->userhelpTooltip));
-            $form_data[0][$i]->userhelp = $this->filter_allowed_tags(($form_data[0][$i]->userhelp));
-
-            if ($form_data[0][$i]->ftype == 'fCommentArea')
+            $form_data[1][0]->title = $this->filter_allowed_tags( $form_data[1][0]->title );
+            $form_data[1][0]->description = $this->filter_allowed_tags( $form_data[1][0]->description );
+            
+            for ( $i=0; $i < count($form_data[0]); $i++ )
+            {
+                if ( isset( $form_data[0][$i]->title ) )
+                    $form_data[0][$i]->title = $this->filter_allowed_tags(($form_data[0][$i]->title));
+                $form_data[0][$i]->userhelpTooltip = $this->filter_allowed_tags(($form_data[0][$i]->userhelpTooltip));
                 $form_data[0][$i]->userhelp = $this->filter_allowed_tags(($form_data[0][$i]->userhelp));
-            else if ($form_data[0][$i]->ftype == 'fradio' || $form_data[0][$i]->ftype == 'fcheck' || $form_data[0][$i]->ftype == 'fdropdown')
-            {
-                    for ($j=0; $j < count($form_data[0][$i]->choices); $j++)
-                        $form_data[0][$i]->choices[$j] = $this->filter_allowed_tags(($form_data[0][$i]->choices[$j]));
+            
+                if ($form_data[0][$i]->ftype == 'fCommentArea')
+                    $form_data[0][$i]->userhelp = $this->filter_allowed_tags(($form_data[0][$i]->userhelp));
+                else if ($form_data[0][$i]->ftype == 'fradio' || $form_data[0][$i]->ftype == 'fcheck' || $form_data[0][$i]->ftype == 'fdropdown')
+                {
+                        for ($j=0; $j < count($form_data[0][$i]->choices); $j++)
+                            $form_data[0][$i]->choices[$j] = $this->filter_allowed_tags(($form_data[0][$i]->choices[$j]));
+                }
+                else if ($form_data[0][$i]->ftype == 'fapp')
+                {
+                    for ($j=0; $j < count($form_data[0][$i]->services); $j++)
+                        $form_data[0][$i]->services[$j]->name = $this->filter_allowed_tags(($form_data[0][$i]->services[$j]->name));
+                    if (isset($form_data[0][$i]->emptySelect))
+                        $form_data[0][$i]->emptySelect= $this->filter_allowed_tags(($form_data[0][$i]->emptySelect));
+                }
             }
-            else if ($form_data[0][$i]->ftype == 'fapp')
-            {
-                for ($j=0; $j < count($form_data[0][$i]->services); $j++)
-                    $form_data[0][$i]->services[$j]->name = $this->filter_allowed_tags(($form_data[0][$i]->services[$j]->name));
-                if (isset($form_data[0][$i]->emptySelect))
-                    $form_data[0][$i]->emptySelect= $this->filter_allowed_tags(($form_data[0][$i]->emptySelect));
-            }
+            $str = json_encode( $form_data );
         }
-        $str = json_encode( $form_data );
         return $str;
     }
 
