@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: hour,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
 Tested up to: 6.7
-Stable tag: 1.4.95
+Stable tag: 1.4.96
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -576,7 +576,10 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.4.95 =
 * PHP 8 compatibility fix
 
+= 1.4.96 =
+* Dashboard add-on fix
+
 == Upgrade Notice ==
 
-= 1.4.95 =
-* PHP 8 compatibility fix
+= 1.4.96 =
+* Dashboard add-on fix

@@ -24,14 +24,14 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 			if( isset( $_REQUEST[ 'cpappb_dashboard' ] ) )
 			{
 				check_admin_referer( 'session_id_ds_'.session_id(), '_cpappb_nonce_dashboard' );
-				update_option( 'cpappb_dashboard_maxitems', trim( intval($_REQUEST[ 'cpappb_dashboard_maxitems' ]) ) );
-                update_option( 'cpappb_dashboard_columns', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columns' ])) ) );
-                update_option( 'cpappb_dashboard_columnlabels', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) ) );
+                if (isset($_REQUEST[ 'cpappb_dashboard_maxitems' ])) update_option( 'cpappb_dashboard_maxitems', trim( intval($_REQUEST[ 'cpappb_dashboard_maxitems' ]) ) );
+                if (isset($_REQUEST[ 'cpappb_dashboard_columns' ])) update_option( 'cpappb_dashboard_columns', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columns' ])) ) );
+                if (isset($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) update_option( 'cpappb_dashboard_columnlabels', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) ) );
 			}
 			?>
 			<form method="post">
 				<div id="metabox_basic_settings" class="postbox" >
-					<h3 class='hndle' style="padding:5px;"><span><?php print esc_html(__($this->name, 'appointment-hour-booking')); ?></span></h3>
+					<h3 class='hndle' style="padding:5px;"><span><?php print esc_html(__('Dashboard Widget: Upcoming appointments', 'appointment-hour-booking')); ?></span></h3>
 					<div class="inside">
 						<table cellspacing="0" style="width:100%;">
 							<tr>
@@ -132,8 +132,8 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
                 $cond .= " AND formid=".intval($calendar);
 
             // calculate dates
-            $from = date("Y-m-d",strtotime($datefrom));
-            $to = date("Y-m-d",strtotime($dateto));
+            $from = gmdate("Y-m-d",strtotime($datefrom));
+            $to = gmdate("Y-m-d",strtotime($dateto));
 
             $events_query = "SELECT * FROM ".$wpdb->prefix.$cp_appb_plugin->table_messages." INNER JOIN ".$wpdb->prefix.$cp_appb_plugin->table_items." ON ".$wpdb->prefix.$cp_appb_plugin->table_messages.".formid=".$wpdb->prefix.$cp_appb_plugin->table_items.".id".
                            " WHERE ".$cond." ORDER BY time DESC";
