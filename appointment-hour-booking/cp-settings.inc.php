@@ -8,34 +8,35 @@ if ( !is_admin() )
     exit;
 }
 
-
-$nonce = wp_create_nonce( 'cpappb_actions_admin' );
-
 $cpid = 'CP_AHB';
 
 $gotab = '';
-if (isset($_POST["gotab"]))
+if ( !empty($_POST["nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["nonce"])), 'cpappb_actions_admin') )
 {
-    $gotab = sanitize_text_field($_POST["gotab"]);
-    if ($gotab == '')
-        $message = 'Email report settings updated.';
-    else if ($gotab == 'fixarea')
-        $message = 'Troubleshoot settings updated.';
-    else if ($gotab == 'csvarea')
-        $message = 'CSV settings updated.';
-    else if ($gotab == 'schedulecalarea')
-        $message = 'Schedule Calendar View settings updated.';
-    else if ($gotab == 'miscsettings')
-        $message = 'Misc settings updated.';
-    else if ($gotab == 'css')
-        $message = 'Custom CSS updated.';
-    else if ($gotab == 'js')
-        $message = 'Custom javascript updated.';
+    if (isset($_POST["gotab"]))
+    {
+        $gotab = sanitize_text_field(wp_unslash($_POST["gotab"]));
+        if ($gotab == '')
+            $message = 'Email report settings updated.';
+        else if ($gotab == 'fixarea')
+            $message = 'Troubleshoot settings updated.';
+        else if ($gotab == 'csvarea')
+            $message = 'CSV settings updated.';
+        else if ($gotab == 'schedulecalarea')
+            $message = 'Schedule Calendar View settings updated.';
+        else if ($gotab == 'miscsettings')
+            $message = 'Misc settings updated.';
+        else if ($gotab == 'css')
+            $message = 'Custom CSS updated.';
+        else if ($gotab == 'js')
+            $message = 'Custom javascript updated.';
+    }
+    else
+        if (isset($_GET["gotab"]))
+            $gotab = sanitize_text_field(wp_unslash($_GET["gotab"]));
 }
-else
-    if (isset($_GET["gotab"]))
-        $gotab = sanitize_text_field($_GET["gotab"]);
 
+$nonce = wp_create_nonce( 'cpappb_actions_admin' );
 
 ?>
 <style>
