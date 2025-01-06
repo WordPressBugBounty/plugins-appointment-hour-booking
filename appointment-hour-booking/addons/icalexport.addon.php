@@ -404,7 +404,7 @@ ahb_icalexp_checkorg();
                             echo "SEQUENCE:0\n";
                             echo "STATUS:CONFIRMED\n";
                             if ($icalSettings[0]->ical_organizer == '1')
-                                echo "ORGANIZER;CN=\"".esc_html($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizername, $data, false, $ct-1))."\":MAILTO:".sanitize_email($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizeremail, $data, false, $ct-1))."\r\n";                            
+                                echo "ORGANIZER;CN=\"".esc_html($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizername, $data, false, $ct-1))."\":MAILTO:".esc_html(sanitize_email($cp_appb_plugin->replace_tags($icalSettings[0]->ical_organizeremail, $data, false, $ct-1)))."\r\n";                            
                             echo "SUMMARY:".esc_html(wp_strip_all_tags($base_summary))."\n";
                             echo "TRANSP:OPAQUE\n";
                             echo "END:VEVENT\n";
