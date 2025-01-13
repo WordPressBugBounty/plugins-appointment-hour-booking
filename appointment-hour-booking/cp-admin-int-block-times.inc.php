@@ -18,23 +18,27 @@ define('CPAPPHOURBK_BLOCK_TIMES', true);
 $message = '';
 $opensecond = false;
 
+
+
 if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform_process'] ) )
     echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>Booking added. It appears now in the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>. </strong></p></div>';
 else if ($this->get_param($this->prefix.'_blockmultiple') == '1' && is_admin() )
 {
     $opensecond = true;
-	echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>Blocked time added. It appears listed in the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>. You can un-block it from the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>.</strong></p></div>';
+    echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>Blocked time added. It appears listed in the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>. You can un-block it from the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>.</strong></p></div>';
 }
 
+
 $selected = array();
-if (!empty($_POST["selectedcalendar"]))
+if (!empty($_POST["selectedcalendar"]) && isset( $_POST['selectedcalendar'] ) && is_array( $_POST['selectedcalendar'] ) && wp_verify_nonce( sanitize_text_field($_POST["anonce"]), 'cpappb_actions_admin'))
 {
-	if (is_array($_POST["selectedcalendar"]))
-		foreach ($_POST["selectedcalendar"] as $item)
-            $selected[] = intval($item);
+    $sanitized_array = array_map( 'sanitize_text_field', $_POST['selectedcalendar'] );    
+    foreach ($sanitized_array as $item)
+        $selected[] = intval($item);    
 }
 else
     $selected = array($this->item);
+
 
 $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 
