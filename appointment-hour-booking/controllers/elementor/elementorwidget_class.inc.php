@@ -132,7 +132,7 @@ class Elementor_CPAppHourBK_Widget extends \Elementor\Widget_Base {
         } 
         else
         {
-            $GLOBALS['codepeople_form_sequence_number'] = mt_rand(99999,999999);
+            $GLOBALS['codepeople_form_sequence_number'] = wp_rand(99999,999999);
             $counter = $GLOBALS['codepeople_form_sequence_number']+1;
             define('APHOURBK_ELEMENTOR_EDIT_MODE', true);            
             echo '<fieldset class="ahbgutenberg_editor" disabled>';

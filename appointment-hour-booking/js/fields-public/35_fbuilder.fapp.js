@@ -202,6 +202,26 @@ $.extend(
 			    for (var i=0;i<me.allOH[ohindex].openhours.length;i++)
 			        if (me.allOH[ohindex].openhours[i].type=="special")
 			            a[a.length] = me.allOH[ohindex].openhours[i].d;
+			        else if (me.allOH[ohindex].openhours[i].type=="specialrange")
+			        {
+			            if (me.allOH[ohindex].openhours[i].d != "")
+				        {
+				            var str = me.allOH[ohindex].openhours[i].d.split(":");
+			                if (str.length == 2)
+			                {
+			                    fromD = $.datepicker.parseDate("yy-mm-dd", str[0]);
+			                    toD = $.datepicker.parseDate("yy-mm-dd", str[1]);
+			                    fromD.setDate( fromD.getDate() + 1 );
+				                while( fromD <= toD )
+				  	  	        {
+				  	  	            var st = $.datepicker.formatDate("yy-mm-dd",fromD);
+				  	  	        	a[a.length] = st;
+				  	  	        	fromD.setDate( fromD.getDate() + 1 );
+				  	  	        }	  
+				  	  	    }	  
+				    	    a[a.length] = str[0];
+				    	}
+			        }    
 			}
 			return a;
 	    },
@@ -245,6 +265,28 @@ $.extend(
 		  	        {
 		  	        	arr[me.allOH[ohindex].openhours[i].d] = arr[me.allOH[ohindex].openhours[i].d] || [];
 		  	        	arr[me.allOH[ohindex].openhours[i].d][arr[me.allOH[ohindex].openhours[i].d].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+		  	        }
+		  	        else if (me.allOH[ohindex].openhours[i].type=="specialrange")
+		  	        {
+		  	        	if (me.allOH[ohindex].openhours[i].d != "")
+				        {
+				            var str = me.allOH[ohindex].openhours[i].d.split(":");
+			                if (str.length == 2)
+			                {
+			                    fromD = $.datepicker.parseDate("yy-mm-dd", str[0]);
+			                    toD = $.datepicker.parseDate("yy-mm-dd", str[1]);
+			                    fromD.setDate( fromD.getDate() + 1 );
+				                while( fromD <= toD )
+				  	  	        {
+				  	  	            var st = $.datepicker.formatDate("yy-mm-dd",fromD);
+				  	  	            arr[st] = arr[st] || [];
+				    	            arr[st][arr[st].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+				  	  	            fromD.setDate( fromD.getDate() + 1 );
+				  	  	        }	  
+				  	  	    }	  
+				    	    arr[str[0]] = arr[str[0]] || [];
+				    	    arr[str[0]][arr[str[0]].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+				    	}
 		  	        }
 		  	        else
 		  	        {
@@ -1085,8 +1127,7 @@ $.extend(
 		  	try{
 		  	var df = "mm/dd/yy";
 		  	if (this.invalidDates.indexOf(".")!=-1)
-		  	    df = me.dateFormat;
-		  	    
+		  	    df = me.dateFormat;   
 		  	if( !/^\s*$/.test( this.invalidDates ) )
 		  	{
 		  	    var counter = 0, dates = this.invalidDates.split( ',' );
@@ -1209,7 +1250,7 @@ $.extend(
 		  	$("#"+me.name).bind("change", function() 
 		  	{
 		  	     if ($(this).attr("reload")=="reload")
-		  	     {              
+		  	     {            
 		  	         $(this).attr("reload","");
 		  	         onChangeDateOrService($.datepicker.formatDate('yy-mm-dd', me.getD));
 		  	         $( '#field' + me.form_identifier + '-' + me.index + ' .fieldCalendar'+me.name ).datepicker( "option", "beforeShowDay", function(d){return me.rC(d)} );

@@ -49,7 +49,7 @@ $.extend(
 		msort:function(arr){
             for(var i =0;i<arr.length;i++){
                 for(var j= i+1;j<arr.length;j++){
-                    if(arr[i].type>arr[j].type || (arr[i].type==arr[j].type && arr[i].type=="special" && arr[i].d>arr[j].d) || (arr[i].type==arr[j].type && arr[i].type!="special" && arr[i].h1*60+arr[i].m1>arr[j].h1*60+arr[j].m1)){
+                    if(arr[i].type>arr[j].type || (arr[i].type==arr[j].type && (arr[i].type=="special" || arr[i].type=="specialrange") && arr[i].d>arr[j].d) || (arr[i].type==arr[j].type && (arr[i].type!="special" && arr[i].type!="specialrange") && arr[i].h1*60+arr[i].m1>arr[j].h1*60+arr[j].m1)){
                         var swap = arr[i];
                         arr[i] = arr[j];
                         arr[j] = swap;
@@ -57,6 +57,17 @@ $.extend(
                 }
             }
             return arr;
+        },
+        rangeFormat:function(str,f){
+            if (str!="")
+			{ 
+			    var s = str.split(":");
+			    if (s.length == 2)
+			        return $.datepicker.formatDate(f,$.datepicker.parseDate("yy-mm-dd", s[0]))+":"+ $.datepicker.formatDate(f,$.datepicker.parseDate("yy-mm-dd", s[1]));
+			    else 
+			        return $.datepicker.formatDate(f,$.datepicker.parseDate("yy-mm-dd", s[0]));
+			}    
+            return str;
         },
         normalizeSelectIndex:function(ind)
         {
@@ -83,6 +94,58 @@ $.extend(
 					me.allOH[i].openhours[inst.input.attr("i")].d = $.datepicker.formatDate("yy-mm-dd", $.datepicker.parseDate(me.dateFormat, d));
 					$.fbuilder.reloadItems({'field':me});
          	}});
+         	$(".openhours_specialrange").datepicker('destroy').datepicker({dateFormat:me.dateFormat,
+         	    beforeShowDay: function(date) {
+         	        var i = $(this).parents(".openhoursdiv").attr("i")*1;
+					if (me.allOH[i].openhours[$(this).attr("i")].d!="")
+					{ 
+					    var s = me.allOH[i].openhours[$(this).attr("i")].d.split(":");
+					    var startDate = $.datepicker.parseDate("yy-mm-dd", s[0]);
+					    var endDate = $.datepicker.parseDate("yy-mm-dd", s[0]);
+					    if (s.length == 2)
+					        var endDate = $.datepicker.parseDate("yy-mm-dd", s[1]);
+					}
+                    if (startDate && endDate) {
+                        var dateInRange = date >= startDate && date <= endDate;
+                        return [true, dateInRange ? "highlight" : ""];
+                    }
+                    return [true, ""];
+                },      
+				onSelect: function(d,inst) {
+				    $(this).data('datepicker').inline = true;
+				    var date = $(this).datepicker("getDate");
+				    var i = $(this).parents(".openhoursdiv").attr("i")*1;
+				    var o = me.allOH[i].openhours[$(this).attr("i")] || {};
+				    if (me.allOH[i].openhours[$(this).attr("i")].d!="")
+					{ 
+					    var s = me.allOH[i].openhours[$(this).attr("i")].d.split(":");
+					    if (s.length == 2)
+					    {
+					        o.startDate = $.datepicker.parseDate("yy-mm-dd", s[0]);
+					        o.endDate = $.datepicker.parseDate("yy-mm-dd", s[1]);;
+					    }
+					    else
+					        o.startDate = $.datepicker.parseDate("yy-mm-dd", s[0]);   
+					}    
+                    if (!o.startDate || (o.startDate && o.endDate)) {
+                        o.startDate = date;
+                        o.endDate = null;
+                    } else {
+                        o.endDate = date;
+                        if (o.startDate > o.endDate)
+                        {
+                            var tmp = new Date(o.startDate);
+                            o.startDate = new Date(o.endDate);
+                            o.endDate = new Date(tmp);
+                        } 
+                    }
+                    me.allOH[i].openhours[$(this).attr("i")].d = $.datepicker.formatDate("yy-mm-dd", o.startDate) + (o.endDate ? ":" + $.datepicker.formatDate("yy-mm-dd", o.endDate) : "");
+					$(this).val(me.rangeFormat(me.allOH[i].openhours[$(this).attr("i")].d,me.dateFormat));
+					$.fbuilder.reloadItems({'field':me});
+				    $(this).datepicker("show");
+                    if (o.startDate && o.endDate)
+                        $(this).data('datepicker').inline = false;
+         	}});
          	$(".service_openhours").each( function(){
          	    var str = "";
 				for (var i=0;i<me.allOH.length;i++)
@@ -106,9 +169,11 @@ $.extend(
 		        str += '<select class="openhours_type" i="'+i+'" "><option value="all" '+((openhours[i].type=='all')?"selected":"")+'>All days</option>';
 		        for (var d=0;d<7;d++)
 		            str += '<option value="d'+d+'" '+((openhours[i].type=="d"+d)?"selected":"")+'>'+dayNames[d]+'</option>';
-		        str += '<option value="special" '+((openhours[i].type=='special')?"selected":"")+'>Only ...</option></select>';
-		        str += '<input style="visibility:'+((openhours[i].type=="special")?"visible":"hidden")+'" class="openhours_special" i="'+i+'" type="text"  value="'+((openhours[i].type=="special")?$.fbuilder.htmlEncode($.datepicker.formatDate(df, $.datepicker.parseDate("yy-mm-dd", openhours[i].d))):"")+'"/>';
-		        str += '<select class="openhours_from" i="'+i+'">';
+		        str += '<option value="special" '+((openhours[i].type=='special')?"selected":"")+'>Only ...</option>';
+		        str += '<option value="specialrange" '+((openhours[i].type=='specialrange')?"selected":"")+'>From ... to ...</option></select>';
+		        str += '<div class="specialcover"><input style="display:'+((openhours[i].type=="special")?"inline":"none")+'" class="openhours_special" i="'+i+'" type="text"  value="'+((openhours[i].type=="special")?$.fbuilder.htmlEncode($.datepicker.formatDate(df, $.datepicker.parseDate("yy-mm-dd", openhours[i].d))):"")+'"/>';
+		        str += '<input style="display:'+((openhours[i].type=="specialrange")?"inline":"none")+'" class="openhours_specialrange" i="'+i+'" type="text"  value="'+((openhours[i].type=="specialrange")?$.fbuilder.htmlEncode(me.rangeFormat(openhours[i].d,df)):"")+'"/>';
+		        str += '</div><select class="openhours_from" i="'+i+'">';
 		        for (var h=0;h<24;h++)
 		          for (var m=0;m<60;m=m+5)
 		            str += '<option h="'+h+'" m="'+m+'" value="'+((h<10)?"0":"")+h+":"+((m<10)?"0":"")+m+'" '+((openhours[i].h1==h && openhours[i].m1==m)?"selected":"")+'>'+me.formattime(h*60+m)+'</option>';    
@@ -277,10 +342,12 @@ $.extend(
 			{
 			    var i = $(this).parents(".openhoursdiv").attr("i")*1;
 				e.data.obj.allOH[i].openhours[$(this).attr("i")].type= $(this).val();
+				$(this).parents(".choicesEdit").find(".openhours_special").css("display","none");
+				$(this).parents(".choicesEdit").find(".openhours_specialrange").css("display","none");
 				if ($(this).val()=="special")
-				    $(this).parents(".choicesEdit").find(".openhours_special").css("visibility","visible");
-				else
-					$(this).parents(".choicesEdit").find(".openhours_special").css("visibility","hidden");    
+				    $(this).parents(".choicesEdit").find(".openhours_special").css("display","inline");	
+				else if ($(this).val()=="specialrange")		    
+					$(this).parents(".choicesEdit").find(".openhours_specialrange").css("display","inline");
 				$.fbuilder.reloadItems({'field':e.data.obj});
 			});
 			$(".openhours").off("change", ".openhours_from").on("change", ".openhours_from", {obj: this}, function(e)
@@ -433,6 +500,28 @@ $.extend(
 				    	  arr[me.allOH[ohindex].openhours[i].d] = arr[me.allOH[ohindex].openhours[i].d] || [];
 				    	  arr[me.allOH[ohindex].openhours[i].d][arr[me.allOH[ohindex].openhours[i].d].length] = me.allOH[ohindex].openhours[i];
 				    }
+				    else if (me.allOH[ohindex].openhours[i].type=="specialrange")
+				    {
+				        if (me.allOH[ohindex].openhours[i].d != "")
+				        {
+				            var str = me.allOH[ohindex].openhours[i].d.split(":");
+			                if (str.length == 2)
+			                {
+			                    fromD = $.datepicker.parseDate("yy-mm-dd", str[0]);
+			                    toD = $.datepicker.parseDate("yy-mm-dd", str[1]);
+			                    fromD.setDate( fromD.getDate() + 1 );
+				                while( fromD <= toD )
+				  	  	        {
+				  	  	            var st = $.datepicker.formatDate("yy-mm-dd",fromD);
+				  	  	            arr[st] = arr[st] || [];
+				    	            arr[st][arr[st].length] = me.allOH[ohindex].openhours[i];
+				  	  	            fromD.setDate( fromD.getDate() + 1 );
+				  	  	        }	  
+				  	  	    }	  
+				    	    arr[str[0]] = arr[str[0]] || [];
+				    	    arr[str[0]][arr[str[0]].length] = me.allOH[ohindex].openhours[i];
+				    	}
+				    }
 				    else
 				    {
 				        arr[me.allOH[ohindex].openhours[i].type] = arr[me.allOH[ohindex].openhours[i].type] || [];
@@ -513,7 +602,27 @@ $.extend(
 		        var ohindex = me.services[me.normalizeSelectIndex($(".fieldCalendarService"+me.name+" select option:selected").index())].ohindex;		    
 		        for (var i=0;i<me.allOH[ohindex].openhours.length;i++)
 		            if (me.allOH[ohindex].openhours[i].type=="special")
-		                me.special_days[me.special_days.length] = me.allOH[ohindex].openhours[i].d;	  
+		                me.special_days[me.special_days.length] = me.allOH[ohindex].openhours[i].d;
+		            else if (me.allOH[ohindex].openhours[i].type=="specialrange")
+		            {    
+		                if (me.allOH[ohindex].openhours[i].d != "")
+				        {
+				            var str = me.allOH[ohindex].openhours[i].d.split(":");
+			                if (str.length == 2)
+			                {
+			                    fromD = $.datepicker.parseDate("yy-mm-dd", str[0]);
+			                    toD = $.datepicker.parseDate("yy-mm-dd", str[1]);
+			                    fromD.setDate( fromD.getDate() + 1 );
+				                while( fromD <= toD )
+				  	  	        {
+				  	  	            var st = $.datepicker.formatDate("yy-mm-dd",fromD);
+				  	  	        	me.special_days[me.special_days.length] = st;
+				  	  	        	fromD.setDate( fromD.getDate() + 1 );
+				  	  	        }	  
+				  	  	    }	  
+				    	    me.special_days[me.special_days.length] = str[0];
+				    	} 
+		            }     	  
 		    }
 		    if ($("#date_format").length>0)
 		        me.dateFormat = $("#date_format").val();

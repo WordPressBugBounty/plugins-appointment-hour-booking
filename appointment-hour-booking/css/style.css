@@ -130,7 +130,9 @@ a.helpfbuilder,a.helpfbuilderfont{font-size:80%;text-decoration:underline;color:
 .choicesEdit input.service_capacity[type=text]{width:60px;}
 .choicesEdit select.service_duration{width:87px;margin-right:2px;}
 .choicesEdit select.openhours_type{width:56px;}
-.choicesEdit input.openhours_special{width:85px;}
+.choicesEdit .specialcover{width:85px;display:inline-block}
+.choicesEdit .specialcover input{width:85px;}
+td.highlight a{background:#2271b1 !important;color:#fff !important}
 .choicesEdit select.openhours_from,.choicesEdit select.openhours_to{width:60px;}
 .choicesSet .labelT{width:150px;float:left}
 .choicesSet .labelF{width:62px;float:left}
