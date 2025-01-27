@@ -1077,7 +1077,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                 wp_enqueue_style('cpahb-jquery-schedcalstyle', plugins_url('/mv/css/cupertino/calendar.css', __FILE__));
                 wp_enqueue_style('cpahb-jquery-schedcalstylemv', plugins_url('/mv/css/main.css', __FILE__));
                 
-                wp_enqueue_script('cpahb-schedcal-underscore', plugins_url('/mv/js/underscore.js', __FILE__));  
+                wp_enqueue_script('underscore', includes_url('/js/underscore.min.js'), array('jquery'), null, true);
                 wp_enqueue_script('cpahb-schedcal-rrule', plugins_url('/mv/js/rrule.js', __FILE__));  
                 wp_enqueue_script('cpahb-schedcal-common', plugins_url('/mv/js/Common.js', __FILE__));  
                 
