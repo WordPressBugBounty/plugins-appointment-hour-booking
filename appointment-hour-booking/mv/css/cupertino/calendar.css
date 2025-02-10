@@ -31,7 +31,8 @@
 .tg-col-overlaywrapper {position:relative;height:0}
 .tg-col-eventwrapper {position:relative;cursor:default;margin-right:10px;border-left:1px solid #D8D8D8;}
 .tg-today {background-color:#ffc;}
-.tg-spanningwrapper {position:relative;margin-left:3px;height:1px;top:1px;}
+.tg-spanningwrapper_old {position:relative;margin-left:3px;height:1px;top:1px;}
+.tg-spanningwrapper {position: absolute;margin-left:3px;top:0px;height:100%;width:100%;}
 .tg-hourmarkers {position:absolute;width:100%}
 .tg-dualmarker {border-top:1px solid #ddd;height:20px;line-height:20px;border-bottom:1px dotted #ddd;margin-bottom:20px;}
 .tg-nowmarker {position:absolute;left:0;width:100%;top:0;height:0;border-top:2px solid red;overflow:hidden;opacity:0.4;filter:alpha(opacity=40);}
