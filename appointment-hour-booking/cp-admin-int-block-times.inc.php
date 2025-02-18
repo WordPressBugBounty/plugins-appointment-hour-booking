@@ -20,12 +20,25 @@ $opensecond = false;
 
 
 
-if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform_process'] ) )
-    echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>Booking added. It appears now in the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>. </strong></p></div>';
-else if ($this->get_param($this->prefix.'_blockmultiple') == '1' && is_admin() )
+if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform_process'] ) ) 
+{
+    echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>';
+    esc_html_e('Booking added. It appears now in the','appointment-hour-booking');
+    echo ' <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">';
+    esc_html_e('bookings list','appointment-hour-booking');
+    echo '</a>. </strong></p></div>';
+} else if ($this->get_param($this->prefix.'_blockmultiple') == '1' && is_admin() )
 {
     $opensecond = true;
-    echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>Blocked time added. It appears listed in the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>. You can un-block it from the <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">bookings list</a>.</strong></p></div>';
+    echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>';
+    esc_html_e('Blocked time added. It appears listed in the','appointment-hour-booking');
+    echo ' <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">';
+    esc_html_e('bookings list','appointment-hour-booking');
+    echo '</a>. ';
+    esc_html_e('You can un-block it from the ','appointment-hour-booking');
+    echo '<a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">';
+    esc_html_e('bookings list','appointment-hour-booking');
+    echo '</a>.</strong></p></div>';
 }
 
 
