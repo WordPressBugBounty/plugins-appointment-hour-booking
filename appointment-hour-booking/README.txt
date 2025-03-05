@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: hour,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
 Tested up to: 6.7
-Stable tag: 1.5.10
+Stable tag: 1.5.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -604,7 +604,7 @@ Please note that the pro features aren't advised as part of the free plugin in t
 * Elementor integration
 
 = 1.5.06 =
-* Removed library not longer needed|
+* Removed library not longer needed
 
 = 1.5.07 =
 * Users add-on
@@ -618,7 +618,10 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.10 =
 * Old code removed
 
+= 1.5.11 =
+* Removed js file
+
 == Upgrade Notice ==
 
-= 1.5.10 =
-* Old code removed
+= 1.5.11 =
+* Removed js file
