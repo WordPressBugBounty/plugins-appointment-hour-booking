@@ -27,6 +27,10 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
                 if (isset($_REQUEST[ 'cpappb_dashboard_maxitems' ])) update_option( 'cpappb_dashboard_maxitems', trim( intval($_REQUEST[ 'cpappb_dashboard_maxitems' ]) ) );
                 if (isset($_REQUEST[ 'cpappb_dashboard_columns' ])) update_option( 'cpappb_dashboard_columns', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columns' ])) ) );
                 if (isset($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) update_option( 'cpappb_dashboard_columnlabels', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) ) );
+                if (isset($_REQUEST[ 'cpappb_dashboard_compactview' ]))
+                    update_option( 'cpappb_dashboard_compactview', trim( sanitize_text_field($_REQUEST[ 'cpappb_dashboard_compactview' ]) ) );
+                else
+                    update_option( 'cpappb_dashboard_compactview', '' );
 			}
 			?>
 			<form method="post">
@@ -52,6 +56,13 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 								<td>
 									<input type="text" name="cpappb_dashboard_columnlabels" value="<?php echo esc_attr(( ( $key = get_option( 'cpappb_dashboard_columnlabels' ) ) !== false ) ? $key : 'Time,Service,Data'); ?>"  style="width:80%;" /><br />
                                     <em><?php print esc_html(__('Visual column names at the top of the table', 'appointment-hour-booking')); ?>.</em>
+								</td>
+							</tr>
+                            <tr>
+								<td style="white-space:nowrap;width:200px;" valign="top"><?php esc_html_e('Compact view?', 'appointment-hour-booking');?>:</td>
+								<td>
+									<input type="checkbox" name="cpappb_dashboard_compactview" value="checked" <?php echo esc_attr( ( get_option( 'cpappb_dashboard_compactview' )  != '' ) ? " checked " : '' ); ?>" />
+                                    <em><?php print esc_html(__('Joins consecutive time-slots of the same booking', 'appointment-hour-booking')); ?>.</em>
 								</td>
 							</tr>
 						</table>
@@ -116,6 +127,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
             $columns = str_replace('>','',str_replace('<','',str_replace('%','',get_option( 'cpappb_dashboard_columns', $columns))));
             $columnlabels = wp_strip_all_tags(get_option( 'cpappb_dashboard_columnlabels', $columnlabels));
 
+            if (get_option( 'cpappb_dashboard_compactview' ) != '') $compact = true;
             $maxitems = get_option( 'cpappb_dashboard_maxitems' );
             if ($maxitems == '')
                 $maxitems = 10;
@@ -125,7 +137,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
             wp_enqueue_script( "jquery" );
 
             $cond = '1=1';
-            
+
             $cond = apply_filters( 'cpappb_the_availability_filter_second', $cond,  intval($cp_appb_plugin->getId()) );
 
             if ($calendar)
@@ -151,7 +163,18 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
                         if ($app["date"] >= $from && $app["date"] <= $to && ($status == '-1' || $status == $app["cancelled"])
 						   && $app["cancelled"] != 'Cancelled' && $app["cancelled"] != 'Cancelled by customer')
                         {
-                            $selection[] = array($app["date"]." ".$app["slot"], $app["date"], $app["slot"], $data, sanitize_email($item->notifyto), $item->data, $app["cancelled"], $app["service"]);
+                            $selection[] = array( $app["date"]." ".$app["slot"], // 0
+                                                  $app["date"], // 1
+                                                  $app["slot"], // 2
+                                                  $data, // 3
+                                                  sanitize_email($item->notifyto), // 4
+                                                  $item->data, // 5
+                                                  $app["cancelled"], // 6
+                                                  $app["service"], // 7
+                                                 '', // 8
+                                                 '', // 9
+                                                 $item->id                      // 10
+                                                 );
                         }
                 }
             }
@@ -159,6 +182,30 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
             // order time-slots
             function listgroupd_addon_appbkfastsortfn($a, $b) { return ($a[0] > $b[0]?1:-1); }
             usort($selection, "listgroupd_addon_appbkfastsortfn" );
+
+            $count_selection = count($selection);
+            // Join consecutive items of the same booking
+            if ( $compact )
+            {
+                for ($i = 0; $i < count($selection)-1; $i++)
+                {
+                    if (isset($selection[$i]) && isset($selection[$i+1]) && $selection[$i][10] == $selection[$i+1][10])
+                    {
+                        $time1 = explode("-",str_replace("/","-",$selection[$i][2]));
+                        $time2 = explode("-",str_replace("/","-",$selection[$i+1][2]));
+                        if ($time1[1] == $time2[0])
+                        {
+                            $selection[$i][2] = $time1[0] ."-".$time2[1];
+                            $selection[$i][0] = $selection[$i][1]." ".$selection[$i][2];
+                            //unset($selection[$i+1]);
+                            for ($j = $i+1; $j < count($selection)-1; $j++)
+                                $selection[$j] = $selection[$j+1];
+                            $i--;
+                            unset($selection[count($selection)-1]);
+                        }
+                    }
+                }
+            }
 
             // clean fields IDs
             $fields = explode(",",trim($columns));
