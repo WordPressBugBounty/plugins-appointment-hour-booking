@@ -1,11 +1,27 @@
 $.fbuilder[ 'nDate' ] = function()
 {
-    if ($("#ahbstid").length > 0 && $("#ahbstid").val()!="")
-        if (typeof cp_hourbk_timezone !== 'undefined')
-            return new Date((new Date($("#ahbstid").val())).getTime()+cp_hourbk_timezone*60*60*1000)
+    if ($("#ahbstid").length > 0 && $("#ahbstid").val()!="") {
+        if (typeof cp_hourbk_timezone !== 'undefined') {
+            const dateTime = new Date( new Date((new Date($("#ahbstid").val())).getTime()) );
+            var tz = $.fbuilder.calculateTimeZoneDifferenceIntl(dateTime, cp_hourbk_timezone, cp_hourbk_timezone_local);              
+            return new Date((new Date($("#ahbstid").val())).getTime()-tz*60*60*1000);
+        }
         else
             return new Date($("#ahbstid").val());
+    }
 	return new Date();
+};
+$.fbuilder[ 'strip_tags' ] = function(str)
+{
+	return $('<div>').html(str).text();
+};
+$.fbuilder[ 'calculateTimeZoneDifferenceIntl' ] = function(dateTime, timeZone1, timeZone2)
+{
+    const date1 = new Date(dateTime.toLocaleString('en-US', { timeZone: timeZone1 }));
+    const date2 = new Date(dateTime.toLocaleString('en-US', { timeZone: timeZone2 }));
+    const differenceMilliseconds = date2.getTime() - date1.getTime();
+    const differenceHours = differenceMilliseconds / (1000 * 60 * 60);
+    return differenceHours;
 };
 $.fbuilder.controls[ 'fapp' ] = function(){};
 $.extend( 
@@ -177,20 +193,29 @@ $.extend(
 		},
 		tzf: function(d)
 		{
-		    function getTZ(o,d)
+		    function getTZ_old(o,d)
 		    {
 		        var tz = ((new Date($.datepicker.parseDate("yy-mm-dd",d).getTime()+12*60*60*1000)).getTimezoneOffset()  * -1)/60 - parseFloat(cp_hourbk_timezone);
 		        if (typeof cp_hourbk_observedaylight !== 'undefined' && cp_hourbk_observedaylight)
 		        {
 		            try{
+		                
 		                if ($.datepicker.parseDate("yy-mm-dd",cp_hourbk_daylightnextchange).getTime() <= $.datepicker.parseDate("yy-mm-dd",d).getTime())
-		                    tz += parseFloat(cp_hourbk_daylightnexaction);
+		                    tz += parseFloat(cp_hourbk_daylightnexaction);  
 		            }catch (e) {}
 		        }
 		        o.tzCache[d] = tz;
 		        return tz;
 		    }
+		    function getTZ(o,d)
+		    {
+                const dateTime = new Date($.datepicker.parseDate("yy-mm-dd",d).getTime()+12*60*60*1000);
+                var tz = $.fbuilder.calculateTimeZoneDifferenceIntl(dateTime, cp_hourbk_timezone, cp_hourbk_timezone_local);
+                o.tzCache[d] = tz;
+                return tz;
+            }
 		    return (typeof cp_hourbk_timezone !== 'undefined')?((typeof this.tzCache[d] !== 'undefined' && this.allowTZCache)?this.tzCache[d]:getTZ(this,d)):this.tz;
+		    
 		},
 		getSpecialDays:function()
 		{
@@ -1176,7 +1201,7 @@ $.extend(
 		  	        capacity = me.services[i].capacity;
 		  	}
 		  	if (me.emptySelectCheckbox) 
-			    str = '<option value="">'+ me.emptySelect +'</option>'+ str ;
+			    str = '<option value="">'+ $.fbuilder.strip_tags(me.emptySelect) +'</option>'+ str ;
 		  	var str2 = "";    
 		  	for (var i=1;i<=me.services[0].capacity;i++)
 		  	    str2 += '<option value="'+i+'">'+i+'</option>';
