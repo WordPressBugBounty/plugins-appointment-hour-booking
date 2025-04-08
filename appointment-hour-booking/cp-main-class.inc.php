@@ -1335,6 +1335,8 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
            (get_option('cp_cpappb_admin_language', '') != 'english' && empty($_POST["cp_cpappb_admin_language"])) || 
            (isset($_POST["cp_cpappb_admin_language"]) && $_POST["cp_cpappb_admin_language"] != 'english'))
             load_plugin_textdomain( 'appointment-hour-booking', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+            
+        cpappb_loading_add_ons();    
 
         if(!empty($_REQUEST['cp_app_action']))
         {

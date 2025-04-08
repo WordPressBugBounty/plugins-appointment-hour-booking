@@ -127,7 +127,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
             $columns = str_replace('>','',str_replace('<','',str_replace('%','',get_option( 'cpappb_dashboard_columns', $columns))));
             $columnlabels = wp_strip_all_tags(get_option( 'cpappb_dashboard_columnlabels', $columnlabels));
 
-            if (get_option( 'cpappb_dashboard_compactview' ) != '') $compact = true;
+            if (get_option( 'cpappb_dashboard_compactview' ) != '') $compact = true; else $compact = false; 
             $maxitems = get_option( 'cpappb_dashboard_maxitems' );
             if ($maxitems == '')
                 $maxitems = 10;
