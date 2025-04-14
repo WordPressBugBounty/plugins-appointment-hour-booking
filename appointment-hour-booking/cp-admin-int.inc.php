@@ -833,12 +833,17 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
     <div class="ahb-adintsection" data-step="6">
      <?php
     	global $cpappb_addons_objs_list, $cpappb_addons_active_list;
+        $printed = false;
     	if( count( $cpappb_addons_active_list ) )
     	{
     		_e( '<h2>Add-Ons Settings:</h2><hr />', 'appointment-hour-booking' );
-    		foreach( $cpappb_addons_active_list as $addon_id ) if( isset( $cpappb_addons_objs_list[ $addon_id ] ) ) print $cpappb_addons_objs_list[ $addon_id ]->get_addon_form_settings( $this->item );  // phpcs:ignore WordPress.Security.EscapeOutput
+            ob_start();
+    		foreach( $cpappb_addons_active_list as $addon_id ) if( isset( $cpappb_addons_objs_list[ $addon_id ] ) ) print $cpappb_addons_objs_list[ $addon_id ]->get_addon_form_settings( $this->item ); // phpcs:ignore WordPress.Security.EscapeOutput
+            $printed = ob_get_contents() != '';
+            ob_end_flush();
     	}
-        else
+        
+        if (!$printed)
         {
             ?>
             <p><?php esc_html_e('You can optionally','appointment-hour-booking'); ?> <a target="_blank" href="?page=cp_apphourbooking_addons"><?php esc_html_e('activate add ons in the add ons section','appointment-hour-booking'); ?></a>.</p>

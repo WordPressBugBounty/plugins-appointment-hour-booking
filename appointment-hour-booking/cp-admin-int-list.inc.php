@@ -190,9 +190,11 @@ $nonce = wp_create_nonce( 'cpappb_actions_list' );
   $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
   foreach ($myrows as $item)
   {
-   $options = unserialize($item->cp_user_access); 
-   if (!is_array($options))
-       $options = array();      
+   $options = !empty($item->cp_user_access) ? unserialize($item->cp_user_access) : array();
+   
+   if (!is_array($options)) 
+       $options = array();
+
    if ($current_user_access || @in_array($current_user->ID, $options))
    {
 ?>
