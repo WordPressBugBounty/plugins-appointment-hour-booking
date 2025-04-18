@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: hour,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
 Tested up to: 6.8
-Stable tag: 1.5.18
+Stable tag: 1.5.19
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -639,7 +639,10 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.18 =
 * WP 6.8 update
 
+= 1.5.19 =
+* Fixed cache issue
+
 == Upgrade Notice ==
 
-= 1.5.18 =
-* WP 6.8 update
+= 1.5.19 =
+* Fixed cache issue
