@@ -309,7 +309,7 @@ ahb_icalexp_checkorg();
 		{
             global $wpdb, $cp_appb_plugin;
 
-            header("Content-type: application/octet-stream");
+            header("Content-type: text/calendar");
             header("Content-Disposition: attachment; filename=events".date("Y-M-D_H.i.s").".ics");
 
             $updatefeaturetime = strtotime('2019-03-05');

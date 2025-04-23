@@ -1159,6 +1159,9 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
 
    public function data_management_pluginsloaded() {
+       
+       cpappb_loading_add_ons();     
+            
        if (isset($_GET["cp_cpappb_resources"]))
        {
            add_filter( 'trp_allow_tp_to_run', 'apphourbk_tp_disable_filter' );
@@ -1330,13 +1333,11 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
     function data_management() {
         global $wpdb;
-
-        if (!is_admin() || 
+            
+       if (!is_admin() || 
            (get_option('cp_cpappb_admin_language', '') != 'english' && empty($_POST["cp_cpappb_admin_language"])) || 
            (isset($_POST["cp_cpappb_admin_language"]) && $_POST["cp_cpappb_admin_language"] != 'english'))
-            load_plugin_textdomain( 'appointment-hour-booking', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-            
-        cpappb_loading_add_ons();    
+            load_plugin_textdomain( 'appointment-hour-booking', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );            
 
         if(!empty($_REQUEST['cp_app_action']))
         {
