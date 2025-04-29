@@ -88,7 +88,7 @@
 	-moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
 	box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);}
 #fbuilder .slots div{display:inline-block;border:1px solid #005;margin:5px;padding:1px}
-#fbuilder .slots div a{background: #ededed;box-shadow:none;display:inline-block;padding:4px}
+#fbuilder .slots div a{background: #ededed;box-shadow:none;display:inline-block;padding:4px;cursor:pointer;}
 #fbuilder .slots div a:hover{background: #f7f7f7;}
 
 

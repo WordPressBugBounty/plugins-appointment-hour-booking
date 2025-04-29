@@ -617,7 +617,7 @@ $.extend(
 		  	  	st += me.pb;
 		  	  	while (st + duration + me.pa <=et  && st < 24 * 60)
 		  	  	{ 
-		  	  	    html = "<div class=\"availableslot\"><a  s=\""+s+"\"  href=\"\" d=\""+arr[i].day+"\" h1=\""+Math.floor((st)/60)+"\" m1=\""+((st)%60)+"\" h2=\""+Math.floor((st+duration)/60)+"\" m2=\""+((st+duration)%60)+"\">"+me.formatString({st:st,et:st+duration},false,me.tzf(d))+((typeof cp_hourbk_cmpublic !== 'undefined')?"<span class=\"ahb_slot_availability\"><span class=\"p\">ahbslotavailabilityP</span><span class=\"t\">ahbslotavailabilityT</span></span>":"")+"</a></div>";
+		  	  	    html = "<div class=\"availableslot\"><a  s=\""+s+"\" d=\""+arr[i].day+"\" h1=\""+Math.floor((st)/60)+"\" m1=\""+((st)%60)+"\" h2=\""+Math.floor((st+duration)/60)+"\" m2=\""+((st+duration)%60)+"\">"+me.formatString({st:st,et:st+duration},false,me.tzf(d))+((typeof cp_hourbk_cmpublic !== 'undefined')?"<span class=\"ahb_slot_availability\"><span class=\"p\">ahbslotavailabilityP</span><span class=\"t\">ahbslotavailabilityT</span></span>":"")+"</a></div>";
 		  	  	    htmlSlots[htmlSlots.length] = {availableslot:true,st:st,serviceindex:s,h1:Math.floor((st)/60),m1:((st)%60),h2:Math.floor((st+duration)/60),m2:((st+duration)%60),html:html,t:$.datepicker.parseDate("yy-mm-dd",arr[i].day).getTime()+st*60*1000};
 		  	  	    if (!me.bSlotsCheckbox)
 		  	  	        st += me.bduration;
