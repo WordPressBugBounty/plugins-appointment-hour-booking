@@ -1,7 +1,7 @@
 <?php
   if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
   if ( !defined('CP_AUTH_INCLUDE') ) { echo 'Direct access not allowed.'; exit; }
-  
+/**  
   if (!is_admin()) {
       $full_url = get_permalink();
   
@@ -14,6 +14,8 @@
       $path .= (strpos($path, '?') === false ? '?' : '&') . 'ahbnocache=' . $cache_buster;
   }
   else $path = "";  
+*/  
+  $path = ""; 
   
 ?>
 <form class="cpp_form no-prefetch" name="<?php echo esc_attr($this->prefix); ?>_pform<?php echo '_'.esc_attr($this->print_counter); ?>" id="<?php echo esc_attr($this->prefix); ?>_pform<?php echo '_'.esc_attr($this->print_counter); ?>" action="<?php echo esc_attr($path); ?>" method="post" enctype="multipart/form-data" onsubmit="return <?php echo esc_attr($this->prefix); ?>_pform_doValidate<?php echo '_'.esc_attr($this->print_counter); ?>(this);"><input type="hidden" name="cp_pform_psequence" value="<?php echo '_'.esc_attr($this->print_counter); ?>" /><input type="hidden" name="<?php echo esc_attr($this->prefix); ?>_pform_process" value="1" /><input type="hidden" name="<?php echo esc_attr($this->prefix); ?>_id" value="<?php echo esc_attr($this->item); ?>" /><input type="hidden" name="cp_ref_page" value="<?php esc_attr($this->get_site_url()); ?>" /><input type="hidden" name="form_structure<?php echo '_'.esc_attr($this->print_counter); ?>" id="form_structure<?php echo '_'.esc_attr($this->print_counter); ?>" size="180" value="<?php echo $raw_form_str; // phpcs:ignore WordPress.Security.EscapeOutput 
