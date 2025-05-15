@@ -86,7 +86,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds a widget to display a list of upcoming appointments in the dashboard welcome page.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds a widget to display a list of upcoming appointments in the dashboard welcome page.", 'appointment-hour-booking' );
             // Check if the plugin is active
 			if( !$this->addon_is_active() ) return;
 
@@ -279,7 +279,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
                             $value = ($selection[$i][3]['paid']?__('Yes','appointment-hour-booking'):'&nbsp;');
                             break;
                         default:
-                            $value = esc_html(($selection[$i][3][$fields[$j]]==''?'&nbsp;':$selection[$i][3][$fields[$j]]))."&nbsp;";
+                            $value = esc_html((!isset($selection[$i][3][$fields[$j]]) || $selection[$i][3][$fields[$j]]==''?'&nbsp;':$selection[$i][3][$fields[$j]]))."&nbsp;";
                     }
                     echo '<td class="cpappbcol'.esc_html($colnum).'">'.esc_html(trim($value)).'</td>';
                 }

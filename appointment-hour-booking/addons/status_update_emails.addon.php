@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_StatusUpdateEmails' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to define emails to be sent when the booking status is changed from the bookings list", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allows to define emails to be sent when the booking status is changed from the bookings list", 'appointment-hour-booking' );
 
         } // End __construct
 

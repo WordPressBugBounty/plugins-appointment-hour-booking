@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_DoubleOptIn' ) )
 
         function __construct()
         {
-			$this->description = __("Double opt-in email verification link to mark the booking as approved", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Double opt-in email verification link to mark the booking as approved", 'appointment-hour-booking' );
 
         } // End __construct
 

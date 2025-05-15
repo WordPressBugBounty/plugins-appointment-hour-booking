@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_iCalImport' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for importing iCal files from external websites/services", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for importing iCal files from external websites/services", 'appointment-hour-booking' );
 
         } // End __construct
 

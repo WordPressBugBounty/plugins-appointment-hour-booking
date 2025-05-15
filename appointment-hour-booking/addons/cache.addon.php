@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on keeps a cache of the available times for faster booking form loading.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on keeps a cache of the available times for faster booking form loading.", 'appointment-hour-booking' );
         } // End __construct
 
 

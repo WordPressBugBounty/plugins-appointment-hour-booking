@@ -145,7 +145,7 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 
         function __construct()
         {
-			$this->description = __("Alternative time slot selection interface that does not display a calendar, but only available dates.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Alternative time slot selection interface that does not display a calendar, but only available dates.", 'appointment-hour-booking' );
             // Check if the plugin is active
 			if( !$this->addon_is_active() ) return;
 

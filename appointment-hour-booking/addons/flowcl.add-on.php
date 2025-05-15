@@ -27,7 +27,7 @@ if( !class_exists( 'CPAPPB_FlowCL' ) && class_exists( 'CPAPPB_BaseAddon' ))
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for Flow.cl payments", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for Flow.cl payments", 'appointment-hour-booking' );
             // Check if the plugin is active
 
         } // End __construct

@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_GoogleCalendarAPI' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for Google Calendar API integration", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for Google Calendar API integration", 'appointment-hour-booking' );
 
         } // End __construct
 

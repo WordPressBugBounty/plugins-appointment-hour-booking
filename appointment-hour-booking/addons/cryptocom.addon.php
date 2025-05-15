@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_CryptoCom' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for Crypto.com payments", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for Crypto.com payments", 'appointment-hour-booking' );
 
         } // End __construct
 

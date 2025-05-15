@@ -25,7 +25,7 @@ if( !class_exists( 'CPAPPB_EmailBlacklistaddon' ) )
         function __construct()
         {
 
-			$this->description = __("The add-on is for preventing bookings from blacklisted emails.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on is for preventing bookings from blacklisted emails.", 'appointment-hour-booking' );
         } // End __construct
 
 

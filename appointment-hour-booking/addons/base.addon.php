@@ -25,7 +25,7 @@ if( !class_exists( 'CPAPPB_BaseAddon' ) )
 
 		public function get_addon_description()
 		{
-			return $this->description;
+			return __($this->description, 'appointment-hour-booking');
 		}
 
 		public function get_addon_form_settings( $form_id )
@@ -44,5 +44,12 @@ if( !class_exists( 'CPAPPB_BaseAddon' ) )
             if (!is_array($cpappb_addons_active_list)) $cpappb_addons_active_list = get_option( 'cpappb_addons_active_list', array() );
 			return in_array( $this->get_addon_id(), $cpappb_addons_active_list );
 		}
+        
+        public function tr_apply($text, $domain)
+		{
+			return $text;
+		}
+
+
 	} // End Class
 }

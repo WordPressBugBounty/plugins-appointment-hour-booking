@@ -25,7 +25,7 @@ if( !class_exists( 'CPAPPB_paymentoptionorder' ) )
 
         function __construct()
         {
-			$this->description = __("Tool for setting the order in which the payment options appear in the booking form (if multiple payment options are enabled).", 'appointment-hour-booking');
+			$this->description = $this->tr_apply("Tool for setting the order in which the payment options appear in the booking form (if multiple payment options are enabled).", 'appointment-hour-booking');
 
         } // End __construct
 

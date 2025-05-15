@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_WebHook' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows put the submitted information to a webhook URL, and integrate the forms with the Zapier service", 'appointment-hour-booking');
+			$this->description = $this->tr_apply("The add-on allows put the submitted information to a webhook URL, and integrate the forms with the Zapier service", 'appointment-hour-booking');
 
         } // End __construct
 

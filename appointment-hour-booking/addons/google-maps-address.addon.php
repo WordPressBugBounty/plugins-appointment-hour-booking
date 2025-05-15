@@ -24,7 +24,7 @@ if( !class_exists( 'CPAPPB_GoogleMapsAddress' ) )
 
         function __construct()
         {
-			$this->description = __("Convert text fields to auto-complete address fields using Google Maps addresses", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Convert text fields to auto-complete address fields using Google Maps addresses", 'appointment-hour-booking' );
 
         } // End __construct
 

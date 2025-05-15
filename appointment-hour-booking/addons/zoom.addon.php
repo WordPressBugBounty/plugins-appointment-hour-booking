@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_Zoom' ) )
 
         function __construct()
         {
-			$this->description = __("Automatically creates a Zoom.us meeting for the booked time", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Automatically creates a Zoom.us meeting for the booked time", 'appointment-hour-booking' );
 
         } // End __construct
 

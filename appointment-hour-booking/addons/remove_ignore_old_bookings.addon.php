@@ -23,7 +23,7 @@ if( !class_exists( 'CPAPPB_RemoveIgnoreOld' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to automatically remove or ignore old bookings to increase the booking form speed", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allows to automatically remove or ignore old bookings to increase the booking form speed", 'appointment-hour-booking' );
 
         } // End __construct
 

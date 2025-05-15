@@ -21,7 +21,7 @@ if( !class_exists( 'CPAPPB_WhatsappButton' ) )
 
         function __construct()
         {
-			$this->description = __("Adds a button in the booking orders list to start a WhatsApp chat", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Adds a button in the booking orders list to start a WhatsApp chat", 'appointment-hour-booking' );
             // Check if the plugin is active
 
 

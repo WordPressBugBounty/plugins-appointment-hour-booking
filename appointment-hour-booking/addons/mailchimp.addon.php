@@ -19,7 +19,7 @@ if( !class_exists( 'CPAPPB_MailChimp' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on creates MailChimp List members with the submitted information", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on creates MailChimp List members with the submitted information", 'appointment-hour-booking' );
 
         } // End __construct
 

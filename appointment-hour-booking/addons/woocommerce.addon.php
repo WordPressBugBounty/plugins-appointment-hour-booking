@@ -21,7 +21,7 @@ if( !class_exists( 'CPAPPB_WooCommerce' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows integrate the forms with WooCommerce products", 'appointment-hour-booking');
+			$this->description = $this->tr_apply("The add-on allows integrate the forms with WooCommerce products", 'appointment-hour-booking');
 
 
         } // End __construct

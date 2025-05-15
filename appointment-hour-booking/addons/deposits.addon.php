@@ -23,7 +23,7 @@ if( !class_exists( 'CPAPPB_Deposits' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on enables the option to accept payment deposit as fixed amount or percent of the booking cost", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on enables the option to accept payment deposit as fixed amount or percent of the booking cost", 'appointment-hour-booking' );
 
         } // End __construct
 

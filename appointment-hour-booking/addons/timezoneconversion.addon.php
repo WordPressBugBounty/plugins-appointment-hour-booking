@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_TimezoneConversion' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on applies the timezone conversion to display the time-slots in the customer timezone", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on applies the timezone conversion to display the time-slots in the customer timezone", 'appointment-hour-booking' );
 
         } // End __construct
 

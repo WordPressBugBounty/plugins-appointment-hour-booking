@@ -21,7 +21,7 @@ if( !class_exists( 'CPAPPB_FrontendLists' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to displays list (schedule) of bookings grouped by date in the frontend", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allows to displays list (schedule) of bookings grouped by date in the frontend", 'appointment-hour-booking' );
 
         } // End __construct
 

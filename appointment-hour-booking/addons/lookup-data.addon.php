@@ -24,7 +24,7 @@ if( !class_exists( 'CPAPPB_DataLookup' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on enables data lookup in previous bookings to auto-fill fields", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on enables data lookup in previous bookings to auto-fill fields", 'appointment-hour-booking' );
 
         } // End __construct
 

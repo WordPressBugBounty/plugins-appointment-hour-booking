@@ -25,7 +25,7 @@ if( !class_exists( 'CPAPPB_WooCommerceAutoBInfo' ))
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for autofilling WooCommerce billing", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for autofilling WooCommerce billing", 'appointment-hour-booking' );
             // Check if the plugin is active
 
 

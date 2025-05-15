@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_SMSBroadcast' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to send notification messages (SMS) via SMSBroadcast.com.au after submitting the form", 'appointment-hour-booking');
+			$this->description = $this->tr_apply("The add-on allows to send notification messages (SMS) via SMSBroadcast.com.au after submitting the form", 'appointment-hour-booking');
 
         } // End __construct
 

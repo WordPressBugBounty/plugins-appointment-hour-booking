@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_UserCalendarCreation' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on creates and assign a calendar for each new registered user", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on creates and assign a calendar for each new registered user", 'appointment-hour-booking' );
 
         } // End __construct
 

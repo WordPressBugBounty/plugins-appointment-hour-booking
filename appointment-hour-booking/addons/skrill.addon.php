@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_Skrill' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for Skrill payments", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for Skrill payments", 'appointment-hour-booking' );
 
         } // End __construct
 

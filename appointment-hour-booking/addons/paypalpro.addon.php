@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_PayPalPro' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for PayPal Payment Pro payments to accept credit cars directly into the website", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for PayPal Payment Pro payments to accept credit cars directly into the website", 'appointment-hour-booking' );
 
         } // End __construct
 

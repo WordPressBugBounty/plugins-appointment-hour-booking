@@ -25,7 +25,7 @@ if( !class_exists( 'CPAPPB_PDFAddon' )  )
 
         function __construct()
         {
-			$this->description = __("The add-on generates PDF files or invoices with the booking data and optionally attach it to emails", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on generates PDF files or invoices with the booking data and optionally attach it to emails", 'appointment-hour-booking' );
         } // End __construct    
         
         

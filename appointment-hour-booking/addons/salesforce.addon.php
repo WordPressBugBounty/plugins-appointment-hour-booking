@@ -19,7 +19,7 @@ if( !class_exists( 'CPAPPB_SalesForce' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows create SalesForce leads with the submitted information", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allows create SalesForce leads with the submitted information", 'appointment-hour-booking' );
 
         } // End __construct
 

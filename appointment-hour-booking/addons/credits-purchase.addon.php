@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_CreditsPurchase' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to purchase some number of hours (credits) and then use those credits to complete bookings", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allows to purchase some number of hours (credits) and then use those credits to complete bookings", 'appointment-hour-booking' );
 
         } // End __construct
 

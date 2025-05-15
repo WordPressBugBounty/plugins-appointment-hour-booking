@@ -22,7 +22,7 @@ if( !class_exists( 'Apphb_Signature' ) )
 
         function __construct()
         {
-            $this->description = __("The add-on allows to replace form fields with \"Signature\" fields", 'appointment-hour-booking');
+            $this->description = $this->tr_apply("The add-on allows to replace form fields with \"Signature\" fields", 'appointment-hour-booking');
 
         } // End __construct
 

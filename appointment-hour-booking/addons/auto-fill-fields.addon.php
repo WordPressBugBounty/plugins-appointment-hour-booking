@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_AutoFillFields' ) )
 
         function __construct()
         {            
-			$this->description = __("Automatically pre-fill form fields with data form URL GET parameters.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Automatically pre-fill form fields with data form URL GET parameters.", 'appointment-hour-booking' );
         } // End __construct
 
 

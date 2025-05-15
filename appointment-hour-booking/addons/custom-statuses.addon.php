@@ -21,7 +21,7 @@ if( !class_exists( 'CPAPPB_CustomStatuses' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to add new statuses to the bookings.", 'appointment-hour-booking');
+			$this->description = $this->tr_apply("The add-on allows to add new statuses to the bookings.", 'appointment-hour-booking');
 
         } // End __construct
 

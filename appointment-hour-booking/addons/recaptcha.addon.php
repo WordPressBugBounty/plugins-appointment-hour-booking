@@ -21,7 +21,7 @@ if( !class_exists( 'CPAPPB_reCAPTCHA' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows to protect the forms with reCAPTCHA service of Google", 'appointment-hour-booking');
+			$this->description = $this->tr_apply("The add-on allows to protect the forms with reCAPTCHA service of Google", 'appointment-hour-booking');
 
         } // End __construct
 

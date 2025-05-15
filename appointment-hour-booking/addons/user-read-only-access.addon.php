@@ -28,7 +28,7 @@ if( !class_exists( 'CPAPPB_UserReadOnly' ) )
 
         function __construct()
         {
-			$this->description = __("Gives read-only access to specific admin users/groups to messages list and reports", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Gives read-only access to specific admin users/groups to messages list and reports", 'appointment-hour-booking' );
             // Check if the plugin is active
 
 

@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_QRCode' ) )
 
         function __construct()
         {
-			$this->description = __("Generates a QRCode image for each booking.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Generates a QRCode image for each booking.", 'appointment-hour-booking' );
 
         } // End __construct
 

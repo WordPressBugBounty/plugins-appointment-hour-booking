@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_UserRegistration' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on creates a WordPress user account upon submission", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on creates a WordPress user account upon submission", 'appointment-hour-booking' );
 
         } // End __construct
 

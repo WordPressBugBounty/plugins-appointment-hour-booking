@@ -22,7 +22,7 @@ if( !class_exists( 'CPAPPB_AutoSelectTime' ) )
 
         function __construct()
         {
-			$this->description = __("Select automatically the time after clicking the day. Useful for cases with only one time-slot per day.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Select automatically the time after clicking the day. Useful for cases with only one time-slot per day.", 'appointment-hour-booking' );
 
         } // End __construct
 

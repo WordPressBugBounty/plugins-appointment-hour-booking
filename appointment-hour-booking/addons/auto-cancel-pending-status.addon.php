@@ -24,7 +24,7 @@ if( !class_exists( 'CPAPPB_AutoCancelStatusManagement' ) )
         function __construct()
         {
 
-			$this->description = __("Automatically cancel pending bookings, expiration time for bookings with pending status.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Automatically cancel pending bookings, expiration time for bookings with pending status.", 'appointment-hour-booking' );
 
         } // End __construct
 

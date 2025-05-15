@@ -21,7 +21,7 @@ if( !class_exists( 'CPAPPB_AdminFrontend' ) )
 
         function __construct()
         {
-			$this->description = __("Shortcode to admin the calendar assigned to the logged in user in the frontend.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Shortcode to admin the calendar assigned to the logged in user in the frontend.", 'appointment-hour-booking' );
 
         } // End __construct
 

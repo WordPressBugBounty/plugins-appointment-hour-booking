@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_SchedudeCalContents' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allow to customize the content and colors displayed on the schedule calendar for each form.", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allow to customize the content and colors displayed on the schedule calendar for each form.", 'appointment-hour-booking' );
 
         } // End __construct
 

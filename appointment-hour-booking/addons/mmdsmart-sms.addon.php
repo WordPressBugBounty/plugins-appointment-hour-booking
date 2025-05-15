@@ -24,7 +24,7 @@ if( !class_exists( 'CPAPPB_MMDSmartSMS' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds support for MMD Smart (www.mmdsmart.com) SMS notifications", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds support for MMD Smart (www.mmdsmart.com) SMS notifications", 'appointment-hour-booking' );
 
         } // End __construct
 

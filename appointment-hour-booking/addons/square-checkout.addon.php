@@ -25,7 +25,7 @@ if( !class_exists( 'CPAPPB_SquareCheckout' ) )
         function __construct()
         {
 
-			$this->description = __("Support for Square Checkout payment gateway (recommended squareup.com integration)", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("Support for Square Checkout payment gateway (recommended squareup.com integration)", 'appointment-hour-booking' );
             // Check if the plugin is active
 
         } // End __construct

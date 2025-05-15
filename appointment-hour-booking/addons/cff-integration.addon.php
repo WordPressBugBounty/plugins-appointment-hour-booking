@@ -23,7 +23,7 @@ if( !class_exists( 'CPAPPB_CFFIntegration' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on adds offers integration with the Calculated Fields Form plugin", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on adds offers integration with the Calculated Fields Form plugin", 'appointment-hour-booking' );
 
         } // End __construct
 

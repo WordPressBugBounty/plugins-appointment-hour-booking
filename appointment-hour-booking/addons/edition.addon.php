@@ -20,7 +20,7 @@ if( !class_exists( 'CPAPPB_BookingEdition' ) )
 
         function __construct()
         {
-			$this->description = __("The add-on allows customers to modify/edit the bookings", 'appointment-hour-booking' );
+			$this->description = $this->tr_apply("The add-on allows customers to modify/edit the bookings", 'appointment-hour-booking' );
 
         } // End __construct
 
