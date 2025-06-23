@@ -114,8 +114,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
         <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
         <input type="hidden" name="<?php echo esc_attr($this->prefix); ?>_blockmultiple" value="1" />
         <strong><?php esc_html_e('Booking Form','appointment-hour-booking'); ?>:</strong><br />
-        <select name="selectedcalendar[]" id="selectedcalendar" multiple required>
-         <!--<option value="0">[<?php esc_html_e('ALL BOOKING FORMS','appointment-hour-booking'); ?>]</option>-->
+        <select name="selectedcalendar[]" id="selectedcalendar" multiple required>         
               <?php
                 $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );                                                                     
                 foreach ($myrows as $item)     
@@ -156,7 +155,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             {
                 echo '<option value="'.intval($i).'" '.(($i==0)?"selected":"").'>'.($i<10?"0":"").intval($i).'</option>';
             }
-            ?></select><!--<input type="text" name="endtime" value="17:00" required>--><br /><br />
+            ?></select><br /><br />
         
         <input type="submit" value="<?php esc_html_e('Block time','appointment-hour-booking'); ?>" />
         </form>
@@ -197,9 +196,9 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 			$('.ahb-adintsection[data-step="'+s+'"]').addClass('ahb-adintsection-active');
             $(window).scrollTop( $("#topadminsection").offset().top );
 		};
-    var dates = [];///$("#bdate").val().split(',');
+    var dates = [];
  	$("#ahb_bt_datepicker").datepicker({
-                    dateFormat: '<?php echo /**$this->get_option('date_format', 'mm/dd/yy') */'yy-mm-dd'; ?>',
+                    dateFormat: '<?php echo 'yy-mm-dd'; ?>',
                     firstDay: 0,
                     beforeShowDay: function(d) {
                         var dd = $.datepicker.formatDate("yy-mm-dd", d);
