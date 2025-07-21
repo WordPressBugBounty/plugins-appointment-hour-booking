@@ -14,7 +14,7 @@ if( !class_exists( 'CPAPPB_SMSButton' ) )
 		protected $name = "SMS open chat button";
 		protected $description;
         public $category = 'SMS Delivery / Text Messaging';
-        public $help = '';
+        public $help = 'https://apphourbooking.dwbooster.com/customdownloads/sms-button.png';
 
 
         /************************ CONSTRUCT *****************************/
