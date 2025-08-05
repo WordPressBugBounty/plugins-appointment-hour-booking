@@ -1,14 +1,14 @@
-=== Appointment Hour Booking - WordPress Booking Plugin ===
+=== Appointment Hour Booking - Booking Calendar ===
 Contributors: codepeople
 Donate link: https://apphourbooking.dwbooster.com/download
-Tags: hour,calendar,booking,appointment,schedule
+Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
 Tested up to: 6.8
-Stable tag: 1.5.34
-License: GPLv2 or later
+Stable tag: 1.5.35
+License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Appointment Hour Booking is a plugin for creating booking forms for appointments with a start time and a defined duration over a schedule.
+Appointment Hour Booking is a plugin for creating booking forms for appointments with a start time and a defined duration within a schedule.
 
 == Description ==
 
@@ -687,7 +687,11 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.34 =
 * +Documentation
 
+= 1.5.35 =
+* Appointment booking improvements
+
+
 == Upgrade Notice ==
 
-= 1.5.34 =
-* +Documentation
+= 1.5.35 =
+* Appointment booking improvements

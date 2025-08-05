@@ -314,7 +314,6 @@ else
 </script>
 
 
-<script type='text/javascript' src='<?php echo esc_attr(plugins_url('js/chart.js', __FILE__)); ?>'></script>
 <script type="text/javascript">
 var $ = jQuery.noConflict();
 $j(document).ready(function(){

@@ -1069,6 +1069,10 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                 wp_enqueue_script( $this->prefix.'_builder_script', plugins_url('js/fbuilder-admin.js', __FILE__),array("jquery","jquery-ui-core","jquery-ui-sortable","jquery-ui-tabs","jquery-ui-droppable","jquery-ui-button","jquery-ui-datepicker") );
             }
                 
+            if (isset($_GET["report"]) && $_GET["report"] == '1') 
+            {
+                wp_enqueue_script('ahbstatschart', plugins_url('js/chart.js', __FILE__), array('jquery'), null, true);
+            }
 
             if (isset($_GET["calendarview"]) && $_GET["calendarview"] == '1')
             {
