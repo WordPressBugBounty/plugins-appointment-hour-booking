@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
 Tested up to: 6.8
-Stable tag: 1.5.35
+Stable tag: 1.5.36
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -690,8 +690,10 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.35 =
 * Appointment booking improvements
 
+= 1.5.36 =
+* Support for capacity override
 
 == Upgrade Notice ==
 
-= 1.5.35 =
-* Appointment booking improvements
+= 1.5.36 =
+* Support for capacity override
