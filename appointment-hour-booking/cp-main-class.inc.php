@@ -986,30 +986,34 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
     function gutenberg_block() {
         global $wpdb;
+        
+        if (!isset($_GET["page"]) || substr($_GET["page"],0,3) != 'cp_') {
 
-        wp_enqueue_script( 'cpapphourbk_gutenberg_editor', plugins_url('/js/block.js', __FILE__));
+            wp_enqueue_script( 'cpapphourbk_gutenberg_editor', plugins_url('/js/block.js', __FILE__));
 
-        wp_enqueue_style('cpapp-calendarstyle', plugins_url('css/cupertino/calendar.css', __FILE__));
-        wp_enqueue_style('cpapp-publicstyle', plugins_url('css/stylepublic.css', __FILE__));
-        wp_enqueue_style('cpapp-custompublicstyle', $this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=css'));
+            wp_enqueue_style('cpapp-calendarstyle', plugins_url('css/cupertino/calendar.css', __FILE__));
+            wp_enqueue_style('cpapp-publicstyle', plugins_url('css/stylepublic.css', __FILE__));
+            wp_enqueue_style('cpapp-custompublicstyle', $this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=css'));
 
-        if (defined("CP_AHB_DYNAMIC_LOADING"))
-        {
-            wp_enqueue_script( $this->prefix.'_builder_script',
-                   $this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=public'),array("jquery","jquery-ui-core","jquery-ui-datepicker","jquery-ui-widget","jquery-ui-position","jquery-ui-tooltip"), false, true );
+            if (defined("CP_AHB_DYNAMIC_LOADING"))
+            {
+                wp_enqueue_script( $this->prefix.'_builder_script',
+                       $this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=public'),array("jquery","jquery-ui-core","jquery-ui-datepicker","jquery-ui-widget","jquery-ui-position","jquery-ui-tooltip"), false, true );
+            }
+            else
+            {
+                wp_enqueue_script( $this->prefix.'_builder_script',
+                      plugins_url('js/fbuilder-public.js', __FILE__),array("jquery","jquery-ui-core","jquery-ui-datepicker","jquery-ui-widget","jquery-ui-position","jquery-ui-tooltip"), false, true );
+            }    
+
+            $forms = $this->getThisUserForms();
+
+            wp_localize_script( 'cpapphourbk_gutenberg_editor', 'apphourbk_forms', array(
+                                'forms' => $forms,
+                                'siteUrl' => get_site_url()
+                              ) );
         }
-        else
-        {
-            wp_enqueue_script( $this->prefix.'_builder_script',
-                  plugins_url('js/fbuilder-public.js', __FILE__),array("jquery","jquery-ui-core","jquery-ui-datepicker","jquery-ui-widget","jquery-ui-position","jquery-ui-tooltip"), false, true );
-        }    
-
-        $forms = $this->getThisUserForms();
-
-        wp_localize_script( 'cpapphourbk_gutenberg_editor', 'apphourbk_forms', array(
-                            'forms' => $forms,
-                            'siteUrl' => get_site_url()
-                          ) );
+                          
     }
 
 
