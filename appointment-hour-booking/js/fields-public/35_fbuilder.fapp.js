@@ -1122,7 +1122,7 @@ $.extend(
 		  		            if (typeof data[i].sid !== 'undefined')
 		  		            {
 		  		                data[i].serviceindex = me.getServiceInd(data[i].sid);
-		  		                if (data[i].serviceindex==-1) continue;
+		  		                //if (data[i].serviceindex==-1) continue; // 2025-08-29
 		  		            }    
 		  		            if (data[i].serviceindex==-1)
                                 delete data[i].serviceindex;
