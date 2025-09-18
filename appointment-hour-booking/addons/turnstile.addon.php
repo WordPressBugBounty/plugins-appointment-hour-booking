@@ -13,7 +13,7 @@ if( !class_exists( 'CPAPPB_Turnstile' ) )
 		protected $name = "Cloudflare Turnstile";
 		protected $description;
         public $category = 'Integration with third party services';
-        public $help = '';
+        public $help = 'https://apphourbooking.dwbooster.com/customdownloads/cloudflare-turnstile-captcha.png';
 		
 
         /************************ CONSTRUCT *****************************/

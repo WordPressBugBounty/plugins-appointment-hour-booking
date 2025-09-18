@@ -157,7 +157,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
             foreach($events as $item)
             {
                 $data = unserialize($item->posted_data);
-                if (!$paidonly || $data['paid'])
+                if (is_array($data) && is_array($data["apps"]) && (!$paidonly || $data['paid']))
                 {
                     foreach($data["apps"] as $app)
                         if ($app["date"] >= $from && $app["date"] <= $to && ($status == '-1' || $status == $app["cancelled"])
