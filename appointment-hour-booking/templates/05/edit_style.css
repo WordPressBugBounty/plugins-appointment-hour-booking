@@ -1,0 +1,31 @@
+.cp_cff_decorative{padding:20px;border-radius: 10px;}
+.cp_cff_decorative #fbuilder .fields:not(.section_breaks) label{color: #e51b24}
+.cp_cff_decorative #fbuilder h1{color:#002241;margin-bottom:0;text-align: center;margin-top:10px;}
+
+.cp_cff_decorative #fbuilder .fields input{border-bottom: #dfddc1;border-left:0px;border-right:0px;border-top:0px;padding:5px 0;background:#FCFAE6;color:#002241}
+
+.cp_cff_decorative #fbuilder .ui-datepicker-header{color:#e0e0e0;background-color: #000;}
+
+.cp_cff_decorative #fbuilder .ui-datepicker th{background-color:inherit;color:inherit}
+
+.cp_cff_decorative #fbuilder .ui-datepicker-unselectable .ui-state-default { color: #b4b3b3;background-color: #f4f4f4;}
+				
+.cp_cff_decorative #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default.ui-state-active{color:#e0e0e0;background:#6eafbf;}					
+.cp_cff_decorative #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default{color:#666666;background:#dedede;}
+.cp_cff_decorative #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default:hover{color: inherit; background: #f7f7f7;}
+.cp_cff_decorative #fbuilder .slots div a{background-color: #ededed;padding:4px;}
+.cp_cff_decorative #fbuilder .slots div:not(.htmlUsed)  a:hover{background-color: #f7f7f7;}
+
+.cp_cff_decorative #fbuilder .pbSubmit{color:#fff;font-size:14px;font-weight:bold;background: #cc3333;border-color:#FCFAE6;border-width:2px;border-style:solid;border-radius: 5px;}
+.cp_cff_decorative #fbuilder .pbSubmit:hover {color: #fff}
+.ahbfield_service{display:inherit;}
+.cp_cff_decorative #fbuilder .slots{border-color:#888;border-width:1px;border-style:solid;width: 100%;padding: 10px;}
+.cp_cff_decorative #fbuilder .slots span{color: inherit;}
+.cp_cff_decorative #fbuilder .usedSlots .ahb_list {padding: inherit;margin:inherit}
+.cp_cff_decorative #fbuilder .usedSlots .ahb_list .d{color: inherit;}
+.cp_cff_decorative #fbuilder .usedSlots .ahb_list .t{color: inherit;}
+.cp_cff_decorative #fbuilder .usedSlots .ahb_list .ahb_list_service{color: inherit;}
+.cp_cff_decorative #fbuilder .usedSlots .ahb_list .cancel{font-weight:inherit}
+.cp_cff_decorative #fbuilder .totalCost{color: inherit;}
+.cp_cff_decorative #fbuilder .totalCost span:not(.n){color: inherit;}
+.cp_cff_decorative #fbuilder .totalCost span.n{color: inherit;}

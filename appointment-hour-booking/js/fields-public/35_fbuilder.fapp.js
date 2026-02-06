@@ -68,7 +68,8 @@ $.extend(
 		arr:new Array(),
 		allUsedSlots:new Array(),
 		service_selected:0,
-		quantity_selected:1,
+		quantity_selected:1,		
+		quantityMin:1,
 		tz:0,
 		tzCache:[],
 		loadOK:false,
@@ -187,6 +188,11 @@ $.extend(
                 ind--;
             return ind;
         },
+        getCapacity:function(i,d)
+        {
+            var c = this.services[i].capacity || 1
+            return (c>=1?c:1);
+        },
 		show:function()
 		{
 		    return '<div class="fields '+$.fbuilder.htmlEncode(this.csslayout)+'" id="field'+this.form_identifier+'-'+this.index+'"><label for="'+this.name+'">'+this.title+''+((this.required)?"<span class='r'>*</span>":"")+'</label><div class="dfield fapp"><input class="field avoid_overlapping_before '+((this.required)?" required":"")+'" id="'+this.name+'" name="'+this.name+'" type="hidden" value="" summary="usedSlots"/><input id="'+this.name+'_services" name="'+this.name+'_services" type="hidden" value="0"/><input id="'+this.name+'_capacity" name="'+this.name+'_capacity" type="hidden" value="0"/><input class="" id="tcost'+this.name+'" name="tcost'+this.name+'" type="hidden" value=""/><div class="fieldCalendarService fieldCalendarService'+this.name+'"></div><div class="fieldCalendar fieldCalendar'+this.name+'"></div><div class="slotsCalendar slotsCalendar'+this.name+'"></div><div class="usedSlots usedSlots'+this.name+'"></div><span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
@@ -289,7 +295,7 @@ $.extend(
 		  	        if (me.allOH[ohindex].openhours[i].type=="special")
 		  	        {
 		  	        	arr[me.allOH[ohindex].openhours[i].d] = arr[me.allOH[ohindex].openhours[i].d] || [];
-		  	        	arr[me.allOH[ohindex].openhours[i].d][arr[me.allOH[ohindex].openhours[i].d].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+		  	        	arr[me.allOH[ohindex].openhours[i].d][arr[me.allOH[ohindex].openhours[i].d].length] = jQuery.extend({capacity:me.getCapacity(j)}, me.allOH[ohindex].openhours[i]);
 		  	        }
 		  	        else if (me.allOH[ohindex].openhours[i].type=="specialrange")
 		  	        {
@@ -305,18 +311,18 @@ $.extend(
 				  	  	        {
 				  	  	            var st = $.datepicker.formatDate("yy-mm-dd",fromD);
 				  	  	            arr[st] = arr[st] || [];
-				    	            arr[st][arr[st].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+				    	            arr[st][arr[st].length] = jQuery.extend({capacity:me.getCapacity(j)}, me.allOH[ohindex].openhours[i]);
 				  	  	            fromD.setDate( fromD.getDate() + 1 );
 				  	  	        }	  
 				  	  	    }	  
 				    	    arr[str[0]] = arr[str[0]] || [];
-				    	    arr[str[0]][arr[str[0]].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+				    	    arr[str[0]][arr[str[0]].length] = jQuery.extend({capacity:me.getCapacity(j)}, me.allOH[ohindex].openhours[i]);
 				    	}
 		  	        }
 		  	        else
 		  	        {
 		  	            arr[me.allOH[ohindex].openhours[i].type] = arr[me.allOH[ohindex].openhours[i].type] || [];
-		  	            arr[me.allOH[ohindex].openhours[i].type][arr[me.allOH[ohindex].openhours[i].type].length] = jQuery.extend({capacity:me.services[j].capacity}, me.allOH[ohindex].openhours[i]);
+		  	            arr[me.allOH[ohindex].openhours[i].type][arr[me.allOH[ohindex].openhours[i].type].length] = jQuery.extend({capacity:me.getCapacity(j)}, me.allOH[ohindex].openhours[i]);
 		  	        }
 		  	    }
 		  	    me.cacheOpenHours[j] = arr;
@@ -337,7 +343,7 @@ $.extend(
                 	    return new Array(); 
                 }       
             }
-            var capacity_service = me.services[s].capacity;
+            var capacity_service = me.getCapacity(s,d);
             var a = [];
             if (me.cacheOpenHours[s][d])
 			    a = me.cacheOpenHours[s][d].slice(0);
@@ -360,7 +366,7 @@ $.extend(
 		  	    me.bduration = me.bSlots*1;
 			var arr = new Array();
 			for (var i=0;i<me.arr[d].length;i++)
-			    arr[i] = jQuery.extend({}, me.arr[d][i]);			  		 	      
+			    arr[i] = jQuery.extend({}, me.arr[d][i], { capacity: capacity_service });			  		 	      
             for (var i=0;i<arr.length;i++)
 			{
 				arr[i].t1 = arr[i].h1 * 60 + arr[i].m1*1;
@@ -505,7 +511,6 @@ $.extend(
             for (var i=arr.length-1;i>=0;i--)
 			    if (arr[i].t1+duration + me.pb + me.pa > arr[i].t2 || arr[i].t1 > 24*60) //if (arr[i].t1+duration > arr[i].t2 || arr[i].t1 > 24*60)
                     arr.splice(i, 1 );
-			
 			return arr;		  
 			  		       
         },    	
@@ -568,7 +573,7 @@ $.extend(
 		    var pb = 0;
 		    var pa = 0;
 		    var v = false;
-		    var capacity_service = me.services[s].capacity;
+		    var capacity_service = me.getCapacity(s,d);
             if (true)
 		    		{ 
 		    		    var compactUsedSlots = me.getCompatSlots(me.htmlUsedSlots[d])             
@@ -796,7 +801,7 @@ $.extend(
                                 q++;
                                 used += ((typeof htmlSlots[i].quantity !== 'undefined')?htmlSlots[i].quantity:0) ;
                             }
-                        total += me.services[me.service_selected].capacity*q;    
+                        total += me.getCapacity(me.service_selected)*q;    
                     }        
 		            else
 		            {
@@ -810,7 +815,7 @@ $.extend(
                                     q++;
                                     used += ((typeof htmlSlots[i].quantity !== 'undefined')?htmlSlots[i].quantity:0) ;
                                 }
-                            total += me.services[ii].capacity*q;        
+                            total += me.getCapacity(ii)*q;        
 		                }    
 		            }                        
                     if (cclass.indexOf("nonworking")==-1)
@@ -836,7 +841,7 @@ $.extend(
 		  	    op = "";
 		  	var capacity = "";
 		    for (var i=0; i< me.services.length;i++)
-		        capacity += ((i!=0)?";":"")+me.services[i].capacity;
+		        capacity += ((i!=0)?";":"")+me.getCapacity(i);
 		    $('#field' + me.form_identifier + '-' + me.index + ' #'+me.name+'_capacity').val(capacity);
 		  	$('#field' + me.form_identifier + '-' + me.index).parents("form").bind('invalid-form.validate', function () {
 		  	    setTimeout(function(){
@@ -943,7 +948,7 @@ $.extend(
 		    		{	     
 		  			    var str = "";				
 		    		    var htmlSlots = me.getCurrentSlots(arr,d,s);
-		    		    var capacity_service = me.services[s].capacity;
+		    		    var capacity_service = me.getCapacity(s);
 		  			    
 		  			    for (var i=0;i<htmlSlots.length;i++)
 		  			    {
@@ -1016,6 +1021,7 @@ $.extend(
                     } catch (e) {}
 		  			$( '.slotsCalendar' + me.name + ' .slots a').off("click").on("click", function() 
 		  			{
+                        if ($(this).parents(".cp_csseditor").length > 0) return;
 		  			    var q = parseFloat($(".fieldCalendarService"+me.name+" select.ahbfield_quantity option:selected").val());
 		  			    if ((me.maxNumberOfApp==1 && me.allUsedSlots.length==me.maxNumberOfApp) || (me.allUsedSlots.length>0 && me.allUsedSlots[0].quantity!=q && !me.allowDifferentQuantities)) //cancel previous slot
 		  			    {
@@ -1060,6 +1066,7 @@ $.extend(
 		  			});		  			
 		  			$( '.usedSlots'+me.name+ ' a.cancel').off("click").on("click", function() 
 		  			{
+		  			    if ($(this).parents(".cp_csseditor").length > 0) return;
 		  			    var d = $(this).parents(".ahb_list").attr("d");
 		  				var h1 = $(this).parents(".ahb_list").attr("h1");
 		  				var m1 = $(this).parents(".ahb_list").attr("m1");
@@ -1196,16 +1203,15 @@ $.extend(
 		  	for (var i=0;i<me.services.length;i++)
 		  	{    
 		  	    str += '<option value="'+me.services[i].duration+'">'+me.services[i].name+'</option>';
-		  	    me.services[i].capacity = (parseFloat(me.services[i].capacity)>0)?me.services[i].capacity:1;
-		  	    if (capacity<me.services[i].capacity)
-		  	        capacity = me.services[i].capacity;
+		  	    if (capacity<me.getCapacity(i))
+		  	        capacity = me.getCapacity(i);
 		  	}
 		  	if (me.emptySelectCheckbox) 
 			    str = '<option value="">'+ $.fbuilder.strip_tags(me.emptySelect) +'</option>'+ str ;
 		  	var str2 = "";    
-		  	for (var i=1;i<=me.services[0].capacity;i++)
+		  	for (var i=(me.showQuantity && me.quantityMin<=me.getCapacity(0)?me.quantityMin:1);i<=me.getCapacity(0);i++)
 		  	    str2 += '<option value="'+i+'">'+i+'</option>';
-		  	d.html('<select class="ahbfield_service">'+str+'</select><div class="ahbfield_quantity_div" '+((!me.showQuantity)?"style='display:none'":"")+'><label class="ahbfield_quantity_label">'+((typeof cp_hourbk_quantity_label !== 'undefined')?cp_hourbk_quantity_label:'Quantity')+'</label><br /><select class="ahbfield_quantity" autocomplete="off">'+str2+'</select></div>');
+		  	d.html('<select class="ahbfield_service">'+str+'</select><div class="ahbfield_quantity_div" '+((!me.showQuantity)?"style='display:none'":"")+'><label class="ahbfield_quantity_label">'+((typeof cp_hourbk_quantity_label !== 'undefined')?cp_hourbk_quantity_label:'Quantity')+'</label><br /><select class="ahbfield_quantity validQuantity" autocomplete="off">'+str2+'</select></div>');
 		  	me.service_selected = me.normalizeSelectIndex($(".fieldCalendarService"+me.name+" select.ahbfield_service option:selected").index());
 		  	me.quantity_selected = parseFloat($(".fieldCalendarService"+me.name+" select.ahbfield_quantity option:selected").val());
 		  	me.duration = parseFloat(me.services[me.service_selected].duration);		  	
@@ -1220,8 +1226,8 @@ $.extend(
 		  	     me.pb = me.services[me.service_selected].pb * 1 || 0;
 		  	     //me.cacheOpenHours = new Array();
 		  	     me.special_days = me.getSpecialDays();
-		  	     var str2 = "";    
-		  	     for (var i=1;i<=me.services[me.service_selected].capacity;i++)
+		  	     var str2 = ""; 
+		  	     for (var i=(me.showQuantity && me.quantityMin<=me.getCapacity(me.service_selected)?me.quantityMin:1);i<=me.getCapacity(me.service_selected);i++)
 		  	         str2 += '<option value="'+i+'">'+i+'</option>';
 		  	     $(".fieldCalendarService"+me.name+" select.ahbfield_quantity").html(str2);
 		  	     me.quantity_selected = parseFloat($(".fieldCalendarService"+me.name+" select.ahbfield_quantity option:selected").val());
@@ -1566,7 +1572,10 @@ $.extend(
 		        me.changeAutomatic = false;     
             });
             if (typeof cp_hourbk_overlapping_label != "undefined")
-                $.extend($.validator.messages, {avoid_overlapping: $.validator.format(cp_hourbk_overlapping_label)});        
+                $.extend($.validator.messages, {avoid_overlapping: $.validator.format(cp_hourbk_overlapping_label)}); 
+            $.validator.addMethod("validQuantity", function(value, element) {
+                return (value*1>0);
+            }, "Please select a valid quantity");			
 			if(!('avoid_overlapping' in $.validator.methods))
 			{ 
 			    function avoid_over_function(value, element){
@@ -1640,6 +1649,7 @@ $.extend(
                                         overlapping = true;
                                         if (msg == "") msg = "<div class=\"ahb_overlapping_detail\"><div class=\"ahb_overlapping_title\">Affected times:</div>";
                                         msg += "<div><span class=\"ahb_list_time\">"+me.formatString(me.allUsedSlots[i],true,me.tzf(d))+"</span><span class=\"ahb_list_service\">"+me.services[me.allUsedSlots[i].serviceindex].name+"</span></div>";
+										console.log(msg);
                                     }
                                     //overlapping = !find; 
                                 } 

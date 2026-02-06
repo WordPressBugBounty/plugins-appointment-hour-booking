@@ -581,6 +581,10 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             if ($has_lang_file)
                 $js_dependencies[] = $this->prefix.'_language_file';
             
+            wp_enqueue_script( $this->prefix.'_validatejs'.$this->print_counter, $this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=validatejs&cal='.$this->item.'&counter='.$this->print_counter),array('jquery'));
+            $js_dependencies[] = $this->prefix.'_validatejs'.$this->print_counter;
+            
+            
             if (defined("CP_AHB_DYNAMIC_LOADING"))
             {
                 wp_enqueue_script( $this->prefix.'_builder_script',
@@ -622,119 +626,9 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             wp_enqueue_script( "jquery" );
             wp_enqueue_script( "jquery-ui-core" );
             wp_enqueue_script( "jquery-ui-datepicker" );
+            
+            echo '<!--noptimize--><script type="text/javascript">' . $this->clean_sanitize($this->getValidateScript()) . '</script><!--/noptimize-->'; // phpcs:ignore WordPress.Security.EscapeOutput
         }
-
-        ?><!--noptimize-->
-        <script type="text/javascript">
-         var cp_hourbk_cancel_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_cancel', 'Cancel') ,'appointment-hour-booking')); ?>';
-         var cp_hourbk_quantity_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_quantity', 'Quantity') ,'appointment-hour-booking')); ?>';
-         var cp_hourbk_cost_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_cost', 'Cost') ,'appointment-hour-booking')); ?>';
-         var cp_hourbk_overlapping_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.') ,'appointment-hour-booking')); ?>';         
-		 var cp_hourbk_nomore_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nomore', 'No more slots available.'),'appointment-hour-booking')); ?>';
-         var cp_hourbk_avoid_overlapping = 0;
-         var apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> = false;
-         function <?php echo esc_html($this->prefix); ?>_pform_doValidate<?php echo '_'.esc_html($this->print_counter); ?>(form)
-         {
-            try { if (document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.<?php echo esc_html($this->prefix); ?>_pform_status.value == '1') return false; } catch (e) {}
-            $dexQuery = jQuery.noConflict();
-            try { document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.cp_ref_page.value = document.location; } catch (e) {}
-            $dexQuery = jQuery.noConflict();<?php if (!is_admin() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) { ?>
-            var result = '';
-            try {
-            if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>) {
-            if (document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.hdcaptcha_<?php echo esc_html($this->prefix); ?>_post.value == '') { setTimeout( "<?php echo esc_html($this->prefix); ?>_cerror<?php echo esc_html('_'.$this->print_counter); ?>()", 100); return false; }
-            var result = $dexQuery.ajax({ type: "GET", url: "<?php echo esc_html($this->get_site_url()); ?>?ps=<?php echo esc_html('_'.$this->print_counter); ?>&<?php echo esc_html($this->prefix); ?>_pform_process=2&<?php echo esc_html($this->prefix); ?>_id=<?php echo intval($this->item); ?>&inAdmin=1&ps=<?php echo esc_html('_'.$this->print_counter); ?>&hdcaptcha_<?php echo esc_html($this->prefix); ?>_post="+document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.hdcaptcha_<?php echo esc_html($this->prefix); ?>_post.value, async: false }).responseText;
-            }
-            } catch (e) {result='';console.log('AHB: Captcha not detected.');}
-            if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> && result.indexOf("captchafailed") != -1) {
-                $dexQuery("#captchaimg<?php echo esc_html('_'.$this->print_counter); ?>").attr('src', $dexQuery("#captchaimg<?php echo esc_html('_'.$this->print_counter); ?>").attr('src')+'&'+Math.floor((Math.random() * 99999) + 1));
-                setTimeout( "<?php echo esc_html($this->prefix); ?>_cerror<?php echo esc_html('_'.$this->print_counter); ?>()", 100);
-                return false;
-            } else <?php } ?>
-            {
-                var cpefb_error = 0;
-                $dexQuery("#<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>").find(".cpefb_error").each(function(index){
-                if ($dexQuery(this).css("display")!="none")
-                    cpefb_error++;
-                });
-                if (cpefb_error==0)
-                {
-                    if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>)
-                    {
-                        try { document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.<?php echo esc_html($this->prefix); ?>_pform_status.value = '1';	 } catch (e) {}
-                        apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(".pbSubmit:visible");
-                        $dexQuery("#<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>").find(".avoid_overlapping_before").not(".ignore,.ignorepb").removeClass("avoid_overlapping_before").removeClass("valid").addClass("avoid_overlapping");
-                        cp_hourbk_avoid_overlapping = 1;
-                        try {
-                            $dexQuery("#<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>").find(".avoid_overlapping").valid();
-                        } catch (e) { cp_hourbk_avoid_overlapping = 0; }
-                        function check_cp_hourbk_avoid_overlapping(){
-		                    if (cp_hourbk_avoid_overlapping>0)
-		                        setTimeout(check_cp_hourbk_avoid_overlapping,100);
-		                    else
-		                    {
-                                var cpefb_error = 0;
-                                $dexQuery("#<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>").find(".cpefb_error").each(function(index){
-                                    if ($dexQuery(this).css("display")!="none")
-                                        cpefb_error++;
-                                    });
-                                try { document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.<?php echo esc_html($this->prefix); ?>_pform_status.value = '0';	 } catch (e) {}
-                                if (cpefb_error==0)
-                                {
-                                    apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> = true;
-                                    if (<?php echo esc_html($this->prefix); ?>_pform_doValidate<?php echo esc_html('_'.$this->print_counter); ?>(form))
-                                    {
-                                        $dexQuery( ".pbSubmit" ).unbind();
-                                        if ($dexQuery( ".pbSubmit" ).hasClass("nofirst"))
-                                            return false;
-                                        $dexQuery( ".pbSubmit" ).addClass("nofirst");
-                                        document.getElementById("<?php echo esc_html($this->prefix).'_pform_'.esc_html($this->print_counter); ?>").submit();
-                                    }
-                                }
-		                    }
-		                }
-		                check_cp_hourbk_avoid_overlapping();
-                        return false;
-                    }
-                    <?php
-                    /**
-				     * Action called before insert the data into database.
-				     * To the function are passed two parameters: the array with submitted data, and the number of form in the page.
-				     */
-
-				    do_action( 'cpappb_script_after_validation', $this->print_counter, $this->item );
-
-	                ?>
-	        		$dexQuery("#<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>").find( '.ignore' ).closest( '.fields' ).remove();
-	        	}
-	        	document.getElementById("form_structure<?php echo esc_html('_'.$this->print_counter); ?>").value = '';
-	        	document.getElementById("refpage<?php echo esc_html('_'.$this->print_counter); ?>").value = document.location;
-                try {
-                    if (cpefb_error==0)
-                    {
-                        document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.<?php echo esc_html($this->prefix); ?>_pform_status.value = '1';
-                        apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(".pbSubmit");
-                    }
-                } catch (e) {}
-                return true;
-            }
-         }
-         function apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(selector){
-             try {
-                 $dexQuery = jQuery.noConflict();
-                 $dexQuery(selector).fadeOut(1000, function(){
-                     $dexQuery(this).fadeIn(1000, function(){
-                             try {
-                                 if (document.<?php echo esc_html($this->prefix); ?>_pform<?php echo esc_html('_'.$this->print_counter); ?>.<?php echo esc_html($this->prefix); ?>_pform_status.value != '0')
-                                     apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(this);
-                             } catch (e) { console.log(e)}
-                     });
-                 });
-             } catch (e) {}
-         }
-         function <?php echo esc_html($this->prefix); ?>_cerror<?php echo esc_html('_'.$this->print_counter); ?>(){$dexQuery = jQuery.noConflict();$dexQuery("#hdcaptcha_error<?php echo esc_html('_'.$this->print_counter); ?>").css('top',$dexQuery("#hdcaptcha_<?php echo esc_html($this->prefix); ?>_post<?php echo esc_html('_'.$this->print_counter); ?>").outerHeight());$dexQuery("#hdcaptcha_error<?php echo esc_html('_'.$this->print_counter); ?>").css("display","inline");}
-        </script><!--/noptimize-->
-        <?php
 
         $button_label = $this->get_option('vs_text_submitbtn', 'Submit');
         $button_label = ($button_label==''?'Submit':$button_label);
@@ -793,13 +687,18 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                     $raw_form_str = json_encode( $form_data );
         		}
         	}
-
+            $form_template = '';
         	if( isset( $form_data[ 1 ] ) && isset( $form_data[ 1 ][ 0 ] ) && isset( $form_data[ 1 ][ 0 ]->formtemplate ) )
         	{
         		$templatelist = $this->available_templates();
+                $form_template = substr(md5($form_data[ 1 ][ 0 ]->formtemplate),0,10);
         		if(  isset( $templatelist[ $form_data[ 1 ][ 0 ]->formtemplate ] ) )
         		print '<link rel=\'stylesheet\' media="all" href="'.esc_attr( esc_url( $templatelist[ $form_data[ 1 ][ 0 ]->formtemplate ][ 'file' ] ) ).'" type="text/css" />';
         	}
+            
+            if (get_option('AHB_CUSTOM_CSS_'.$this->getId().$form_template) != '') {
+                echo '<style class="ahb_inlinecss_'.$this->getId().'">'.$this->clean_sanitize(get_option('AHB_CUSTOM_CSS_'.$this->getId().$form_template)).'</style>'; // phpcs:ignore WordPress.Security.EscapeOutput
+            }             
         }
 
         $raw_form_str = str_replace('"','&quot;',esc_attr($raw_form_str));
@@ -841,6 +740,128 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     }
 
 
+    public function getValidateScript() {
+        
+        ob_start();        
+        
+        ?>
+         var cp_hourbk_cancel_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_cancel', 'Cancel') ,'appointment-hour-booking')); ?>';
+         var cp_hourbk_quantity_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_quantity', 'Quantity') ,'appointment-hour-booking')); ?>';
+         var cp_hourbk_cost_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_cost', 'Cost') ,'appointment-hour-booking')); ?>';
+         var cp_hourbk_overlapping_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nmore', 'Selected time is no longer available. Please select a different time.') ,'appointment-hour-booking')); ?>';         
+		 var cp_hourbk_nomore_label = '<?php echo esc_js( __( $this->get_option_not_empty('vs_text_nomore', 'No more slots available.'),'appointment-hour-booking')); ?>';
+         var cp_hourbk_avoid_overlapping = 0;
+         var apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> = false;
+         function cp_appbooking_pform_doValidate<?php echo '_'.esc_html($this->print_counter); ?>(form)
+         {   
+            var counteridn = <?php echo esc_html($this->print_counter); ?>;         
+            var counterid = "_"+counteridn;
+            try { if (form.cp_appbooking_pform_status.value == '1') return false; } catch (e) {}
+            $dexQuery = jQuery.noConflict();
+            try { form.cp_ref_page.value = document.location; } catch (e) {}
+            $dexQuery = jQuery.noConflict();<?php if (!is_admin() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) { ?>
+            var result = '';
+            try {
+            if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>) {
+            if (form.hdcaptcha_cp_appbooking_post.value == '') { setTimeout( "cp_appbooking_cerror"+counterid+"()", 100); return false; }
+            var result = $dexQuery.ajax({ type: "GET", url: "<?php echo esc_html($this->get_site_url()); ?>?ps="+counterid+"&cp_appbooking_pform_process=2&cp_appbooking_id=<?php echo intval($this->item); ?>&inAdmin=1&ps="+counterid+"&hdcaptcha_cp_appbooking_post="+form.hdcaptcha_cp_appbooking_post.value, async: false }).responseText;
+            }
+            } catch (e) {result='';console.log('AHB: Captcha not detected.');}
+            if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> && result.indexOf("captchafailed") != -1) {
+                $dexQuery("#captchaimg"+counterid).attr('src', $dexQuery("#captchaimg"+counterid).attr('src')+'&'+Math.floor((Math.random() * 99999) + 1));
+                setTimeout( "cp_appbooking_cerror"+counterid+"()", 100);
+                return false;
+            } else <?php } ?>
+            {
+                var cpefb_error = 0; 
+                $dexQuery("#"+form.id).find(".cpefb_error").each(function(index){
+                if ($dexQuery(this).css("display")!="none")
+                    cpefb_error++;
+                });
+                if (cpefb_error==0)
+                {
+                    if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>)
+                    {
+                        try { form.cp_appbooking_pform_status.value = '1';	 } catch (e) {}
+                        apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(".pbSubmit:visible", form);
+                        $dexQuery("#"+form.id).find(".avoid_overlapping_before").not(".ignore,.ignorepb").removeClass("avoid_overlapping_before").removeClass("valid").addClass("avoid_overlapping");
+                        cp_hourbk_avoid_overlapping = 1;
+                        try {
+                            $dexQuery("#"+form.id).find(".avoid_overlapping").valid();
+                        } catch (e) { cp_hourbk_avoid_overlapping = 0; }
+                        function check_cp_hourbk_avoid_overlapping(){
+		                    if (cp_hourbk_avoid_overlapping>0)
+		                        setTimeout(check_cp_hourbk_avoid_overlapping,100);
+		                    else
+		                    {
+                                var cpefb_error = 0;
+                                $dexQuery("#"+form.id).find(".cpefb_error").each(function(index){
+                                    if ($dexQuery(this).css("display")!="none")
+                                        cpefb_error++;
+                                    });
+                                try { form.cp_appbooking_pform_status.value = '0';	 } catch (e) {}
+                                if (cpefb_error==0)
+                                {
+                                    apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> = true;
+                                    if (cp_appbooking_pform_doValidate<?php echo esc_html('_'.$this->print_counter); ?>(form))
+                                    {
+                                        $dexQuery( ".pbSubmit" ).unbind();
+                                        if ($dexQuery( ".pbSubmit" ).hasClass("nofirst"))
+                                            return false;
+                                        $dexQuery( ".pbSubmit" ).addClass("nofirst");
+                                        form.submit();
+                                    }
+                                }
+		                    }
+		                }
+		                check_cp_hourbk_avoid_overlapping();
+                        return false;
+                    }
+                    <?php
+                    /**
+				     * Action called before insert the data into database.
+				     * To the function are passed two parameters: the array with submitted data, and the number of form in the page.
+				     */
+
+				    do_action( 'cpappb_script_after_validation', $this->print_counter, $this->item );
+
+	                ?>
+	        		$dexQuery("#"+form.id).find( '.ignore' ).closest( '.fields' ).remove();
+	        	}
+	        	document.getElementById("form_structure"+counterid).value = '';
+	        	document.getElementById("refpage"+counterid).value = document.location;
+                try {
+                    if (cpefb_error==0)
+                    {
+                        form.cp_appbooking_pform_status.value = '1';
+                        apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(".pbSubmit", form);
+                    }
+                } catch (e) {}
+                return true;
+            }
+         }
+         function apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(selector, form){
+             try {
+                 $dexQuery = jQuery.noConflict();
+                 $dexQuery(selector).fadeOut(1000, function(){
+                     $dexQuery(this).fadeIn(1000, function(){
+                             try {
+                                 if (form.cp_appbooking_pform_status.value != '0')
+                                     apphbblink<?php echo esc_html('_'.$this->print_counter); ?>(this, form);
+                             } catch (e) { console.log(e)}
+                     });
+                 });
+             } catch (e) {}
+         }
+         function cp_appbooking_cerror<?php echo esc_html('_'.$this->print_counter); ?>(){$dexQuery = jQuery.noConflict();$dexQuery("#hdcaptcha_error<?php echo esc_html('_'.$this->print_counter); ?>").css('top',$dexQuery("#hdcaptcha_cp_appbooking_post<?php echo esc_html('_'.$this->print_counter); ?>").outerHeight());$dexQuery("#hdcaptcha_error<?php echo esc_html('_'.$this->print_counter); ?>").css("display","inline");}
+        <?php
+        
+        $buffered_contents = ob_get_contents();
+        ob_end_clean();
+        
+        return $buffered_contents;
+    }
+
     /* Code for the admin area */
 
     public function plugin_page_links( $links ) {
@@ -859,6 +880,10 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         add_menu_page( $this->plugin_name.' '.__( 'Options' ,'appointment-hour-booking'), $this->plugin_name, 'read', $this->menu_parameter, array($this, 'settings_page') );
         add_submenu_page( $this->menu_parameter, __('General Settings' ,'appointment-hour-booking'), __('General Settings' ,'appointment-hour-booking'), 'edit_pages', $this->menu_parameter."_settings", array($this, 'settings_page') );
         add_submenu_page( $this->menu_parameter, __('Add Ons' ,'appointment-hour-booking'), __('Add Ons' ,'appointment-hour-booking'), 'edit_pages', $this->menu_parameter."_addons", array($this, 'settings_page') );
+        add_submenu_page( $this->menu_parameter, __('Styles Editor' ,'appointment-hour-booking'), __('Styles Editor' ,'appointment-hour-booking').
+         ' <span class="apphourbk-new-feature-label">'.
+         __('New' ,'appointment-hour-booking').'</span>'
+        , 'edit_pages', $this->menu_parameter."_csseditor_page", array($this, 'settings_page') );
         add_submenu_page( $this->menu_parameter, __( 'Online Demo','appointment-hour-booking'), __('Online Demo' ,'appointment-hour-booking'), 'edit_pages', $this->menu_parameter."_odemo", array($this, 'settings_page') );
         add_submenu_page( $this->menu_parameter, __( 'Help','appointment-hour-booking'), __('Help' ,'appointment-hour-booking'), 'edit_pages', $this->menu_parameter."_support", array($this, 'settings_page') );
         add_submenu_page( $this->menu_parameter, __('Upgrade Plugin' ,'appointment-hour-booking'), __('Upgrade Plugin' ,'appointment-hour-booking'), 'edit_pages', $this->menu_parameter."_upgrade", array($this, 'settings_page') );
@@ -955,6 +980,8 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             else
                 @include_once dirname( __FILE__ ) . '/cp-admin-int.inc.php';
         }
+        else if ($this->get_param("page") == $this->menu_parameter.'_csseditor_page')
+            @include_once dirname( __FILE__ ) . '/csseditor.inc.php';           
         else if ($this->get_param("page") == $this->menu_parameter.'_upgrade')
         {
             echo("Redirecting to upgrade page...<script type='text/javascript'>document.location='".esc_js($this->plugin_download_URL)."';</script>");
@@ -1054,6 +1081,9 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
 
     function insert_adminScripts( $hook ) {
+        
+        wp_enqueue_style('cpapp-genstyle', plugins_url('/css/genstyle.css', __FILE__));
+        
         if ($this->get_param("page") == $this->menu_parameter && $this->get_param("blocktimes") != '1' && $this->get_param("addbk") != '1')
         {
             wp_deregister_script( 'bootstrap-datepicker-js' );
@@ -1342,7 +1372,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     function data_management() {
         global $wpdb;
             
-       if (!is_admin() || 
+        if (!is_admin() || 
            (get_option('cp_cpappb_admin_language', '') != 'english' && empty($_POST["cp_cpappb_admin_language"])) || 
            (isset($_POST["cp_cpappb_admin_language"]) && $_POST["cp_cpappb_admin_language"] != 'english'))
             load_plugin_textdomain( 'appointment-hour-booking', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );            
@@ -1434,6 +1464,13 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                 $custom_scripts = apply_filters( 'cpappb_the_customjs', $custom_scripts,  intval($_GET["cal"]) );
                 echo $this->clean_sanitize($custom_scripts);  // phpcs:ignore WordPress.Security.EscapeOutput
     		}
+            else if( $_REQUEST[ 'cp_cpappb_resources' ] == 'validatejs' )
+    		{
+                header("Content-type: application/javascript");  
+                $this->print_counter = intval($_GET["counter"]);
+                $this->item = intval($_GET["cal"]);                
+                echo $this->clean_sanitize($this->getValidateScript());  // phpcs:ignore WordPress.Security.EscapeOutput
+    		}            
     		else
     		{
     			require_once dirname( __FILE__ ).'/js/fbuilder-loader-public.php';

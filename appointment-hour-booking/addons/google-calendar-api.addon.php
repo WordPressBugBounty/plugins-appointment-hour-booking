@@ -2,6 +2,9 @@
 /*
 Documentation: https://googlecalapi.com/docs/quickstart
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 require_once dirname( __FILE__ ).'/base.addon.php';
 
 if( !class_exists( 'CPAPPB_GoogleCalendarAPI' ) )

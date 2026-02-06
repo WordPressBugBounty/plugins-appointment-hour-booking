@@ -61,6 +61,6 @@
 				},
 			showSpecialDataInstance: function() 
 				{
-					return '<div class="column"><label>Min length/characters</label><br /><input name="sMinlength" id="sMinlength" value="'+this.minlength+'"></div><div class="column"><label>Max length/characters</label><br /><input name="sMaxlength" id="sMaxlength" value="'+this.maxlength+'"></div><div class="clearer"></div>';
+					return '<div class="column"><label>Min length/characters</label><br /><input name="sMinlength" id="sMinlength" value="'+$.fbuilder.htmlEncode(this.minlength)+'"></div><div class="column"><label>Max length/characters</label><br /><input name="sMaxlength" id="sMaxlength" value="'+$.fbuilder.htmlEncode(this.maxlength)+'"></div><div class="clearer"></div>';
 				}
 	});

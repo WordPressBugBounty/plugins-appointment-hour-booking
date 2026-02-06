@@ -3,8 +3,8 @@ Contributors: codepeople
 Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
-Tested up to: 6.8
-Stable tag: 1.5.42
+Tested up to: 6.9
+Stable tag: 1.5.63
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -711,7 +711,70 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.42 =
 * Revolut add-on
 
+= 1.5.43 =
+* Get Capacity improvement
+
+= 1.5.44 =
+* Revolut payments
+
+= 1.5.45 =
+* Better min quantity
+
+= 1.5.46 =
+* Admin CSS fix
+
+= 1.5.47 =
+* iCal Export update
+
+= 1.5.48 =
+* New visual styles editor
+
+= 1.5.49 =
+* Style customizing change
+
+= 1.5.50 =
+* Better CSS editor
+
+= 1.5.51 =
+* Admin interface update
+
+= 1.5.52 =
+* New theme
+
+= 1.5.53 =
+* Quantity fix
+
+= 1.5.54 =
+* New def theme
+
+= 1.5.55 =
+* Doc update
+
+= 1.5.56 =
+* Better script loader
+
+= 1.5.57 =
+* Fixed script conflict with Elementor
+
+= 1.5.58 =
+* Link updates
+
+= 1.5.59 =
+* iCal update
+
+= 1.5.60 =
+* Captcha improvements
+
+= 1.5.61 =
+* Min / max lenght settings sanitization
+
+= 1.5.62 =
+* iCal updates
+
+= 1.5.63 =
+* New revenue report
+
 == Upgrade Notice ==
 
-= 1.5.42 =
-* Revolut add-on
+= 1.5.63 =
+* New revenue report

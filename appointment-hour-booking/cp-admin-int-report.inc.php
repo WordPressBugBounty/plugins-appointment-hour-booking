@@ -66,6 +66,12 @@ $fields = array();
 $fields["date"] = array();
 $fields["ip"] = array();
 $fields["notifyto"] = array();
+
+// --- MODIFICATION START: Init revenue variables ---
+$revenue_daily = array();
+$total_revenue = 0;
+// --- MODIFICATION END ---
+
 foreach ($events as $item)
 {
     if (empty($fields["date"]["k".substr($item->time,0,10)])) $fields["date"]["k".substr($item->time,0,10)] = 0;
@@ -78,6 +84,18 @@ foreach ($events as $item)
     $fields["notifyto"]["k".$item->notifyto]++;
     $fields["ip"]["k".$item->ipaddr]++;
     $params = unserialize($item->posted_data);
+    
+    // --- MODIFICATION START: Calculate Revenue ---
+    $price = 0;
+    if (isset($params["final_price"])) 
+        $price = floatval($params["final_price"]);
+    
+    $date_key = "k".substr($item->time,0,10);
+    if (empty($revenue_daily[$date_key])) $revenue_daily[$date_key] = 0;
+    $revenue_daily[$date_key] += $price;
+    $total_revenue += $price;
+    // --- MODIFICATION END ---
+
     foreach ($params as $param => $value)
         if (!is_array($value) && strlen($value) < 100)
         {
@@ -119,10 +137,12 @@ if ($date_end == '')
 }
 
 $daily_messages = '';
+$daily_revenue_str = ''; // --- MODIFICATION: Init revenue string
 $max_daily_messages = 200;
 $date = $date_start;
 while ($date <= $date_end)
 {
+    // Messages Logic
     if (isset($fields['date']['k'.$date]))
     {
         $daily_messages .= ','.$fields['date']['k'.$date];
@@ -131,9 +151,18 @@ while ($date <= $date_end)
     }        
     else
         $daily_messages .=',0';
+
+    // --- MODIFICATION START: Revenue Logic ---
+    if (isset($revenue_daily['k'.$date]))
+        $daily_revenue_str .= ','.$revenue_daily['k'.$date];
+    else
+        $daily_revenue_str .= ',0';
+    // --- MODIFICATION END ---
+
     $date = date("Y-m-d",strtotime($date." +1 day"));
 }
 $daily_messages = substr($daily_messages,1);
+$daily_revenue_str = substr($daily_revenue_str,1); // --- MODIFICATION: Trim string
 
 if (!isset($_GET["field"]))
     $field_filter = 'time';
@@ -225,6 +254,21 @@ else
   </div>
 </div>
 
+<br />
+
+<div class="container">
+  <div class="col12">
+    <div class="ahb-graphs">
+        <div class="ahb-statssection-header">
+            <h3><?php esc_html_e('Revenue per day','appointment-hour-booking'); ?> (Total: <?php echo number_format($total_revenue, 2); ?>)</h3>
+            <span><?php esc_html_e('Days from','appointment-hour-booking'); ?> <?php echo esc_html($date_start); ?> to <?php echo esc_html($date_end); ?></span>
+        </div>
+        <div class="ahb-statssection">
+            <canvas id="chartrevenue" st="<?php echo esc_attr($date_start); ?>" et="<?php echo esc_attr($date_end); ?>" label="<?php esc_html_e('Revenue','appointment-hour-booking'); ?>" questions='[{"color":"#4caf50","values":[<?php echo esc_html($daily_revenue_str); ?>]}]'></canvas>
+        </div>
+    </div>
+  </div>
+</div>
 <br />
 
 <div class="ahb-statssection-container" style="background:#f6f6f6;">
@@ -444,6 +488,8 @@ function drawChartDaily(obj)
 }           
             
 chartperday($("#chartperday")); 
+chartperday($("#chartrevenue")); // --- MODIFICATION: Initialize Revenue Chart
+
 function chartperday(obj)
 {           
     var data = jQuery.parseJSON(obj.attr("questions"));
@@ -461,7 +507,9 @@ function chartperday(obj)
           labels: l,
           datasets: [{
             label: obj.attr("label"),
-            data: data[0].values
+            data: data[0].values,
+            borderColor: data[0].color, // --- MODIFICATION: Allow custom color from data
+            backgroundColor: data[0].color // --- MODIFICATION: Allow custom color from data
           }]
         },
       });    

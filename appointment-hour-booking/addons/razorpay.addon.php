@@ -3,6 +3,9 @@
 Documentation: https://razorpay.com/docs/payment-gateway/web-integration/standard/
 Keys: https://dashboard.razorpay.com/app/keys
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 require_once dirname( __FILE__ ).'/base.addon.php';
 
 if( !class_exists( 'CPAPPB_razorpay' ) )

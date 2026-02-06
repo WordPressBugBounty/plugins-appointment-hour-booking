@@ -23,7 +23,7 @@
 .ahb_m3 #fbuilder .ui-datepicker-inline{max-width:calc(97%);}   
 .ahb_m3 #fbuilder .slots{border:0px;box-shadow:none;}	
 
-.ahb_m3 #fbuilder .ui-datepicker-next, .ahb_m3 #fbuilder .ui-datepicker-prev {display: inline-block;width: 15px;height: 15px;border:none;border-top: 2px solid #000 !important;border-right: 2px solid #000;background:none;margin:20px 10px;}
+.ahb_m3 #fbuilder .ui-datepicker-next, .ahb_m3 #fbuilder .ui-datepicker-prev {display: inline-block;width: 15px;height: 15px;border:none;border-top: 2px solid #000;border-right: 2px solid #000;background:none !important;margin:20px 10px;}
 .ahb_m3 #fbuilder .ui-datepicker-next {transform: rotate(45deg);}
 .ahb_m3 #fbuilder .ui-datepicker-prev {transform: rotate(-135deg);}
 .ahb_m3 #fbuilder .ui-datepicker-next span, .ahb_m3 #fbuilder .ui-datepicker-prev span{background:none}

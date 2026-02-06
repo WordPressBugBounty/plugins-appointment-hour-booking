@@ -42,6 +42,7 @@ $.extend(
 		militaryTime:1,
 		autonum:0,
 		autonumStaff:0,
+		quantityMin:1,
 		display:function()
 		{
 			return '<div class="fields '+this.name+' fapp" id="field'+this.form_identifier+'-'+this.index+'"><div class="arrow ui-icon ui-icon-play "></div><div title="Duplicate" class="copy ui-icon ui-icon-copy "></div><div title="Delete" class="remove ui-icon ui-icon-trash "></div><label>'+$.fbuilder.htmlEncode(this.title)+''+((this.required)?"*":"")+'</label><div class="dfield"><div class="fieldCalendarService'+this.name+'"></div><div class="fieldCalendar'+this.name+'"></div><div class="slotsCalendar'+this.name+'"></div><span class="uh">'+$.fbuilder.htmlEncode(this.userhelp)+'</span></div><div class="clearer"></div></div>';
@@ -225,6 +226,7 @@ $.extend(
 				{s:"#sDefaultDate",e:"change", l:"defaultDate"},
 				{s:"#sDropdownRange",e:"keyup", l:"dropdownRange"},
 				{s:"#sShowTotalCostFormat",e:"keyup", l:"showTotalCostFormat"},
+				{s:"#sQuantityMin",e:"change", l:"quantityMin"},
 				{s:"#sEmptySelectCheckbox",e:"click", l:"emptySelectCheckbox", f:function(el){
 					var v = el.is(':checked'); 
 					$("#sEmptySelectDiv")[( v ) ? 'show' : 'hide']();
@@ -244,7 +246,9 @@ $.extend(
 					}
 				},							
 				{s:"#sShowQuantity",e:"click", l:"showQuantity", f:function(el){
-					return el.is(':checked');
+					var v = el.is(':checked'); 
+					$("#divQuantityMin")[( v ) ? 'show' : 'hide']();
+					return v;
 					}
 				},
 				{s:"#sUsedSlotsCheckbox",e:"click", l:"usedSlotsCheckbox", f:function(el){
@@ -722,7 +726,7 @@ $.extend(
 			for (var i=0;i<this.services.length;i++)
 			{
 			    str += '<div class="choicesEdit" style="background:#ddd">';
-			    str += '<div><div class="labelN">Name</div><div class="labelahb">Price</div><div class="labelahb">Capacity</div><div class="clearer"></div></div>';
+			    str += '<div><div class="labelN">Name</div><div class="labelP">Price</div><div class="labelC">Capacity</div><div class="clearer"></div></div>';
 			    str += '<input class="service_name" i="'+i+'" type="text" name="sService'+this.name+'" id="sService'+this.name+'" value="'+$.fbuilder.htmlEncode(this.services[i].name)+'"/><input class="service_price" i="'+i+'" type="text" name="sService'+this.name+'P'+i+'" id="sService'+this.name+'P'+i+'" value="'+$.fbuilder.htmlEncode(this.services[i].price)+'"/>';
 			    str += '<input class="service_capacity" i="'+i+'" type="text" name="sService'+this.name+'C'+i+'" id="sService'+this.name+'C'+i+'" value="'+$.fbuilder.htmlEncode(((parseInt(this.services[i].capacity)>0)?this.services[i].capacity:"1"))+'"/>';
 			    str += '<div><div class="labelahb">Duration</div><div >Padding time before and after</div><div class="clearer"></div></div>';
@@ -785,7 +789,10 @@ $.extend(
             str += '<div><input type="checkbox" name="sShowDropdown" id="sShowDropdown" '+((this.showDropdown)?"checked":"")+'/><label>Show Dropdown Year and Month</label><div id="divdropdownRange" style="display:'+((this.showDropdown)?"":"none")+'">Year Range [<a class="helpfbuilder" text="The range of years displayed in the year drop-down: either relative to today\'s year (&quot;-nn:+nn&quot;), absolute (&quot;nnnn:nnnn&quot;), or combinations of these formats (&quot;nnnn:-nn&quot;)">help?</a>]: <input type="text" name="sDropdownRange" id="sDropdownRange" value="'+$.fbuilder.htmlEncode(this.dropdownRange)+'"/></div></div>';
 			str += '<div><input type="checkbox" name="sShowEndTime" id="sShowEndTime" '+((this.showEndTime)?"checked":"")+'/><label>Show end time [<a class="helpfbuilder" text="If enabled it will display the end time for each time-slot based in the duration of the selected service.">help?</a>]</label></div>';
 			str += '<div><input type="checkbox" name="sShowTotalCost" id="sShowTotalCost" '+((this.showTotalCost)?"checked":"")+'/><label>Show Total Cost</label><div id="divTotalCostFormat" style="display:'+((this.showTotalCost)?"":"none")+'">Total cost format [<a class="helpfbuilder" text="The string {0} will be replaced with the calculated cost. Keep the {0} reference. You can edit the currency symbol or add additional text.">help?</a>]: <input type="text" name="sShowTotalCostFormat" id="sShowTotalCostFormat" value="'+$.fbuilder.htmlEncode(this.showTotalCostFormat)+'"/></div></div>';
-			str += '<div><input type="checkbox" name="sShowQuantity" id="sShowQuantity" '+((this.showQuantity)?"checked":"")+'/><label>Show quantity field [<a class="helpfbuilder" text="If enabled a drop-down field will be displayed above the calendar to select the quantity to book o the selected service (useful for services with capacity greater than 1).">help?</a>]</label></div>';
+			var sQMin = "";
+			for (var i=0;i<=this.services[0].capacity;i++)
+				sQMin += '<option value="'+i+'" '+((i==this.quantityMin)?"selected":"")+'>'+i+'</option>';
+			str += '<div><input type="checkbox" name="sShowQuantity" id="sShowQuantity" '+((this.showQuantity)?"checked":"")+'/><label>Show quantity field [<a class="helpfbuilder" text="If enabled a drop-down field will be displayed above the calendar to select the quantity to book o the selected service (useful for services with capacity greater than 1).">help?</a>]</label><div id="divQuantityMin" style="display:'+((this.showQuantity)?"":"none")+'">From <select name="sQuantityMin" id="sQuantityMin" >'+sQMin+'</select></div></div>';
 		    str += '<hr></hr>';
 			return str;
 		}

@@ -1,0 +1,28 @@
+.ahb_m #fbuilder{color:inherit;}
+.ahb_m #fbuilder .ui-datepicker-header{background-color:transparent;padding:0px;margin:0px;color:inherit}
+.ahb_m #fbuilder .ui-datepicker-prev {border-top: 2px solid #000;border-right: 2px solid #000;width:18px !important;height:18px !important;margin:10px !important;background:none !important;}
+.ahb_m #fbuilder .ui-datepicker-next {border-top: 2px solid #000;border-right: 2px solid #000;width:18px !important;height:18px !important;margin:10px !important;background:none !important;}
+
+.ahb_m #fbuilder .ui-datepicker th{background-color:inherit;color:inherit}
+
+.ahb_m #fbuilder .ui-datepicker-unselectable .ui-state-default {color:inherit;background-color:inherit;}
+				
+.ahb_m #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default.ui-state-active{color:inherit;background-color:inherit;}					
+.ahb_m #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default{color:inherit;background-color:inherit;}
+.ahb_m #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default:hover{color:inherit;background-color:inherit;}
+.ahb_m #fbuilder .slots div a{color:inherit;background-color: #ededed;padding:4px;}
+.ahb_m #fbuilder .slots div a:hover{color:inherit;background-color: #f7f7f7;}
+.ahb_m #fbuilder .pbSubmit {background-color: #ccc;color: #000;margin: 10px 10px 0px 0px;padding: 5px 20px;}
+.ahb_m #fbuilder .pbSubmit:hover {background-color: #ccc;color: #000;}
+.ahb_m #fbuilder .fields input{border-color:inherit;border-width:1px;border-style:solid;background-color:inherit;padding:inherit;}
+.ahbfield_service{display:inherit;}
+.ahb_m #fbuilder .slots{border-color:#888;border-width:1px;border-style:solid;width: 100%;padding: 10px;}
+.ahb_m #fbuilder .slots span{color: inherit;}
+.ahb_m #fbuilder .usedSlots .ahb_list {padding: inherit;margin:inherit}
+.ahb_m #fbuilder .usedSlots .ahb_list .d{color: inherit;}
+.ahb_m #fbuilder .usedSlots .ahb_list .t{color: inherit;}
+.ahb_m #fbuilder .usedSlots .ahb_list .ahb_list_service{color: inherit;}
+.ahb_m #fbuilder .usedSlots .ahb_list .cancel{font-weight:inherit}
+.ahb_m #fbuilder .totalCost{color: inherit;}
+.ahb_m #fbuilder .totalCost span:not(.n){color: inherit;}
+.ahb_m #fbuilder .totalCost span.n{color: inherit;}

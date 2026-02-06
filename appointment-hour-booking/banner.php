@@ -1,4 +1,7 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 global $codepeople_promote_banner_plugins;
 if(empty($codepeople_promote_banner_plugins)) $codepeople_promote_banner_plugins = array();
 if(!function_exists( 'codepeople_add_promote_banner' ))

@@ -1,0 +1,37 @@
+.ahbfield_service{display:inherit;--comment:In order to hide the select set display to -none;}
+.ahb_m3 #fbuilder .fields  label{color:#000}
+.ahb_m3 #fbuilder .fields  input{color:#000;padding:inherit;font-weight:inherit;background-color:inherit;border-color:inherit;border-width:1px;border-style:solid;}
+.ahb_m3 #fbuilder .ui-datepicker-header{background-color:inherit;color:#000}
+.ahb_m3 #fbuilder .ui-datepicker-prev {width: 30px;height: 30px;border-top: 2px solid #000;border-right: 2px solid #000;margin:20px 10px;}
+.ahb_m3 #fbuilder .ui-datepicker-next{width: 30px;height: 30px;border-top: 2px solid #000;border-right: 2px solid #000;margin:20px 10px;}
+
+.ahb_m3 #fbuilder .ui-datepicker th{background:#fff;color:inherit}	
+.ahb_m3 #fbuilder .ui-datepicker-unselectable .ui-state-default {color:#AAAAAA;background-color:inherit;}
+				
+.ahb_m3 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default.ui-state-active{background:#3995D0}					
+.ahb_m3 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default{background:#ddd}
+.ahb_m3 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default:hover{color: #FFF; background: #66CCFF}
+.ahb_m3 #fbuilder .slots div a {
+    border-width:1px;
+    border-color:#66CCFF;	
+    border-style:solid;	
+	background: #f8f8f8; 
+	color: #000;
+	padding:8px 12px;
+}
+.ahb_m3 #fbuilder .slots div:not(.htmlUsed)  a:hover {
+	background:#66CCFF;
+	color:#fff;
+}
+.ahb_m3 #fbuilder .pbSubmit {background-color: #ccc;color: #000;margin: 10px 10px 0px 0px;padding: 5px 20px;}
+.ahb_m3 #fbuilder .pbSubmit:hover {background-color: #ccc;color: #000;}
+.ahb_m3 #fbuilder .slots{padding: 20px 10px 10px}
+.ahb_m3 #fbuilder .slots span{color: inherit;}
+.ahb_m3 #fbuilder .usedSlots .ahb_list {margin-top:5px;}
+.ahb_m3 #fbuilder .usedSlots .ahb_list .d{color: inherit;}
+.ahb_m3 #fbuilder .usedSlots .ahb_list .t{color: inherit;}
+.ahb_m3 #fbuilder .usedSlots .ahb_list .ahb_list_service{color: inherit;}
+
+.ahb_m3 #fbuilder .totalCost{color: inherit;}
+.ahb_m3 #fbuilder .totalCost span:not(.n){color: inherit;}
+.ahb_m3 #fbuilder .totalCost span.n{color: inherit;}

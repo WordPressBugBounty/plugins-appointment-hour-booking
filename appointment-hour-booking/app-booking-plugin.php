@@ -3,7 +3,7 @@
 Plugin Name: Appointment Hour Booking
 Plugin URI: https://apphourbooking.dwbooster.com
 Description: Appointment Hour Booking is a plugin for creating booking forms for appointments with a start time and a defined duration.
-Version: 1.5.42
+Version: 1.5.63
 Author: CodePeople
 Author URI: https://apphourbooking.dwbooster.com
 License: GPLv2
@@ -12,9 +12,11 @@ Text Domain: appointment-hour-booking
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+//define("CP_AHB_DYNAMIC_LOADING", true);
+
 define('CP_APPBOOK_DEFER_SCRIPTS_LOADING', (get_option('CP_APPB_LOAD_SCRIPTS',"1") == "1"?true:false));
 
-define('CP_APPBOOK_DEFAULT_form_structure', '[[{"form_identifier":"","name":"fieldname1","shortlabel":"","index":0,"ftype":"fapp","userhelp":"","userhelpTooltip":false,"csslayout":"","title":"Appointment","services":[{"name":"Service 1","price":1,"duration":60}],"openhours":[{"name":"Default","openhours":[{"type":"all","d":"","h1":8,"m1":0,"h2":17,"m2":0}]}],"allOH":[{"name":"Default","openhours":[{"type":"all","d":"","h1":8,"m1":0,"h2":17,"m2":0}]}],"dateFormat":"mm/dd/yy","showDropdown":false,"dropdownRange":"-10:+10","working_dates":[true,true,true,true,true,true,true],"numberOfMonths":1,"firstDay":0,"minDate":"0","maxDate":"","defaultDate":"","invalidDates":"","required":true,"fBuild":{}},{"form_identifier":"","name":"email","shortlabel":"","index":1,"ftype":"femail","userhelp":"","userhelpTooltip":false,"csslayout":"","title":"Email","predefined":"","predefinedClick":false,"required":true,"size":"medium","equalTo":"","fBuild":{}}],[{"title":"","description":"","formlayout":"top_aligned","formtemplate":"","evalequations":1,"autocomplete":1}]]');
+define('CP_APPBOOK_DEFAULT_form_structure', '[[{"form_identifier":"","name":"fieldname1","shortlabel":"","index":0,"ftype":"fapp","userhelp":"","userhelpTooltip":false,"csslayout":"","title":"Appointment","services":[{"name":"Service 1","price":1,"duration":60}],"openhours":[{"name":"Default","openhours":[{"type":"all","d":"","h1":8,"m1":0,"h2":17,"m2":0}]}],"allOH":[{"name":"Default","openhours":[{"type":"all","d":"","h1":8,"m1":0,"h2":17,"m2":0}]}],"dateFormat":"mm/dd/yy","showDropdown":false,"dropdownRange":"-10:+10","working_dates":[true,true,true,true,true,true,true],"numberOfMonths":1,"firstDay":0,"minDate":"0","maxDate":"","defaultDate":"","invalidDates":"","required":true,"fBuild":{}},{"form_identifier":"","name":"email","shortlabel":"","index":1,"ftype":"femail","userhelp":"","userhelpTooltip":false,"csslayout":"","title":"Email","predefined":"","predefinedClick":false,"required":true,"size":"medium","equalTo":"","fBuild":{}}],[{"title":"","description":"","formlayout":"top_aligned","formtemplate":"ahb_m4","evalequations":1,"autocomplete":1}]]');
 
 
 define('CP_APPBOOK_DEFAULT_track_IP', true);
@@ -149,7 +151,7 @@ if (function_exists('register_block_type'))
 // banner
 $codepeople_promote_banner_plugins[ 'appointment-hour-booking' ] = array(
                       'plugin_name' => 'Appointment Hour Booking',
-                      'plugin_url'  => 'https://wordpress.org/support/plugin/appointment-hour-booking/reviews/?filter=5#new-post'
+                      'plugin_url'  => 'https://wordpress.org/support/plugin/appointment-hour-booking/reviews/?#new-post'
 );
 require_once 'banner.php';
 
@@ -310,3 +312,22 @@ add_action( 'init', function(){
         return $v;
     }, 10, 5 );
 } );
+
+
+// Exclude from SiteGround Speed Optimizer JS Combination
+add_filter( 'sgo_javascript_combine_exclude', 'apphourbk_exclude_js_from_combination' );
+function apphourbk_exclude_js_from_combination( $exclude_list ) {
+    $exclude_list[] = 'cp_appbooking_language_file';
+    $exclude_list[] = 'cp_appbooking_builder_script';
+    $exclude_list[] = 'cp_appbooking_customjs';
+    return $exclude_list;
+}
+
+// Exclude from SiteGround Speed Optimizer JS Minification
+add_filter( 'sgo_js_minify_exclude', 'apphourbk_exclude_js_from_minification' );
+    function apphourbk_exclude_js_from_minification( $exclude_list ) {
+    $exclude_list[] = 'cp_appbooking_language_file';
+    $exclude_list[] = 'cp_appbooking_builder_script';
+    $exclude_list[] = 'cp_appbooking_customjs';
+    return $exclude_list;
+}

@@ -280,7 +280,7 @@
 					{
 						var d,
 							e = $("#"+f);
-						
+						try{
 						this.formId = e.parents( 'form' ).attr( 'id' );
 						if ( d = $.parseJSON( e.val() ))
 						{
@@ -301,7 +301,7 @@
 							   reloadItemsPublic();
 						   }
 						}
-
+                        }catch(e){console.log(e)}
 						if( typeof window[ 'cpcff_load_defaults' ] != 'undefined' )
                         {
                             window[ 'cpcff_load_defaults' ]();

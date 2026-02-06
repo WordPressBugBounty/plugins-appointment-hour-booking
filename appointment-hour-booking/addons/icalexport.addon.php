@@ -34,7 +34,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
 
 			// Insertion in database
 			if(
-				isset( $_REQUEST[ 'CPAPPB_icalexport_id' ] )
+				isset( $_POST[ 'CPAPPB_icalexport_id' ] ) && isset( $_POST["anonce"] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["anonce"])), 'cpappb_actions_admin')
 			)
 			{
 			    $wpdb->delete( $wpdb->prefix.$this->form_table, array( 'formid' => $form_id ), array( '%d' ) );
@@ -43,17 +43,17 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
 								array(
 									'formid' => $form_id,
 
-									'observe_day_light'	 => stripslashes_deep(sanitize_text_field($_REQUEST["observe_day_light"])),
-									'ical_daylight_zone'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_daylight_zone"])),
-									'cal_time_zone_modify'	 => stripslashes_deep(sanitize_text_field($_REQUEST["cal_time_zone_modify"])),
-                                    'attachical'	 => stripslashes_deep(sanitize_text_field($_REQUEST["attachical"])),
-                                    'base_summary'	 => stripslashes_deep($cp_appb_plugin->sanitize($_REQUEST["base_summary"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                                    'base_description'	 => stripslashes_deep($cp_appb_plugin->sanitize($_REQUEST["base_description"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                                    'cal_tzid'	 => stripslashes_deep(sanitize_text_field($_REQUEST["cal_tzid"])),
-                                    'ical_uselocal'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_uselocal"])),
-                                    'ical_organizer'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_organizer"])),
-                                    'ical_organizername'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_organizername"])),
-                                    'ical_organizeremail'	 => stripslashes_deep(sanitize_text_field($_REQUEST["ical_organizeremail"]))
+									'observe_day_light'	 => sanitize_text_field(stripslashes_deep($_POST["observe_day_light"])),
+									'ical_daylight_zone'	 => sanitize_text_field(stripslashes_deep($_POST["ical_daylight_zone"])),
+									'cal_time_zone_modify'	 => sanitize_text_field(stripslashes_deep($_POST["cal_time_zone_modify"])),
+                                    'attachical'	 => sanitize_text_field(stripslashes_deep($_POST["attachical"])),
+                                    'base_summary'	 => stripslashes_deep($cp_appb_plugin->sanitize($_POST["base_summary"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                                    'base_description'	 => stripslashes_deep($cp_appb_plugin->sanitize($_POST["base_description"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                                    'cal_tzid'	 => sanitize_text_field(stripslashes_deep($_POST["cal_tzid"])),
+                                    'ical_uselocal'	 => sanitize_text_field(stripslashes_deep($_POST["ical_uselocal"])),
+                                    'ical_organizer'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizer"])),
+                                    'ical_organizername'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizername"])),
+                                    'ical_organizeremail'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizeremail"]))
 
 								),
 								array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
@@ -74,7 +74,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                 $row["base_description"] = 'Booking for %email%';
                 $row["ical_uselocal"] = '0';
                 $row["ical_organizer"] = '0';
-                $row["ical_organizername"] = sanitize_text_field($_SERVER["HTTP_HOST"]);
+                $row["ical_organizername"] = sanitize_text_field(wp_unslash($_SERVER["HTTP_HOST"]));
                 $row["ical_organizeremail"] = sanitize_email($cp_appb_plugin->get_option('fp_from_email'));
 			} else {
 			    $row["observe_day_light"] = $rows[0]->observe_day_light;
@@ -334,6 +334,8 @@ ahb_icalexp_checkorg();
                 if ($item->ipaddr != 'remote-ical-file')
                 {
                     $data = unserialize($item->posted_data);
+					if (!is_array($data)) $data = array();  
+					if (!isset($data["apps"]) || !is_array($data["apps"])) $data["apps"] = array();                      
                     $ct = 0;
                     foreach($data["apps"] as $app)
                         if (
@@ -397,7 +399,7 @@ ahb_icalexp_checkorg();
                             echo "DTSTART".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify))."T".gmdate("His",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify))).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
                             echo "DTEND".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify.$duration))."T".gmdate("His",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify.$duration))).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
                             echo "DTSTAMP".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",$submissiontime)."T".gmdate("His",$submissiontime)).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
-                            echo "UID:uid".esc_html($item->id.'_'.$ct."@".sanitize_text_field($_SERVER["SERVER_NAME"]).($submissiontime > $updatefeaturetime?$form_id:''))."\n";
+                            echo "UID:uid".esc_html($item->id.'_'.$ct."@".sanitize_text_field(wp_unslash($_SERVER["SERVER_NAME"])).($submissiontime > $updatefeaturetime?$form_id:''))."\n";
                             echo "DESCRIPTION:".esc_html(wp_strip_all_tags($base_description))."\n";
                             echo "LAST-MODIFIED".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",$submissiontime)."T".gmdate("His",$submissiontime)).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
                             echo "LOCATION:\n";
@@ -418,7 +420,7 @@ ahb_icalexp_checkorg();
 
         function attach_ical_file( $attachments, $params, $form_id)
         {
-            global $wpdb, $cp_appb_plugin;
+            global $wpdb, $cp_appb_plugin, $wp_filesystem;;
 
             $updatefeaturetime = strtotime('2019-03-05');
 
@@ -499,7 +501,7 @@ ahb_icalexp_checkorg();
                     $buffer .= "DTSTART".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify))."T".gmdate("His",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify))).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
                     $buffer .= "DTEND".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify.$duration))."T".gmdate("His",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify.$duration))).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
                     $buffer .= "DTSTAMP".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",$submissiontime)."T".gmdate("His",$submissiontime)).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
-                    $buffer .= "UID:uid".esc_html($params["itemnumber"].'_'.$ct."@".sanitize_text_field($_SERVER["SERVER_NAME"]).($submissiontime > $updatefeaturetime?$form_id:''))."\n";
+                    $buffer .= "UID:uid".esc_html($params["itemnumber"].'_'.$ct."@".sanitize_text_field(wp_unslash($_SERVER["SERVER_NAME"])).($submissiontime > $updatefeaturetime?$form_id:''))."\n";
                     $buffer .= "DESCRIPTION:".wp_strip_all_tags($base_description)."\n";
                     $buffer .= "LAST-MODIFIED".esc_html(($icalSettings[0]->cal_tzid != '' ? ';TZID='.$icalSettings[0]->cal_tzid : '').":".gmdate("Ymd",$submissiontime)."T".gmdate("His",$submissiontime)).($icalSettings[0]->cal_tzid != '' || $icalSettings[0]->ical_uselocal == '1'?'':'Z')."\n";
                     $buffer .= "LOCATION:\n";
@@ -514,12 +516,16 @@ ahb_icalexp_checkorg();
 
                     $buffer .= 'END:VCALENDAR';
 
-                    $filename1 = sanitize_file_name('Appointment'.'_'.$params["itemnumber"].'_'.$ct.'.ics');
-                    $filename1 = WP_CONTENT_DIR . '/uploads/'.$filename1;
-                    $handle = fopen($filename1, 'w');
-                    fwrite($handle,$buffer);
-                    fclose($handle);
-                    $attachments[] = $filename1;
+                    if ( empty( $wp_filesystem ) ) {
+                        require_once( ABSPATH . '/wp-admin/includes/file.php' );
+                        WP_Filesystem();
+                    }
+                    $filename1 = sanitize_file_name( 'Appointment' . '_' . $params["itemnumber"] . '_' . $ct . '.ics' );
+                    $upload_dir_info = wp_upload_dir();
+                    $file_path = $upload_dir_info['basedir'] . '/' . $filename1;
+                    if ( $wp_filesystem->put_contents( $file_path, $buffer, FS_CHMOD_FILE ) ) {    
+                        $attachments[] = $file_path;
+                    }
 
                 }
 

@@ -277,7 +277,7 @@ label {font-weight:600;}
     flex-wrap: wrap; /* Allow items to wrap to the next line */
      /*  margin: -10px; Negative margin to offset padding */
 }
-.col3,.col4,.col6 {
+.col3,.col4,.col6,.col12 {
     padding: 0px; /* Padding around each column */
     box-sizing: border-box; /* Include padding in width calculation */
 }
@@ -286,8 +286,15 @@ label {font-weight:600;}
 .col4 {-webkit-box-flex:0;-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}
 .col6 {flex: 0 0 50%;}
 
+.col12 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
 @media (max-width: 768px) {
-    .col3,.col4,.col6 {-webkit-box-flex:0;-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}
+    .col3,.col4,.col6,.col12 {-webkit-box-flex:0;-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}
 }
 .margin-top-15{margin-top:15px}
 

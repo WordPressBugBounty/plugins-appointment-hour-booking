@@ -1,5 +1,7 @@
 <?php 
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 header('Content-Type: application/x-javascript; charset=UTF-8'); 
 
 require 'jQuery.stringify.js';

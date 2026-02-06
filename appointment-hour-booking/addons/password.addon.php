@@ -2,6 +2,9 @@
 /*
 Documentation: https://apphourbooking.dwbooster.com/documentation
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 require_once dirname( __FILE__ ).'/base.addon.php';
 
 if( !class_exists( 'CPAPPB_Passwordaddon' ) )

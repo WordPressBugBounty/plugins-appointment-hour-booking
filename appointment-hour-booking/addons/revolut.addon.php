@@ -2,6 +2,9 @@
 /*
 
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 require_once dirname( __FILE__ ).'/base.addon.php';
 
 if( !class_exists( 'CPAPPB_Revolut' ) )
@@ -14,7 +17,7 @@ if( !class_exists( 'CPAPPB_Revolut' ) )
 		protected $name = "Revolut Payments Integration";
 		protected $description;
         public $category = 'Payment Gateways Integration';
-        public $help = 'https://apphourbooking.dwbooster.com/contact-us';
+        public $help = 'https://apphourbooking.dwbooster.com/customdownloads/revolut-payments.png';
         protected $default_label = 'Pay with Revolut';
 
 
