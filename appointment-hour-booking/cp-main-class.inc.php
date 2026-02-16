@@ -956,7 +956,32 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
     public function settings_page() {
         global $wpdb;
-        if ($this->get_param("cal") || $this->get_param("cal") == '0' || $this->get_param("pwizard") == '1')
+        
+        if ($this->get_param("page") == $this->menu_parameter.'_csseditor_page')
+            @include_once dirname( __FILE__ ) . '/csseditor.inc.php';           
+        else if ($this->get_param("page") == $this->menu_parameter.'_upgrade')
+        {
+            echo("Redirecting to upgrade page...<script type='text/javascript'>document.location='".esc_js($this->plugin_download_URL)."';</script>");
+            exit;
+        }
+        else if ($this->get_param("page") == $this->menu_parameter.'_odemo')
+        {
+            echo("Redirecting to demo page...<script type='text/javascript'>document.location='https://apphourbooking.dwbooster.com/home#demos';</script>");
+            exit;
+        }
+        else if ($this->get_param("page") == $this->menu_parameter.'_support')
+        {
+            @include_once dirname( __FILE__ ) . '/cp-help.inc.php';
+        }
+        else if ($this->get_param("page") == $this->menu_parameter.'_settings')
+        {
+            @include_once dirname( __FILE__ ) . '/cp-settings.inc.php';
+        }
+        else if ($this->get_param("page") == $this->menu_parameter.'_addons')
+        {
+            @include_once dirname( __FILE__ ) . '/cp-addons.inc.php';
+        } 
+        else if ($this->get_param("cal") || $this->get_param("cal") == '0' || $this->get_param("pwizard") == '1')
         {
             $this->item = intval($this->get_param("cal"));
             if (isset($_GET["edit"]) && $_GET["edit"] == '1')
@@ -979,32 +1004,6 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             }
             else
                 @include_once dirname( __FILE__ ) . '/cp-admin-int.inc.php';
-        }
-        else if ($this->get_param("page") == $this->menu_parameter.'_csseditor_page')
-            @include_once dirname( __FILE__ ) . '/csseditor.inc.php';           
-        else if ($this->get_param("page") == $this->menu_parameter.'_upgrade')
-        {
-            echo("Redirecting to upgrade page...<script type='text/javascript'>document.location='".esc_js($this->plugin_download_URL)."';</script>");
-            exit;
-        }
-        else if ($this->get_param("page") == $this->menu_parameter.'_odemo')
-        {
-            echo("Redirecting to demo page...<script type='text/javascript'>document.location='https://apphourbooking.dwbooster.com/home#demos';</script>");
-            exit;
-        }
-        else if ($this->get_param("page") == $this->menu_parameter.'_support')
-        {
-            //echo("Redirecting to support page...<script type='text/javascript'>document.location='https://wordpress.org/support/plugin/appointment-hour-booking#new-post';</script>");
-            //exit;
-            @include_once dirname( __FILE__ ) . '/cp-help.inc.php';
-        }
-        else if ($this->get_param("page") == $this->menu_parameter.'_settings')
-        {
-            @include_once dirname( __FILE__ ) . '/cp-settings.inc.php';
-        }
-        else if ($this->get_param("page") == $this->menu_parameter.'_addons')
-        {
-            @include_once dirname( __FILE__ ) . '/cp-addons.inc.php';
         }
         else
             @include_once dirname( __FILE__ ) . '/cp-admin-int-list.inc.php';
