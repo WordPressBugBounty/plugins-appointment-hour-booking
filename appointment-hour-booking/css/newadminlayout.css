@@ -303,3 +303,126 @@ canvas {
             max-width: 100%; /* Responsive */
             height: 200px; /* Fixed height */
         }
+
+.ahbaptimes { margin-bottom: 10px; font-weight: 500;}
+
+/* Header styling */
+.ahb-appointment-header {
+    font-weight: 600; /* Semi-bold */
+    color: #1d2327;
+    margin-bottom: 6px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* The primary time badge */
+.ahb-appointment-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f0f6fb; /* Soft WordPress Blue */
+    border: 1px solid #c3d9e8;
+    border-radius: 4px;
+    padding: 4px 10px;
+    margin-bottom: 5px;
+}
+
+/* Icon inside the badge */
+.ahb-appointment-badge .dashicons-clock {
+    color: #2271b1;
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    margin-right: 8px;
+}
+
+/* The specific time string */
+.ahb-time {
+    font-weight: 600; /* Semi-bold */
+    color: #2271b1;
+    margin-right: 8px;
+}
+
+/* The service/description text */
+.ahb-service {
+    color: #50575e;
+    font-size: 12px;
+    border-left: 1px solid #c3d9e8;
+    padding-left: 8px;
+}
+
+
+.ahbmessagemw {
+    min-width: 200px; /* Set your desired pixels here */
+    display: block;   /* Ensures the div respects the width */
+}
+
+/* Styling the customer detail divs below the badge */
+.ahbaptimes + div, 
+.ahb-appointment-badge + div {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #2c3338;
+}
+
+.ahbmessagemw div:nth-child(n+4):not(:last-child) {
+    border-top: 1px dotted #ddd;
+}
+
+/* 1. Prevent the table from collapsing too much */
+.ahb-orders-list {
+    table-layout: auto; /* Browser calculates best fit */
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* 2. Align all content to the top so icons don't float in the middle */
+.ahb-orders-list th, 
+.ahb-orders-list td {
+    vertical-align: top !important; /* Forces icons and text to line up at the top */
+    padding: 12px 8px !important;
+    word-break: break-word; /* Allows long text to wrap instead of pushing columns */
+}
+
+/* 3. Assign specific widths to narrow columns */
+.ahb-orders-list th:nth-child(1) { width: 40px; }  /* Checkbox */
+.ahb-orders-list th:nth-child(2) { width: 50px; }  /* ID */
+.ahb-orders-list th:nth-child(3) { width: 110px; } /* Submission Date */
+.ahb-orders-list th:nth-child(6) { width: 120px; text-align: center; } /* Paid Status */
+
+/* 4. Ensure the Message column takes the remaining space but doesn't shrink too small */
+.ahb-orders-list td:nth-child(5) {
+    min-width: 250px;
+}
+
+/* 5. Prevent the Badge from overflowing its own cell */
+.ahb-appointment-badge {
+    display: flex; /* Changed from inline-flex to flex */
+    flex-wrap: wrap; /* Allows the service text to drop to a new line if narrow */
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Target the Submission Date column */
+.ahb-orders-list th.col-submission-date,
+.ahb-orders-list td:nth-child(3) {
+    width: 1% !important;        /* Trick to force minimum possible width */
+    white-space: normal !important; /* Allows text to wrap/stack */
+    min-width: 85px !important;   /* Just enough for the date string */
+    line-height: 1.3;
+    font-size: 11px;             /* Optional: smaller font saves more space */
+    padding-right: 5px !important;
+    padding-left: 5px !important;
+}
+
+/* Ensure the date and time have a natural break point */
+.ahb-orders-list td:nth-child(3) {
+    word-spacing: 100vw; /* Forces a wrap at every space character */
+}
+
+.buttonnf {float:none !important;min-height:40px !important;}
+.selectmh {min-height:40px !important;}
+.ahbno-wrap-div {
+    white-space: nowrap;
+    overflow: visible;  
+}

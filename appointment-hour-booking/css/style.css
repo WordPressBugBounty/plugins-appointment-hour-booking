@@ -185,7 +185,7 @@ font-weight: bold;
 background-color: #dcdcdc;
 }
 .cpappb_cancelled {
-     opacity: 0.8;
+     opacity: 0.7;
      color: #ff0000;
 }   
 .cpappb_cancelled input, .cpappb_cancelled select {
