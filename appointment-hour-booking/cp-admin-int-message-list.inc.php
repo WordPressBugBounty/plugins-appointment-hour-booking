@@ -122,16 +122,60 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
     <a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="page-title-action">&larr; <?php esc_html_e('Return to the calendars list','appointment-hour-booking'); ?></a>
     <hr class="wp-header-end">
 
-    <?php if ($message) echo "<div id='setting-error-settings_updated' class='updated notice is-dismissible'><p><strong>".esc_html($message)."</strong></p></div>"; ?>
+    <?php if ($message && !isset($_GET['ud'])) echo "<div id='setting-error-settings_updated' class='updated notice is-dismissible'><p><strong>".esc_html($message)."</strong></p></div>"; ?>
 
-    <script type="text/javascript">
+<script type="text/javascript">
+     // AJAX Status Update
      function cp_UpsItem(id) {
-         var status = document.getElementById("sb"+id).options[document.getElementById("sb"+id).selectedIndex].value;
-         document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&ud='+id+'&status='+status+'&r='+Math.random();
+         var selectBox = document.getElementById("sb" + id);
+         var status = selectBox.options[selectBox.selectedIndex].value;
+         var url = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&ud=' + id + '&status=' + encodeURIComponent(status) + '&r=' + Math.random();
+         
+         selectBox.disabled = true;
+         
+         jQuery.get(url, function() {
+             selectBox.disabled = false;
+             var tr = jQuery(selectBox).closest('tr');
+             var lowerStatus = status.toLowerCase();
+             
+             // Toggle cancelled class based on status
+             if (lowerStatus === 'cancelled' || lowerStatus === 'cancelled by customer') {
+                 tr.addClass('cpappb_cancelled');
+             } else {
+                 tr.removeClass('cpappb_cancelled');
+             }
+             
+             // Visual feedback
+             var check = jQuery('<span style="color:green; margin-left:5px; font-weight:bold;">&#10003;</span>');
+             jQuery(selectBox).after(check);
+             check.fadeOut(2000, function() { jQuery(this).remove(); });
+         });
      }
-     function cp_updateMessageItem(id,status) {
-        document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&status='+status+'&lu='+id+'&r='+Math.random( );
+
+     // AJAX Toggle Payment
+     function cp_updateMessageItem(id, status, linkElement) {
+         var url = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&status=' + status + '&lu=' + id + '&r=' + Math.random();
+         
+         var $link = jQuery(linkElement);
+         var $cell = $link.closest('tr').find('td').eq(4); // Target the Paid Status column
+         
+         $link.css('opacity', '0.5');
+
+         jQuery.get(url, function() {
+             $link.css('opacity', '1');
+             // Toggle the link status for next click
+             var newStatus = (status == '1') ? '0' : '1';
+             $link.attr('onclick', 'cp_updateMessageItem(' + id + ',' + newStatus + ', this);');
+
+             // Update the visual icon in the "Paid Status" column
+             if (status == '1') {
+                 $cell.html('<span class="dashicons dashicons-money-alt" style="color: green;" title="Paid"></span><br/><em style="font-size: 11px; color: #666;"><?php esc_html_e('Manually updated','appointment-hour-booking'); ?></em>');
+             } else {
+                 $cell.html('<span class="dashicons dashicons-minus" style="color: #d63638;" title="Not Paid"></span>');
+             }
+         });
      }
+
      function cp_resendMessageItem(id) {
         if (confirm('Are you sure that you want to resend the notification emails for this item?')) {
             document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&resend='+id+'&r='+Math.random( );
@@ -228,7 +272,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
         </div>
     </div>
 
-    <div id="dex_printable_contents" style="min-width:900px !important;">
+    <div id="dex_printable_contents">
         <form name="dex_table_form" id="dex_table_form" action="admin.php" method="get">
             <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>" />
             <input type="hidden" name="cal" value="<?php echo intval($_GET["cal"]); ?>" />
@@ -237,17 +281,17 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
             <input type="hidden" name="statusmark" value="" />
             <input type="hidden" name="sbmi" value="" /> 
             <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
-            <div class="ahb-orderssection-container" style="background:#f6f6f6; padding-bottom:20px; overflow-x: auto;">
+            <div class="ahb-orderssection-container">
             <table class="wp-list-table widefat fixed striped ahb-orders-list">
                 <thead>
                 <tr>
                     <td id="cb" class="manage-column column-cb check-column"><input type="checkbox" name="cpcontrolck" id="cpcontrolck" value="" onclick="cp_markall();"></td>
-                    <th scope="col" class="manage-column column-id" style="width: 50px;"><?php esc_html_e('ID','appointment-hour-booking'); ?></th>
-                    <th scope="col" class="manage-column column-date" style="width: 130;"><?php esc_html_e('Submission Date','appointment-hour-booking'); ?></th>
-                    <th scope="col" class="manage-column column-email" style="width: 15%;"><?php esc_html_e('Email','appointment-hour-booking'); ?></th>
-                    <th scope="col" class="manage-column column-message" nowrap><?php esc_html_e('Message','appointment-hour-booking'); ?></th>
-                    <th scope="col" class="manage-column column-status" style="width: 12%; text-align:center;"><?php esc_html_e('Paid Status','appointment-hour-booking'); ?></th>
-                    <th scope="col" class="manage-column column-options cpnopr" style="width: 20%;"><?php esc_html_e('Actions','appointment-hour-booking'); ?></th>
+                    <th scope="col" class="manage-column column-id" ><?php esc_html_e('ID','appointment-hour-booking'); ?></th>
+                    <th scope="col" class="manage-column column-date" ><?php esc_html_e('Submission Date','appointment-hour-booking'); ?></th>
+                    <th scope="col" class="manage-column column-email" ><?php esc_html_e('Email','appointment-hour-booking'); ?></th>
+                    <th scope="col" class="manage-column column-message" ><?php esc_html_e('Message','appointment-hour-booking'); ?></th>
+                    <th scope="col" class="manage-column column-status" ><?php esc_html_e('Paid Status','appointment-hour-booking'); ?></th>
+                    <th scope="col" class="manage-column column-options cpnopr"><?php esc_html_e('Actions','appointment-hour-booking'); ?></th>
                 </tr>
                 </thead>
                 <tbody id="the-list">
@@ -283,15 +327,8 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
                         $data = str_replace("&lt;img ","<img ", $data);
                         echo '<div class="ahb-appointment-header">'; // style="display:none"
                         $data = str_replace('<br /><br />', '</div><div>',$this->filter_allowed_tags(apply_filters( 'cpappb_booking_orders_item', $data, $posted_data ))); 
-                        /*$data = preg_replace(
-                                '/^- (.*)$/m', 
-                                '<div class="ahb-appointment-line"><span class="ahb-appointment-time"><span class="dashicons dashicons-clock"></span>$1</span></div>', 
-                                $data
-                            );*/
-                            //$data = '<div class="ahbaptimes">Appointments:<br> - 02/21/2026 18:00 - 20:00 (Rezerwacja stolika dla 2 osób)</div>';
 
-
-$appts = ""; // __('Appointments','appointment-hour-booking').":
+$appts = "";
 
 for($k=0; $k<count($posted_data["apps"]); $k++)
     $appts .=   '<div class="ahb-appointment-badge">' .
@@ -318,10 +355,9 @@ for($k=0; $k<count($posted_data["apps"]); $k++)
                     <td class="cpnopr">
                       <div style="margin-bottom: 5px;">
                           <?php $this->render_status_box('sb'.intval($events[$i]->id), $status); ?>
-                          <input class="button" type="button" name="calups_<?php echo intval($events[$i]->id); ?>" value="<?php esc_html_e('Update','appointment-hour-booking'); ?>" onclick="cp_UpsItem(<?php echo intval($events[$i]->id); ?>);" />
                       </div>
                       <div class="row-actions visible">
-                          <span class="edit"><a href="javascript:void(0);" onclick="cp_updateMessageItem(<?php echo intval($events[$i]->id); ?>,<?php echo ($is_paid ? '0' : '1'); ?>);"><?php esc_html_e('Toggle Payment','appointment-hour-booking'); ?></a> | </span>
+                          <span class="edit"><a href="javascript:void(0);" onclick="cp_updateMessageItem(<?php echo intval($events[$i]->id); ?>,<?php echo ($is_paid ? '0' : '1'); ?>, this);"><?php esc_html_e('Toggle Payment','appointment-hour-booking'); ?></a> | </span>
                           <span class="inline"><a href="javascript:void(0);" onclick="cp_resendMessageItem(<?php echo intval($events[$i]->id); ?>);"><?php esc_html_e('Resend Email','appointment-hour-booking'); ?></a> | </span>
                           <span class="trash"><a href="javascript:void(0);" onclick="cp_deleteMessageItem(<?php echo intval($events[$i]->id); ?>);" class="submitdelete"><?php esc_html_e('Delete','appointment-hour-booking'); ?></a></span>
                       </div>
@@ -355,7 +391,16 @@ for($k=0; $k<count($posted_data["apps"]); $k++)
 ?>
  var $j = jQuery.noConflict();
  $j(function() {
-  //  $j("#dfrom").datepicker({ dateFormat: '<?php echo esc_js($dformatc); ?>' });
-  //  $j("#dto").datepicker({ dateFormat: '<?php echo esc_js($dformatc); ?>' });
+    // Bind AJAX onchange listener for status dropdowns
+    $j("select[id^='sb']").each(function() {
+        var idAttr = $j(this).attr('id');
+        // Make sure we only catch item statuses (sb123) and not things like sbmi (statusbox_markeditems)
+        if (/^sb\d+$/.test(idAttr)) {
+            $j(this).on('change', function() {
+                var id = idAttr.replace('sb', '');
+                cp_UpsItem(id);
+            });
+        }
+    });
  });
 </script>

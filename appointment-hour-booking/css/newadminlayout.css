@@ -108,12 +108,11 @@ label {font-weight:600;}
 /* booking orders page */
 
 .ahb-orderssection-container {
-	border: 1px solid #e6e6e6;
+	border: 0px;
 	padding:0;
-	border-radius: 3px;
 	-webkit-box-flex: 1;
 	flex: 1;
-	margin: 1em 1em 1em 0;
+	margin: 0;
 	min-width: 200px;
 	background: #ffffff;
 	position:relative;
@@ -142,11 +141,12 @@ label {font-weight:600;}
 	border-radius: 3px;
 	-webkit-box-flex: 1;
 	flex: 1;
-	margin: 1em 1em 1em 0;
+	margin: 15px 0 15px 0;
 	min-width: 200px;
 	background: #f6f6f6;
 	position:relative;
 }
+
 .ahb-adintsection{padding:20px;display:none;}
 .ahb-adintsection label{font-weight:600;}
 .ahb-adintsection-active{display:block;}
@@ -198,7 +198,7 @@ label {font-weight:600;}
 .working_dates input[type='checkbox'] { width: auto !important; margin-left: 10px; }
 #sWD0 { margin-left: 0px; }
 
-#dex_printable_contents{overflow:auto;}
+
 .cpapp_no_wrap{
 	width: 100%;
 	display:flex;
@@ -323,7 +323,7 @@ canvas {
     background-color: #f0f6fb; /* Soft WordPress Blue */
     border: 1px solid #c3d9e8;
     border-radius: 4px;
-    padding: 4px 10px;
+    padding: 3px;
     margin-bottom: 5px;
 }
 
@@ -353,7 +353,7 @@ canvas {
 
 
 .ahbmessagemw {
-    min-width: 200px; /* Set your desired pixels here */
+    min-width: 170px; /* Set your desired pixels here */
     display: block;   /* Ensures the div respects the width */
 }
 
@@ -385,10 +385,17 @@ canvas {
 }
 
 /* 3. Assign specific widths to narrow columns */
-.ahb-orders-list th:nth-child(1) { width: 40px; }  /* Checkbox */
+.ahb-orders-list th:nth-child(1) { width: 30px; }  /* Checkbox */
 .ahb-orders-list th:nth-child(2) { width: 50px; }  /* ID */
-.ahb-orders-list th:nth-child(3) { width: 110px; } /* Submission Date */
-.ahb-orders-list th:nth-child(6) { width: 120px; text-align: center; } /* Paid Status */
+.ahb-orders-list th:nth-child(3) { width: 100px; } /* Submission Date */
+.ahb-orders-list th:nth-child(4) { width: 40%; } /* Email */
+.ahb-orders-list th:nth-child(5) { width: 60%; } /* Message */
+.ahb-orders-list th:nth-child(6) { width: 80px;text-align: center; } /* Paid Status */
+.ahb-orders-list .cpnopr select{width:100%;max-width:150px}
+.ahb-orders-list th:nth-child(7) {max-width:160px;width: 160px;}
+
+.ahb-orders-list .cpnopr .inline{white-space: nowrap;}
+
 
 /* 4. Ensure the Message column takes the remaining space but doesn't shrink too small */
 .ahb-orders-list td:nth-child(5) {
@@ -422,7 +429,122 @@ canvas {
 
 .buttonnf {float:none !important;min-height:40px !important;}
 .selectmh {min-height:40px !important;}
-.ahbno-wrap-div {
-    white-space: nowrap;
-    overflow: visible;  
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+.tablenav.top .ahbno-wrap-div{display:inline-flex;}
+.tablenav.top .ahbno-wrap-div input {margin-right:2px}
+@media screen and (max-width: 782px) {
+    .tablenav.top .ahbno-wrap-div {
+        display: inline;
+        text-align:center;
+    }
+    .tablenav.top .ahbno-wrap-div input,.tablenav.top .ahbno-wrap-div select {
+        width:calc(50% - 5px);
+        max-width: none;
+        margin-top:3px;
+    }
+    .ahbnoprint.tablenav.bottom .actions input,.ahbnoprint.tablenav.bottom .actions select{
+        width:calc(50%);
+        max-width: none;
+        margin:3px 5px 0px 0px !important;
+    }
+    .ahbnoprint .alignleft,.ahbnoprint .alignright{float:none;width:100%;display:inline-flex}
+    .dex_printable_contents{min-width:782px !important;}
+}
+@media screen and (max-width: 768px) {
+    #dex_table_form table, 
+    #dex_table_form tbody{ 
+        display: block; 
+        width: 100% !important;
+    }
+    #dex_table_form thead { 
+        display: contents; 
+    }
+    #dex_table_form thead tr {
+        display: flex;
+        background: #f1f1f1;
+        border: 1px solid #ccc;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+    }
+    #dex_table_form thead tr:nth-child(1){
+        padding: 0px;
+        margin: 0px;
+    }
+    #dex_table_form thead th:not(.column-cb) { 
+        display: none;
+    }
+    #dex_table_form thead th.column-cb {
+        display: block;
+        width: 50px !important;
+        padding: 10px !important;
+    }
+    #dex_table_form tr {
+        display: flex;
+        flex-wrap: wrap; 
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+        background: #fff;
+        border-radius: 0 0 8px 8px; 
+    }
+    #dex_table_form th.check-column {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px !important;
+        min-width: 50px;
+        background: #f9f9f9;
+        border-right: 1px solid #eee;
+        padding: 6px 0px 0px !important;
+    }
+    #dex_table_form td {
+        display: block;
+        flex: 1; /* Ocupa el espacio restante */
+        min-width: calc(100% - 60px); 
+        border: none;
+        padding: 8px 15px !important;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    #dex_table_form td:nth-child(2),
+    #dex_table_form td:nth-child(3) {
+        flex: none;
+        width: calc(100% - 150px) !important;
+        min-width: 100px;
+        font-size: 11px;
+        color: #666;
+        border-bottom: none;
+        background: #f9f9f9;        
+        padding: 12px 0px 0px 30px !important;
+        font-size: 14px;
+    }
+    #dex_table_form td:nth-child(2) {
+        width: 100px !important;
+    }
+	#dex_table_form td:nth-child(2):before {
+        content: "\f483";
+        font-family: dashicons;
+        font-size: 18px;
+    }
+    #dex_table_form td:nth-child(3) {
+        word-spacing: normal;
+    }
+    #dex_table_form td:nth-child(3):before {
+        content: "\f469";
+        font-family: dashicons;
+        font-size: 18px;
+    }
+    #dex_table_form td.ahbmessage {
+        width: 100%;
+        background: #fff;
+    }
+    #dex_table_form td.cpnopr,
+    #dex_table_form td[align="center"] {
+        width: 100%;
+        background: #fafafa;
+    }
+    #dex_table_form td a {
+        word-break: break-all;
+    }
+	.ahb-orderssection-container .wp-list-table.widefat{border:0px !important}
 }

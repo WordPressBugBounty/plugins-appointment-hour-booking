@@ -1131,7 +1131,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
 
             wp_enqueue_style('jquery-style', plugins_url('/css/cupertino/jquery-ui-1.8.20.custom.css', __FILE__));            
             wp_enqueue_style('cpapp-style', plugins_url('/css/style.css', __FILE__));
-            wp_enqueue_style('cpapp-newadminstyle', plugins_url('/css/newadminlayout.css', __FILE__));
+            wp_enqueue_style('cpapp-newadminstyle', plugins_url('/css/newadminlayout.css', __FILE__), array(), '1.3');
             $calendar_language = $this->get_option('calendar_language','');
             if ($calendar_language == '') $calendar_language = $this->autodetect_language();
             if ($calendar_language != '')
