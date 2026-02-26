@@ -53,7 +53,7 @@ label {font-weight:600;}
 	}
 	.ahb-calendars-list thead,
 	.ahb-calendars-list th{display:none}
-	.ahb-calendars-list td .button{width:48%; margin:5px 0;}
+	.ahb-calendars-list td .button{width:calc(50% - 5px); margin:5px 0;}
     .ahb-calendars-list .firstcol,
     .ahb-calendars-list td .button:nth-child(1) {display: none }
     .ahb-calendars-list .lastcol { clear:both;  visibility:hidden; }

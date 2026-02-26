@@ -106,8 +106,8 @@ if ($this->item != 0) $cond .= " AND formid=".intval($this->item);
 
 
 $events_query = "SELECT count(id) as ck FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC";
-$events = $wpdb->get_results( $events_query );
-$total_pages = ceil($events[0]->ck / $records_per_page);
+$eventscount = $wpdb->get_results( $events_query );
+$total_pages = ceil($eventscount[0]->ck / $records_per_page);
 
 $events_query = "SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC LIMIT ".intval(($current_page-1)*$records_per_page).",".intval($records_per_page);
 
@@ -176,14 +176,41 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
          });
      }
 
-     function cp_resendMessageItem(id) {
-        if (confirm('Are you sure that you want to resend the notification emails for this item?')) {
-            document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&resend='+id+'&r='+Math.random( );
+    function cp_resendMessageItem(id, element) {
+        if (confirm('<?php echo esc_js(__('Are you sure that you want to resend the notification emails for this item?','appointment-hour-booking')); ?>')) {
+            var url = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&resend='+id+'&r='+Math.random();
+            var $link = jQuery(element);
+            var originalText = $link.text();
+            
+            // Visual feedback while processing
+            $link.text('<?php echo esc_js(__('Sending...','appointment-hour-booking')); ?>').css({'pointer-events': 'none', 'opacity': '0.5'});
+            
+            jQuery.get(url, function() {
+                // Success state
+                $link.text('<?php echo esc_js(__('Sent!','appointment-hour-booking')); ?>').css('color', 'green');
+                
+                // Revert to original state after 2 seconds
+                setTimeout(function() {
+                    $link.text(originalText).css({'pointer-events': 'auto', 'opacity': '1', 'color': ''});
+                }, 2000);
+            });
         }
      } 
-     function cp_deleteMessageItem(id) {
-        if (confirm('Are you sure that you want to delete this item?')) {
-            document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&ld='+id+'&r='+Math.random();
+     
+     function cp_deleteMessageItem(id, element) {
+        if (confirm('<?php echo esc_js(__('Are you sure that you want to delete this item?','appointment-hour-booking')); ?>')) {
+            var url = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&ld='+id+'&r='+Math.random();
+            var $tr = jQuery(element).closest('tr');
+            
+            // Visual feedback while processing
+            $tr.css('opacity', '0.5');
+            
+            jQuery.get(url, function() {
+                // Smoothly fade out and remove the row
+                $tr.fadeOut(400, function() {
+                    jQuery(this).remove();
+                });
+            });
         }
      }
      function cp_deletemarked() {
@@ -252,26 +279,68 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
             </div>
         </form>
 
-        <div class="tablenav-pages">
-            <?php
-            echo paginate_links( array(        // phpcs:ignore WordPress.Security.EscapeOutput
-                'base'         => 'admin.php?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1%_%&dfrom='.urlencode(sanitize_text_field((!empty($_GET["dfrom"])?sanitize_text_field($_GET["dfrom"]):''))).'&dto='.urlencode(sanitize_text_field((!empty($_GET["dto"])?sanitize_text_field($_GET["dto"]):''))).'&search='.urlencode($this->clean_sanitize((!empty($_GET["search"])?sanitize_text_field($_GET["search"]):''))),
-                'format'       => '&p=%#%',
-                'total'        => intval($total_pages),
-                'current'      => intval($current_page),
-                'show_all'     => False,
-                'end_size'     => 1,
-                'mid_size'     => 2,
-                'prev_next'    => True,
-                'prev_text'    => esc_html(__('&laquo; Previous', 'appointment-hour-booking')),
-                'next_text'    => esc_html(__('Next &raquo;', 'appointment-hour-booking')),
-                'type'         => 'plain',
-                'add_args'     => False
-            ) );
-            ?>
+        <style>
+            /* Force exact standard WordPress List Table pagination styling to override plugin conflicts */
+            .ahb-wp-pagination { float: right; display: flex; align-items: center; margin-top: 3px; color: #3c434a; font-size: 13px; }
+            .ahb-wp-pagination .displaying-num { margin-right: 7px; }
+            .ahb-wp-pagination .pagination-links { display: flex; align-items: center; }
+            .ahb-wp-pagination .pagination-links .button { 
+                margin: 0 2px; 
+                padding: 0 4px; 
+                min-width: 30px; 
+                min-height: 30px; 
+                line-height: 28px; 
+                text-align: center; 
+                display: inline-block;
+                box-sizing: border-box;
+                border: 1px solid #8c8f94;
+                border-radius: 3px;
+                background: #f6f7f7;
+                color: #2271b1;
+                text-decoration: none;
+                font-weight: normal;
+            }
+            .ahb-wp-pagination .pagination-links .button.disabled { border-color: #dcdcde; color: #a7aaad; background: #f6f7f7; cursor: default; }
+            .ahb-wp-pagination .pagination-links .button:hover:not(.disabled) { background: #f0f0f1; border-color: #0a4b78; color: #0a4b78; }
+            .ahb-wp-pagination .paging-input { margin: 0 4px; display: inline-flex; align-items: center; }
+            .ahb-wp-pagination .paging-input input { width: 40px !important; margin: 0 4px; text-align: center; border: 1px solid #8c8f94; border-radius: 3px; line-height: 2; min-height: 30px; padding: 0 4px; color: #2c3338; }
+        </style>
+
+        <div class="tablenav-pages ahb-wp-pagination<?php if($total_pages <= 1) echo ' one-page'; ?>">
+            <?php if ( $total_pages > 0 ) : ?>
+                <span class="displaying-num"><?php echo esc_html( sprintf( _n( '%s item', '%s items', $eventscount[0]->ck, 'appointment-hour-booking' ), number_format_i18n( $eventscount[0]->ck ) ) ); ?></span>
+                
+                <?php 
+                // Build the base URL for the pagination links
+                $base_url = 'admin.php?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1&dfrom='.urlencode(sanitize_text_field((!empty($_GET["dfrom"])?sanitize_text_field($_GET["dfrom"]):''))).'&dto='.urlencode(sanitize_text_field((!empty($_GET["dto"])?sanitize_text_field($_GET["dto"]):''))).'&search='.urlencode($this->clean_sanitize((!empty($_GET["search"])?sanitize_text_field($_GET["search"]):'')));
+                ?>
+                <span class="pagination-links">
+                    <?php if ( $current_page == 1 ) : ?>
+                        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>
+                        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>
+                    <?php else : ?>
+                        <a class="first-page button" href="<?php echo esc_url($base_url . '&p=1'); ?>"><span class="screen-reader-text"><?php esc_html_e( 'First page', 'appointment-hour-booking' ); ?></span><span aria-hidden="true">&laquo;</span></a>
+                        <a class="prev-page button" href="<?php echo esc_url($base_url . '&p=' . ($current_page - 1)); ?>"><span class="screen-reader-text"><?php esc_html_e( 'Previous page', 'appointment-hour-booking' ); ?></span><span aria-hidden="true">&lsaquo;</span></a>
+                    <?php endif; ?>
+
+                    <span class="paging-input">
+                        <label for="current-page-selector" class="screen-reader-text"><?php esc_html_e( 'Current Page', 'appointment-hour-booking' ); ?></label>
+                        <input class="current-page" id="current-page-selector" type="text" name="p" value="<?php echo esc_attr( $current_page ); ?>" size="<?php echo strlen( (string) $total_pages ); ?>" aria-describedby="table-paging" onkeydown="if(event.keyCode==13) { window.location.href='<?php echo esc_url_raw($base_url); ?>&p='+this.value; return false; }">
+                        <span class="tablenav-paging-text"> <?php esc_html_e( 'of', 'appointment-hour-booking' ); ?> <span class="total-pages"><?php echo esc_html( number_format_i18n( $total_pages ) ); ?></span></span>
+                    </span>
+
+                    <?php if ( $current_page == $total_pages ) : ?>
+                        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>
+                        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>
+                    <?php else : ?>
+                        <a class="next-page button" href="<?php echo esc_url($base_url . '&p=' . ($current_page + 1)); ?>"><span class="screen-reader-text"><?php esc_html_e( 'Next page', 'appointment-hour-booking' ); ?></span><span aria-hidden="true">&rsaquo;</span></a>
+                        <a class="last-page button" href="<?php echo esc_url($base_url . '&p=' . $total_pages); ?>"><span class="screen-reader-text"><?php esc_html_e( 'Last page', 'appointment-hour-booking' ); ?></span><span aria-hidden="true">&raquo;</span></a>
+                    <?php endif; ?>
+                </span>
+            <?php endif; ?>
         </div>
     </div>
-
+    <div class="clear"></div>
     <div id="dex_printable_contents">
         <form name="dex_table_form" id="dex_table_form" action="admin.php" method="get">
             <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>" />
@@ -328,18 +397,22 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
                         echo '<div class="ahb-appointment-header">'; // style="display:none"
                         $data = str_replace('<br /><br />', '</div><div>',$this->filter_allowed_tags(apply_filters( 'cpappb_booking_orders_item', $data, $posted_data ))); 
 
-$appts = "";
+                        $appts = "";
 
-for($k=0; $k<count($posted_data["apps"]); $k++)
-    $appts .=   '<div class="ahb-appointment-badge">' .
-                   '<span class="dashicons dashicons-clock"></span>' .
-                   '<span class="ahb-time">'.$this->format_date($posted_data["apps"][$k]["date"]).' '.$posted_data["apps"][$k]["slot"].'</span>' .
-                   '<span class="ahb-service">'.$posted_data["apps"][$k]["service"].'</span>' .
-               '</div>';
+                        for($k=0; $k<count($posted_data["apps"]); $k++) {
+                            $app = $posted_data["apps"][$k];
+                            $appts .=   '<div class="ahb-appointment-badge">' .
+                                           '<span class="dashicons dashicons-clock"></span>' .
+                                           '<span class="ahb-time">'.$this->format_date($app["date"]).' '.$app["slot"].(isset($app["quant"]) && $app["quant"]>1?' ('.$app["quant"].')':'').'</span>' .
+                                           '<span class="ahb-service">'.$app["service"].'</span>' .
+                                       '</div>';
+                        }
 
                         
                         echo $appts.'</div><div style="display:none">'.$data; // phpcs:ignore WordPress.Security.EscapeOutput
                         echo '</div>';
+                        
+                        
                         ?>
                        </div>
                     </td>
@@ -356,11 +429,11 @@ for($k=0; $k<count($posted_data["apps"]); $k++)
                       <div style="margin-bottom: 5px;">
                           <?php $this->render_status_box('sb'.intval($events[$i]->id), $status); ?>
                       </div>
-                      <div class="row-actions visible">
+                    <div class="row-actions visible">
                           <span class="edit"><a href="javascript:void(0);" onclick="cp_updateMessageItem(<?php echo intval($events[$i]->id); ?>,<?php echo ($is_paid ? '0' : '1'); ?>, this);"><?php esc_html_e('Toggle Payment','appointment-hour-booking'); ?></a> | </span>
-                          <span class="inline"><a href="javascript:void(0);" onclick="cp_resendMessageItem(<?php echo intval($events[$i]->id); ?>);"><?php esc_html_e('Resend Email','appointment-hour-booking'); ?></a> | </span>
-                          <span class="trash"><a href="javascript:void(0);" onclick="cp_deleteMessageItem(<?php echo intval($events[$i]->id); ?>);" class="submitdelete"><?php esc_html_e('Delete','appointment-hour-booking'); ?></a></span>
-                      </div>
+                          <span class="inline"><a href="javascript:void(0);" onclick="cp_resendMessageItem(<?php echo intval($events[$i]->id); ?>, this);"><?php esc_html_e('Resend Email','appointment-hour-booking'); ?></a> | </span>
+                          <span class="trash"><a href="javascript:void(0);" onclick="cp_deleteMessageItem(<?php echo intval($events[$i]->id); ?>, this);" class="submitdelete"><?php esc_html_e('Delete','appointment-hour-booking'); ?></a></span>
+                      </div>                      
                     </td>
                   </tr>
                  <?php } ?>
