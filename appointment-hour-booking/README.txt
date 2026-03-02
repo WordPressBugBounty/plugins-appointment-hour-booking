@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 3.0.5
 Tested up to: 6.9
-Stable tag: 1.5.68
+Stable tag: 1.5.69
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -225,10 +225,12 @@ Please note that the pro features aren't advised as part of the free plugin in t
 == Screenshots ==
 
 1. Appointment booking form.
-2. Inserting an appointment hour booking calendar into a page.
+2. Booking orders list
 3. Managing the appointment hour booking  calendar.
 4. Appointment Hour Booking calendar settings.
 5. Integration with the new Gutenberg Editor
+6. Stats - Reports section
+7. Schedule Calendar view
 
 == Changelog ==
 
@@ -789,7 +791,10 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.68 =
 * Admin interface improvement
 
+= 1.5.69 =
+* New friendly theme
+
 == Upgrade Notice ==
 
-= 1.5.68 =
-* Admin interface improvement
+= 1.5.69 =
+* New friendly theme

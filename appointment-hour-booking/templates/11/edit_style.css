@@ -1,0 +1,98 @@
+.ahbfield_service{display:inherit;--comment:In order to hide the select set display to -none;}
+.ahb_m5 #fbuilder .fields  label{color:#000}
+.ahb_m5 #fbuilder .fields  input{color:#000;padding:inherit;font-weight:inherit;background-color:inherit;border-color:inherit;border-width:1px;border-style:solid;}
+.ahb_m5 #fbuilder .ui-datepicker-header{background-color:inherit;color:#000;padding:10px 0px;}
+.ahb_m5 #fbuilder .ui-datepicker-prev {width: 20px;height: 20px;border-top: 2px solid #000;border-right: 2px solid #000;}
+.ahb_m5 #fbuilder .ui-datepicker-next{width: 20px;height: 20px;border-top: 2px solid #000;border-right: 2px solid #000;}
+
+.ahb_m5 #fbuilder .ui-datepicker th{background:#fff;color:inherit}	
+.ahb_m5 #fbuilder .ui-datepicker-unselectable .ui-state-default {color:#AAAAAA;}
+				
+.ahb_m5 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default.ui-state-active{background:#3995D0}					
+.ahb_m5 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default{background:#ddd}
+.ahb_m5 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default:hover{color: #FFF; background: #66CCFF}
+.ahb_m5 #fbuilder .slots{text-align:center}
+.ahb_m5 #fbuilder .slots span{color: inherit;}
+.ahb_m5 #fbuilder .slots div a {
+    border-width:1px;
+    border-color:#66CCFF;	
+    border-style:solid;	
+	background: #f8f8f8; 
+	color: #000;
+	padding:8px 12px;
+}
+.ahb_m5 #fbuilder .slots div:not(.htmlUsed)  a:hover {
+	background:#66CCFF;
+	color:#fff;
+}
+.ahb_m5 #fbuilder .slots div.htmlUsed a{
+	border:1px solid #ccc;
+}
+.ahb_m5 #fbuilder .slots div.currentSelection.htmlUsed a {
+    color: #fff; background: #3995D0 !important;
+}
+.ahb_m5 #fbuilder .slots div.currentSelection a {
+    color: #fff; background: #3995D0 !important;
+}
+
+.ahb_m5 #fbuilder .usedSlots .ahb_list {background-color:#f4f4f4;color: inherit;border-color:#ccc;border-width:1px;border-style:dashed; padding: 10px;margin:10px 10px 10px 0px;position: relative;}
+.ahb_m5 #fbuilder .usedSlots .ahb_list .d{color: inherit;}
+.ahb_m5 #fbuilder .usedSlots .ahb_list .t{color: inherit;}
+.ahb_m5 #fbuilder .usedSlots .ahb_list .ahb_list_service{color: inherit;}
+.ahb_m5 #fbuilder .usedSlots .ahb_list .cancel{font-weight:inherit}
+.ahb_m5 #fbuilder .totalCost{color: inherit;}
+.ahb_m5 #fbuilder .totalCost span:not(.n){color: inherit;}
+.ahb_m5 #fbuilder .totalCost span.n{color: inherit;}
+
+/* --- Form Fields (Inputs & Selects) --- */
+.ahb_m5 #fbuilder input[type="text"],
+.ahb_m5 #fbuilder input[type="email"],
+.ahb_m5 #fbuilder textarea,
+.ahb_m5 #fbuilder select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    font-size: 15px;
+    margin-bottom: 15px;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+    transition: border-color 0.2s ease;
+}
+
+.ahb_m5 #fbuilder input:not(.pbSubmit):focus,
+.ahb_m5 #fbuilder select:focus,
+.ahb_m5 #fbuilder textarea:focus {
+    border-color: #0073aa; /* Focus color */
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+}
+
+/* Labels */
+.ahb_m5 #fbuilder label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+}
+
+/* --- Submit Button --- */
+.ahb_m5 #fbuilder .pbSubmit {
+    background-color: #0073aa; /* Primary Button Color */
+    color: #ffffff !important;
+    border: none;
+    padding: 14px 30px !important;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 50px; /* Pill shape */
+    cursor: pointer;
+    width: 100%; /* Full width button */
+    margin-top: 10px;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.ahb_m5 #fbuilder .pbSubmit:hover {
+    background-color: #005177;
+    transform: translateY(-1px);
+}
