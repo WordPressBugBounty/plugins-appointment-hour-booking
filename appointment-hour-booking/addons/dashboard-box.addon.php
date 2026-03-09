@@ -27,6 +27,7 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
                 if (isset($_REQUEST[ 'cpappb_dashboard_maxitems' ])) update_option( 'cpappb_dashboard_maxitems', trim( intval($_REQUEST[ 'cpappb_dashboard_maxitems' ]) ) );
                 if (isset($_REQUEST[ 'cpappb_dashboard_columns' ])) update_option( 'cpappb_dashboard_columns', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columns' ])) ) );
                 if (isset($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) update_option( 'cpappb_dashboard_columnlabels', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_columnlabels' ])) ) );
+                if (isset($_REQUEST[ 'cpappb_dashboard_capability' ])) update_option( 'cpappb_dashboard_capability', trim( sanitize_text_field(wp_unslash($_REQUEST[ 'cpappb_dashboard_capability' ])) ) );
                 if (isset($_REQUEST[ 'cpappb_dashboard_compactview' ]))
                     update_option( 'cpappb_dashboard_compactview', trim( sanitize_text_field($_REQUEST[ 'cpappb_dashboard_compactview' ]) ) );
                 else
@@ -59,9 +60,23 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 								</td>
 							</tr>
                             <tr>
+								<td style="white-space:nowrap;width:200px;" valign="top"><?php esc_html_e('Required User Level', 'appointment-hour-booking');?>:</td>
+								<td>
+									<?php $cap = get_option( 'cpappb_dashboard_capability', 'manage_options' ); ?>
+									<select name="cpappb_dashboard_capability">
+										<option value="manage_options" <?php selected( $cap, 'manage_options' ); ?>><?php esc_html_e('Administrator', 'appointment-hour-booking'); ?></option>
+										<option value="edit_pages" <?php selected( $cap, 'edit_pages' ); ?>><?php esc_html_e('Editor', 'appointment-hour-booking'); ?></option>
+										<option value="publish_posts" <?php selected( $cap, 'publish_posts' ); ?>><?php esc_html_e('Author', 'appointment-hour-booking'); ?></option>
+										<option value="edit_posts" <?php selected( $cap, 'edit_posts' ); ?>><?php esc_html_e('Contributor', 'appointment-hour-booking'); ?></option>
+										<option value="read" <?php selected( $cap, 'read' ); ?>><?php esc_html_e('Subscriber', 'appointment-hour-booking'); ?></option>
+									</select><br />
+                                    <em><?php print esc_html(__('Minimum user role required to see the dashboard widget.', 'appointment-hour-booking')); ?></em>
+								</td>
+							</tr>
+                            <tr>
 								<td style="white-space:nowrap;width:200px;" valign="top"><?php esc_html_e('Compact view?', 'appointment-hour-booking');?>:</td>
 								<td>
-									<input type="checkbox" name="cpappb_dashboard_compactview" value="checked" <?php echo esc_attr( ( get_option( 'cpappb_dashboard_compactview' )  != '' ) ? " checked " : '' ); ?>" />
+									<input type="checkbox" name="cpappb_dashboard_compactview" value="checked" <?php echo esc_attr( ( get_option( 'cpappb_dashboard_compactview' )  != '' ) ? " checked " : '' ); ?> />
                                     <em><?php print esc_html(__('Joins consecutive time-slots of the same booking', 'appointment-hour-booking')); ?>.</em>
 								</td>
 							</tr>
@@ -95,7 +110,11 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 
 
         public function add_dashboard_widgets() {
-        	wp_add_dashboard_widget('dashboard_widget', __('Appointment Hour Booking: Upcoming appointments', 'appointment-hour-booking'), array(&$this, 'pp_DashboardWidget'));
+            // Apply capability restriction
+            $required_cap = get_option('cpappb_dashboard_capability', 'manage_options');
+            if ( current_user_can( $required_cap ) ) {
+        	    wp_add_dashboard_widget('dashboard_widget', __('Appointment Hour Booking: Upcoming appointments', 'appointment-hour-booking'), array(&$this, 'pp_DashboardWidget'));
+            }
         }
 
         /************************ PRIVATE METHODS *****************************/
@@ -313,5 +332,3 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 	global $cpappb_addons_objs_list;
 	$cpappb_addons_objs_list[ $CPAPPB_DashboardWidget_obj->get_addon_id() ] = $CPAPPB_DashboardWidget_obj;
 }
-
-

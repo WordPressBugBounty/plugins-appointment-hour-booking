@@ -3,7 +3,7 @@
 Plugin Name: Appointment Hour Booking
 Plugin URI: https://apphourbooking.dwbooster.com
 Description: Appointment Hour Booking is a plugin for creating booking forms for appointments with a start time and a defined duration.
-Version: 1.5.69
+Version: 1.5.70
 Author: CodePeople
 Author URI: https://apphourbooking.dwbooster.com
 License: GPLv2
@@ -83,6 +83,17 @@ function cpappb_loading_add_ons()
 	$cpappb_addons_active_list = get_option( 'cpappb_addons_active_list', array() );
     if (!is_array($cpappb_addons_active_list))
         $cpappb_addons_active_list	 = array();
+    
+    // --- ONE-TIME CHECK TO ENABLE CACHE ADD-ON ---
+    if ( ! get_option( 'cpappb_cache_addon_initializeda', false ) ) {
+        if ( ! in_array( 'addon-Cache-20260309', $cpappb_addons_active_list ) ) {
+            $cpappb_addons_active_list[] = 'addon-Cache-20260309';
+            update_option( 'cpappb_addons_active_list', $cpappb_addons_active_list );
+        }
+        update_option( 'cpappb_cache_addon_initializeda', '1' );
+    }
+    // ---------------------------------------------
+    
 	if( !empty( $cpappb_addons_active_list )
         || ( isset( $_GET["page"] ) && $_GET["page"] == "cp_apphourbooking" )
         || ( isset( $_GET["page"] ) && $_GET["page"] == "cp_apphourbooking_addons" )
@@ -312,6 +323,23 @@ add_action( 'init', function(){
         return $v;
     }, 10, 5 );
 } );
+
+
+// prevent non-admin users from using the list shortcode
+add_filter( 'content_save_pre', function ( $content ) {
+
+    if ( current_user_can( 'manage_options' ) ) {
+        return $content;
+    }
+    
+    $content = preg_replace(
+        '/\[CP_APP_HOUR_BOOKING_LIST[^\]]*\]/',
+        '',
+        $content
+    );
+
+    return $content;
+});
 
 
 // Exclude from SiteGround Speed Optimizer JS Combination

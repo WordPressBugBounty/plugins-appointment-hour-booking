@@ -39,8 +39,11 @@ else if (isset($_GET['delmark']) && $_GET['delmark'] != '')
 {
     $this->verify_nonce ( sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
     for ($i=0; $i<=$records_per_page; $i++)
-    if (isset($_GET['c'.$i]) && $_GET['c'.$i] != '')
+    if (isset($_GET['c'.$i]) && $_GET['c'.$i] != '') {
+        do_action( 'cpappb_item_deleted', intval($_GET['c'.$i]) );
         $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.$this->table_messages.'` WHERE id=%d', sanitize_text_field($_GET['c'.$i])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    }
+    do_action( 'cpappb_cache_clean', $this->item );
     $message = __('Marked items deleted','appointment-hour-booking');
 }
 else if (isset($_GET['del']) && $_GET['del'] == 'all')
@@ -65,6 +68,7 @@ else if (isset($_GET['lu']) && $_GET['lu'] != '')
 else if (isset($_GET['ld']) && $_GET['ld'] != '')
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
+    do_action( 'cpappb_item_deleted', intval($_GET['ld']) );
     $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.$this->table_messages.'` WHERE id=%d', sanitize_text_field($_GET['ld'])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
     $message = __('Item deleted','appointment-hour-booking');
 }

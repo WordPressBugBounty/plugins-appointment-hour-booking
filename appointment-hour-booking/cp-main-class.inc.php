@@ -1344,7 +1344,9 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             );
             $ret['events'][] = $ev;
         }
-        echo json_encode($ret);
+        $dataoutput = json_encode($ret);
+        do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
+        echo $dataoutput;
         exit;
     }
 
@@ -1376,7 +1378,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
            (isset($_POST["cp_cpappb_admin_language"]) && $_POST["cp_cpappb_admin_language"] != 'english'))
             load_plugin_textdomain( 'appointment-hour-booking', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );            
 
-        if(!empty($_REQUEST['cp_app_action']))
+        if(!empty($_REQUEST['cp_app_action']) && ($_REQUEST['cp_app_action'] == 'get_slots' || $_REQUEST['cp_app_action'] == 'mv') && isset($_SERVER['REQUEST_METHOD']) && 'POST' == $_SERVER['REQUEST_METHOD'])
         {
             $formid = intval($_REQUEST['formid']);
             $field = (isset($_REQUEST['formfield']) ? sanitize_key($_REQUEST['formfield']) : '');
@@ -1394,9 +1396,14 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             }
 
             if ($_REQUEST['cp_app_action'] != 'mv' || get_option('cp_cpappb_sch_admin_blockedt','') == 'Yes')
-                $myrows = $wpdb->get_results( $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." where formid=%d", $formid) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." where formid=%d", $formid); 
             else
-                $myrows = $wpdb->get_results( $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." where formid=%d AND notifyto<>%s", $formid, $this->blocked_by_admin_indicator) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." where formid=%d AND notifyto<>%s", $formid, $this->blocked_by_admin_indicator);
+            
+            do_action( 'cpappb_cache_check', $formid, $dataquery );
+            
+            $myrows = $wpdb->get_results( $dataquery ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            
             $tmp2 = array();
 
             $excluded_multiview = ',,'.get_option('cp_cpappb_schcalcontent_exclude','').','; // fields excluded form multi view calendar
@@ -1436,11 +1443,14 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             {
                 if (is_admin() && $this->check_current_user_access(intval($formid)))
                     $this->print_multiview_format($tmp2);
-                else                  
+                else 
                     echo 'Authentication required';
             }
-            else
-                echo json_encode($tmp2); //{type:"all",d:"",h1:8,m1:0,h2:17,m2:0}
+            else {
+                $dataoutput = json_encode($tmp2);
+                do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
+                echo $dataoutput; //{type:"all",d:"",h1:8,m1:0,h2:17,m2:0}                
+            }
 		    exit;
         }
 
