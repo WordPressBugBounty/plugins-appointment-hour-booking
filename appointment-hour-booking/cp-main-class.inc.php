@@ -2318,7 +2318,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             update_option( 'cp_cpappb_storeip', sanitize_text_field($posted_items["cp_cpappb_storeip"]));
 			update_option( 'cp_cpappb_admin_language', sanitize_text_field($_POST["cp_cpappb_admin_language"]));
         }
-        else if (isset($_POST["gotab"]) && $_POST["gotab"] == 'schedulecalarea')
+        else if (current_user_can('manage_options') && isset($_POST["gotab"]) && $_POST["gotab"] == 'schedulecalarea')
         {
             update_option( 'cp_cpappb_schcaltitle_admin', $this->clean_sanitize($posted_items["schcaltitle_admin"]));
             update_option( 'cp_cpappb_schcalcontent_admin', $this->clean_sanitize($posted_items["schcalcontent_admin"]));
@@ -2357,7 +2357,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         {
             if (substr_count($posted_items['editionarea'],"\\\""))
                 $_POST["editionarea"] = stripcslashes($posted_items["editionarea"]);
-            if (!empty($posted_items["cfwpp_edit"]) && $posted_items["cfwpp_edit"] == 'js')
+            if (current_user_can('manage_options') && !empty($posted_items["cfwpp_edit"]) && $posted_items["cfwpp_edit"] == 'js')
                 update_option('CP_AHB_JS', base64_encode($this->clean_sanitize(@$posted_items["editionarea"])));
             else if (!empty($posted_items["cfwpp_edit"]) && $posted_items["cfwpp_edit"] == 'css')
                 update_option('CP_AHB_CSS', base64_encode($this->clean_sanitize(@$posted_items["editionarea"])));

@@ -8,6 +8,8 @@ if ( !is_admin() )
     exit;
 }
 
+$is_admin = current_user_can('manage_options');
+
 $cpid = 'CP_AHB';
 
 $gotab = '';
@@ -130,10 +132,14 @@ jQuery(function(){
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == '') echo ' nav-tab-active'; ?>" data-tab="1"><?php esc_html_e('Email Report Settings','appointment-hour-booking'); ?></a>
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'fixarea') echo ' nav-tab-active'; ?>"  data-tab="2"><?php esc_html_e('Troubleshoot Area','appointment-hour-booking'); ?></a>
     <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'csvarea') echo ' nav-tab-active'; ?>"  data-tab="5"><?php esc_html_e('CSV Settings','appointment-hour-booking'); ?></a>
+    <?php if ($is_admin) { ?>
     <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'schedulecalarea') echo ' nav-tab-active'; ?>"  data-tab="6"><?php esc_html_e('Schedule Calendar Contents','appointment-hour-booking'); ?></a>
+    <?php } ?>
     <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'miscsettings') echo ' nav-tab-active'; ?>"  data-tab="7"><?php esc_html_e('Misc Settings','appointment-hour-booking'); ?></a>
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'css') echo ' nav-tab-active'; ?>"  data-tab="3"><?php esc_html_e('Edit Styles','appointment-hour-booking'); ?></a>
+    <?php if ($is_admin) { ?>
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'js') echo ' nav-tab-active'; ?>"  data-tab="4"><?php esc_html_e('Edit Scripts','appointment-hour-booking'); ?></a>
+    <?php } ?>
 </nav>
 
 <!-- TAB 1 -->
@@ -297,7 +303,7 @@ jQuery(function(){
     </form>
 </div>
 
-
+<?php if ($is_admin) { ?>
 <!-- TAB 6 -->
 <div class="ahb-tab<?php if ($gotab == 'schedulecalarea') echo ' tab-active'; ?>" data-tab="6">
 	<h2><?php esc_html_e('Schedule Calendar Contents','appointment-hour-booking'); ?></h2>
@@ -399,7 +405,7 @@ jQuery(function(){
 	    <input type="submit" value="<?php esc_html_e('Update Changes','appointment-hour-booking'); ?>" class="button button-primary" />
     </form>
 </div>
-
+<?php } ?>
 
 
 <!-- TAB 6 -->
@@ -555,6 +561,7 @@ jQuery(function(){
 
 </div>
 
+<?php if ($is_admin) { ?>
 <!-- TAB 4 -->
 <div class="ahb-tab<?php if ($gotab == 'js') echo ' tab-active'; ?>" data-tab="4">
 	<h2><?php esc_html_e('Edit Scripts','appointment-hour-booking'); ?></h2>
@@ -570,3 +577,4 @@ jQuery(function(){
 	     <input type="submit" value="<?php esc_html_e('Save Scripts','appointment-hour-booking'); ?>" class="button button-primary" />
      </form>
 </div>
+<?php } ?>
