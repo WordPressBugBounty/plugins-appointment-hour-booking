@@ -2078,7 +2078,11 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         $from = $this->get_option('fp_from_email', (defined('CP_APPBOOK_DEFAULT_fp_from_email')?CP_APPBOOK_DEFAULT_fp_from_email:''));
         $from_name = $this->get_option('fp_from_name', '');
         $to = explode(",",$this->get_option('fp_destination_emails', (defined('CP_APPBOOK_DEFAULT_fp_destination_emails')?CP_APPBOOK_DEFAULT_fp_destination_emails:'')));
-        if ('html' == $this->get_option('fp_emailformat', (defined('CP_APPBOOK_DEFAULT_email_format')?CP_APPBOOK_DEFAULT_email_format:'text'))) $content_type = "Content-Type: text/html; charset=utf-8\n"; else $content_type = "Content-Type: text/plain; charset=utf-8\n";
+        
+        
+        $is_html_admin = ('html' == $this->get_option('fp_emailformat', (defined('CP_APPBOOK_DEFAULT_email_format')?CP_APPBOOK_DEFAULT_email_format:'text')));
+        $html_filter = function() { return 'text/html'; };
+        if ( $is_html_admin ) { add_filter( 'wp_mail_content_type', $html_filter ); }
 
         $replyto = sanitize_email($myrows[0]->notifyto);
         if ($this->get_option('fp_emailfrommethod', "fixed") == "customer")
@@ -2115,9 +2119,13 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                     "From: ".$from_1."\r\n".
                     ($replyto!=''?"Reply-To: ".$replyto."\r\n":'').
                     $content_type.
-                    "X-Mailer: PHP/" . phpversion(), $attachments);
+                    "X-Mailer: PHP/" . phpversion(), $attachments);                   
+
+                wp_mail(trim($item), $subject, $message, $headers, $attachments);
             }
 
+        if ( $is_html_admin ) { remove_filter( 'wp_mail_content_type', $html_filter ); }
+        
         if (!$resendonly && $mycalendarrows[0]->rep_days == 0 && $mycalendarrows[0]->rep_enable == 'yes')
         {
             $this->check_reports(true);
@@ -2146,18 +2154,21 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             $subject = $this->replace_tags($subject, $params);
 
             if (!strpos($from,">"))
-                $from = '"'.($from_name!=''?$from_name:$from).'" <'.$from.'>';
-            if ('html' == $this->get_option('cu_emailformat', CP_APPBOOK_DEFAULT_email_format)) $content_type = "Content-Type: text/html; charset=utf-8\n"; else $content_type = "Content-Type: text/plain; charset=utf-8\n";
+                $from = '"'.($from_name!=''?$from_name:$from).'" <'.$from.'>';            
+                        
+            $is_html_cu = ('html' == $this->get_option('cu_emailformat', CP_APPBOOK_DEFAULT_email_format));
+            if ( $is_html_cu ) { add_filter( 'wp_mail_content_type', $html_filter ); }
+            
+            $headers_cu = array();
+            $headers_cu[] = "From: " . $from;
+            $headers_cu[] = "X-Mailer: PHP/" . phpversion();
+
             if ($destination_to != '')
-                wp_mail($destination_to, $subject, $message,
-                        "From: ".$from."\r\n".
-                        $content_type.
-                        "X-Mailer: PHP/" . phpversion(), $attachments);
+                wp_mail($destination_to, $subject, $message, $headers_cu, $attachments);
             if ($destination_to != $payer_email && $payer_email != '')
-                wp_mail(trim($payer_email), $subject, $message,
-                        "From: ".$from."\r\n".
-                        $content_type.
-                        "X-Mailer: PHP/" . phpversion(), $attachments);
+                wp_mail(trim($payer_email), $subject, $message, $headers_cu, $attachments);
+                
+            if ( $is_html_cu ) { remove_filter( 'wp_mail_content_type', $html_filter ); }            
         }
         
         foreach ($attachments as $item)
@@ -3090,13 +3101,21 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                             $attachments[] = $filename;
                         }
                     }
-                    if ('html' == get_option('cp_cpappb_rep_emailformat','')) $content_type = "Content-Type: text/html; charset=utf-8\n"; else $content_type = "Content-Type: text/plain; charset=utf-8\n";
+                                    
+                    $is_html_rep = ('html' == get_option('cp_cpappb_rep_emailformat',''));
+                    $html_filter = function() { return 'text/html'; };
+                    if ( $is_html_rep ) { add_filter( 'wp_mail_content_type', $html_filter ); }
+                    
+                    $headers_rep = array();
+                    $headers_rep[] = "From: \"" . get_option('cp_cpappb_fp_from_email','') . "\" <" . get_option('cp_cpappb_fp_from_email','') . ">";
+                    $headers_rep[] = "X-Mailer: PHP/" . phpversion();
+
                     if (count($attachments))
-                        wp_mail( str_replace(" ","",str_replace(";",",",get_option('cp_cpappb_rep_emails',''))), get_option('cp_cpappb_rep_subject',''), get_option('cp_cpappb_rep_message','')."\n".$text,
-                                    "From: \"".get_option('cp_cpappb_fp_from_email','')."\" <".get_option('cp_cpappb_fp_from_email','').">\r\n".
-                                    $content_type.
-                                    "X-Mailer: PHP/" . phpversion(),
-                                    @$attachments);
+                        wp_mail( str_replace(" ","",str_replace(";",",",get_option('cp_cpappb_rep_emails',''))), get_option('cp_cpappb_rep_subject',''), get_option('cp_cpappb_rep_message','')."\n".$text, $headers_rep, @$attachments);
+                        
+                    if ( $is_html_rep ) { remove_filter( 'wp_mail_content_type', $html_filter ); }                                    
+                                    
+                                    
                     foreach ($attachments as $file)
                         @unlink($file);                                      
                 }
@@ -3121,12 +3140,19 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                         fwrite($handle,$csv);
                         fclose($handle);
                         $attachments = array( $filename );
-                        if ('html' == $form->rep_emailformat) $content_type = "Content-Type: text/html; charset=utf-8\n"; else $content_type = "Content-Type: text/plain; charset=utf-8\n";
-                        wp_mail( str_replace(" ","",str_replace(";",",",$form->rep_emails)), $form->rep_subject, $form->rep_message,
-                                "From: \"".$form->fp_from_email."\" <".$form->fp_from_email.">\r\n".
-                                $content_type.
-                                "X-Mailer: PHP/" . phpversion(),
-                                $attachments);
+                        
+                        $is_html_frep = ('html' == $form->rep_emailformat);
+                        $html_filter = function() { return 'text/html'; };
+                        if ( $is_html_frep ) { add_filter( 'wp_mail_content_type', $html_filter ); }
+                        
+                        $headers_frep = array();
+                        $headers_frep[] = "From: \"" . $form->fp_from_email . "\" <" . $form->fp_from_email . ">";
+                        $headers_frep[] = "X-Mailer: PHP/" . phpversion();
+
+                        wp_mail( str_replace(" ","",str_replace(";",",",$form->rep_emails)), $form->rep_subject, $form->rep_message, $headers_frep, $attachments);
+                                
+                        if ( $is_html_frep ) { remove_filter( 'wp_mail_content_type', $html_filter ); }
+                        
                         foreach ( $attachments as $file )
                             @unlink( $file );                                  
                     }
