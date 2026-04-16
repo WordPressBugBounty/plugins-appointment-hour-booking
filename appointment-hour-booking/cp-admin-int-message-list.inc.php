@@ -407,8 +407,8 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
                             $app = $posted_data["apps"][$k];
                             $appts .=   '<div class="ahb-appointment-badge">' .
                                            '<span class="dashicons dashicons-clock"></span>' .
-                                           '<span class="ahb-time">'.$this->format_date($app["date"]).' '.$app["slot"].(isset($app["quant"]) && $app["quant"]>1?' ('.$app["quant"].')':'').'</span>' .
-                                           '<span class="ahb-service">'.$app["service"].'</span>' .
+                                           '<span class="ahb-time">'.$this->format_date($app["date"]).' '.esc_html($app["slot"]).(isset($app["quant"]) && $app["quant"]>1?' ('.$app["quant"].')':'').'</span>' .
+                                           '<span class="ahb-service">'.esc_html($app["service"]).'</span>' .
                                        '</div>';
                         }
 
