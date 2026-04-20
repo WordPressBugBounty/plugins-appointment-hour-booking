@@ -1,0 +1,30 @@
+#fbuilder {
+    /* Brand Colors */
+    --ahb-primary: #3995D0;
+    --ahb-primary-hover: #2a7db3;
+    --ahb-primary-shadow: rgba(57, 149, 208, 0.3);
+
+    /* Typography Colors */
+    --ahb-text-main: #1f2937;
+    --ahb-text-muted: #6b7280;
+    --ahb-text-disabled: #d1d5db;
+    --ahb-text-light: #ffffff;
+
+    /* Background Colors */
+    --ahb-bg-main: #ffffff;
+    --ahb-bg-secondary: #f9fafb;
+    --ahb-bg-hover: #f3f4f6;
+    --ahb-bg-summary: #f8fafc;
+
+    /* Borders and Shadows */
+    --ahb-border-light: #e5e7eb;
+    --ahb-border-dark: #d1d5db;
+    --ahb2-shadow-card: 0 10px 25px rgba(0, 0, 0, 0.05);
+
+    /* Shape and Typography settings */
+    --ahb2-font-family: Inter, -apple-system, sans-serif;
+    --ahb2-radius-card: 16px;
+    --ahb2-radius-summary: 12px;
+    --ahb2-radius-pill: 999px;
+    --ahb2-radius-circle: 50%;
+}

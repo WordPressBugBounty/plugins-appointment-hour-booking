@@ -416,7 +416,7 @@ jQuery(document).on("showHideDepEvent", function(){
                     const $tr = $('<tr>'); // Crear una fila para cada propiedad
                     let $label = $('<td >').text(property); // Celda para la propiedad
                     let $input,$input1,$inputCell; 
-                    if (property.includes('-color') || property === 'color' || property === 'background') {
+                    if (property.includes('-color') || property === 'color' || property === 'background' || property.includes('--ahb-')) {
                         $input = $('<input class="colorPicker">').attr({
                             type: 'color',
                             value: value || '#ffffff'

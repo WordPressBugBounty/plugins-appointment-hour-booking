@@ -1,0 +1,322 @@
+/* =========================================
+   CSS VARIABLES (THEME CONFIGURATION)
+   Modify these values to easily update the design
+   ========================================= */
+#fbuilder {
+    /* Brand Colors */
+    --ahb-primary: #3995D0;
+    --ahb-primary-hover: #2a7db3;
+    --ahb-primary-shadow: rgba(57, 149, 208, 0.3);
+
+    /* Typography Colors */
+    --ahb-text-main: #1f2937;
+    --ahb-text-muted: #6b7280;
+    --ahb-text-disabled: #d1d5db;
+    --ahb-text-light: #ffffff;
+
+    /* Background Colors */
+    --ahb-bg-main: #ffffff;
+    --ahb-bg-secondary: #f9fafb;
+    --ahb-bg-hover: #f3f4f6;
+    --ahb-bg-summary: #f8fafc;
+
+    /* Borders and Shadows */
+    --ahb-border-light: #e5e7eb;
+    --ahb-border-dark: #d1d5db;
+    --ahb2-shadow-card: 0 10px 25px rgba(0, 0, 0, 0.05);
+
+    /* Shape and Typography settings */
+    --ahb2-font-family: 'Inter', -apple-system, sans-serif;
+    --ahb2-radius-card: 16px;
+    --ahb2-radius-summary: 12px;
+    --ahb2-radius-pill: 999px;
+    --ahb2-radius-circle: 50%;
+}
+
+/* =========================================
+   1. BASE AND CALENDAR CONTAINER
+   ========================================= */
+.ahb_m6 #fbuilder .ui-datepicker-inline{max-width:calc(100%);}   
+.ahb_m6 #fbuilder .ui-datepicker table, 
+.ahb_m6 #fbuilder .ui-datepicker thead, 
+.ahb_m6 #fbuilder .ui-datepicker tr, 
+.ahb_m6 #fbuilder .ui-datepicker th, 
+.ahb_m6 #fbuilder .ui-datepicker td { border: 0px; }
+
+.ahb_m6 #fbuilder .ui-datepicker {
+    box-shadow: var(--ahb2-shadow-card); 
+    border: 1px solid var(--ahb-border-light);
+    border-radius: var(--ahb2-radius-card); 
+    font-family: var(--ahb2-font-family);
+    padding: 15px;
+    background: var(--ahb-bg-main);
+}
+
+.ahb_m6 #fbuilder .ui-datepicker-header {
+    text-shadow: none; 
+    color: var(--ahb-text-main); 
+    background: var(--ahb-bg-main);
+    border-bottom: none; 
+    font-weight: 600; 
+    font-size: 1.4rem; 
+    padding: 10px 0px 20px 0px;
+}
+
+.ahb_m6 #fbuilder .ui-datepicker th {
+    background: var(--ahb-bg-main); 
+    font-weight: 600; 
+    color: var(--ahb-text-muted); 
+    font-size: 0.85rem; 
+    padding-bottom: 15px;
+}
+
+/* Navigation Arrows */
+.ahb_m6 #fbuilder .ui-datepicker-next, 
+.ahb_m6 #fbuilder .ui-datepicker-prev {
+    display: inline-block; width: 12px; height: 12px; 
+    border: none; border-top: 2px solid var(--ahb-text-muted); border-right: 2px solid var(--ahb-text-muted); 
+    background: none !important; margin: 15px 10px; cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+.ahb_m6 #fbuilder .ui-datepicker-next:hover, 
+.ahb_m6 #fbuilder .ui-datepicker-prev:hover { border-color: var(--ahb-text-main); }
+.ahb_m6 #fbuilder .ui-datepicker-next { transform: rotate(45deg); }
+.ahb_m6 #fbuilder .ui-datepicker-prev { transform: rotate(-135deg); }
+.ahb_m6 #fbuilder .ui-datepicker-next span, 
+.ahb_m6 #fbuilder .ui-datepicker-prev span { background: none; }
+
+/* =========================================
+   2. CALENDAR DAYS (CIRCLES)
+   ========================================= */
+.ahb_m6 #fbuilder .ui-datepicker table { border-collapse: collapse; }
+.ahb_m6 #fbuilder .ui-datepicker-calendar td { text-align: center; padding: 4px; }
+
+/* Base shape for dates (Perfect circle) */
+.ahb_m6 #fbuilder td a, 
+.ahb_m6 #fbuilder td span {
+    display: inline-flex !important; 
+    justify-content: center; 
+    align-items: center;
+    width: 36px; height: 36px; 
+    margin: 0 auto; 
+    text-shadow: none; 
+    font-weight: 500;
+    color: var(--ahb-text-main);
+    border-radius: var(--ahb2-radius-circle); 
+    transition: all 0.2s ease;
+}
+
+/* Unavailable days */
+.ahb_m6 #fbuilder .ui-datepicker-unselectable .ui-state-default { 
+    color: var(--ahb-text-disabled); 
+    background: transparent; 
+}
+
+/* Available days (Hover effect) */
+.ahb_m6 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default { background: transparent; }
+.ahb_m6 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default:hover { 
+    background: var(--ahb-bg-hover); 
+    color: var(--ahb-text-main);
+}
+
+/* Selected day */
+.ahb_m6 #fbuilder td:not(.ui-datepicker-unselectable) a.ui-state-default.ui-state-active {
+    background: var(--ahb-primary); 
+    color: var(--ahb-text-light); 
+    font-weight: 600;
+    box-shadow: 0 4px 10px var(--ahb-primary-shadow);
+}
+
+/* =========================================
+   3. TIME SLOT BUTTONS (PILLS)
+   ========================================= */
+.ahb_m6 #fbuilder .slots { text-align: center; padding: 15px 5px 5px; border: 0px; box-shadow: none; }
+.ahb_m6 #fbuilder .slots div { border-color: transparent; margin: 8px 6px; display: inline-block; }
+
+.ahb_m6 #fbuilder .slots div a {
+    display: block; width: 100%;
+    background: var(--ahb-bg-main); 
+    color: var(--ahb-text-main);
+    border: 1px solid var(--ahb-border-dark); 
+    border-radius: var(--ahb2-radius-pill); 
+    text-decoration: none; 
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+/* Available slot hover */
+.ahb_m6 #fbuilder .slots div:not(.htmlUsed) a:hover {
+    background: var(--ahb-bg-main); 
+    border-color: var(--ahb-primary); 
+    color: var(--ahb-primary);
+}
+
+/* Booked slot */
+.ahb_m6 #fbuilder .slots div.htmlUsed a { 
+    border: 1px solid var(--ahb-border-light); 
+    color: var(--ahb-text-muted); 
+    background: var(--ahb-bg-secondary); 
+    cursor: not-allowed; 
+}
+.ahb_m6 #fbuilder .slots div.htmlUsed a:hover { cursor: not-allowed;}
+.ahb_m6 #fbuilder .slots .htmlUsed.currentSelection{border:0px}
+.ahb_m6 #fbuilder .slots .htmlUsed.currentSelection a{background-color: var(--ahb-primary);color: var(--ahb-text-light);}
+/* =========================================
+   4. BOTTOM SUMMARY (USED SLOTS ITEMS)
+   ========================================= */
+
+/* The main container for each booked slot */
+.ahb_m6 #fbuilder .usedSlots .ahb_list {
+    display: flex;
+    flex-wrap: wrap; 
+    align-items: center;
+    border: 1px solid var(--ahb-border-light); 
+    background-color: var(--ahb-bg-summary); 
+    border-radius: var(--ahb2-radius-summary); 
+    padding: 16px 50px 16px 16px; /* Extra right padding for the absolute cancel button */
+    margin: 15px 0px; 
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* Time and Date wrapper - Forces this to take the whole first row */
+.ahb_m6 #fbuilder .ahb_list_time {
+    display: flex;
+    flex-basis: 100%; /* Pushes everything else to the next line */
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ahb-text-main);
+    margin-bottom: 8px; /* Space between time and service name */
+}
+
+/* Highlight the Date with primary color */
+.ahb_m6 #fbuilder .ahb_list_time .d {
+    color: var(--ahb-primary);
+}
+
+/* The service name - Now sits on the second row automatically */
+.ahb_m6 #fbuilder .ahb_list_service {
+    flex-basis: auto; /* Takes only the space it needs */
+    font-size: 0.85rem;
+    color: var(--ahb-text-muted);
+    line-height: 1.4;
+}
+
+/* The quantity badge e.g., "(4)" - Positioned right after the service name */
+.ahb_m6 #fbuilder .ahb_list_quantity {
+    background-color: var(--ahb-bg-main);
+    border: 1px solid var(--ahb-border-dark);
+    color: var(--ahb-text-main);
+    font-size: 0.80rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--ahb2-radius-pill);
+    display: inline-block;
+    margin-left: 8px; /* Space between service text and quantity pill */
+}
+
+/* Modern Cancel Button - Replacing the "[Cancel]" text with an icon */
+.ahb_m6 #fbuilder a.cancel {
+    visibility: visible;
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    font-size: 0; 
+    text-decoration: none;
+    width: 28px;
+    height: 28px;
+    background-color: var(--ahb-bg-main);
+    border: 1px solid var(--ahb-border-light);
+    border-radius: var(--ahb2-radius-circle);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+/* Injecting the "X" icon */
+.ahb_m6 #fbuilder a.cancel::after {
+    content: "X";
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ahb-text-muted);
+}
+
+/* Cancel button hover effect (Red warning state) */
+.ahb_m6 #fbuilder a.cancel:hover {
+    background-color: #fee2e2; 
+    border-color: #fca5a5;
+}
+
+.ahb_m6 #fbuilder a.cancel:hover::after {
+    color: #ef4444; 
+}
+
+/* Hide the old pseudo-element */
+.ahb_m6 #fbuilder a.cancel:before {
+    display: none !important; 
+}
+/* =========================================
+   6. PAGINATION AND SUBMIT BUTTONS
+   ========================================= */
+
+/* Container for pagination to align buttons properly */
+#fbuilder .pbreak {
+    display: flex;
+    justify-content: flex-end; /* Aligns buttons to the right side */
+    align-items: center;
+    gap: 12px; /* Space between buttons */
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--ahb-border-light);
+}
+
+/* Shared base styles for all form buttons */
+#fbuilder .pbreak .pbPrevious, 
+#fbuilder .pbreak .pbNext, 
+#fbuilder .pbSubmit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-family: var(--ahb2-font-family);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px; /* Slightly squarer than the time pills for contrast */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+/* Primary Actions: "Next" & "Submit" */
+#fbuilder .pbreak .pbNext, 
+#fbuilder .pbSubmit {
+    background-color: var(--ahb-primary);
+    color: var(--ahb-text-light);
+    border: 1px solid var(--ahb-primary);
+    box-shadow: 0 4px 6px var(--ahb-primary-shadow);
+}
+
+/* Primary Actions: Hover state */
+#fbuilder .pbreak .pbNext:hover, 
+#fbuilder .pbSubmit:hover {
+    background-color: var(--ahb-primary-hover);
+    border-color: var(--ahb-primary-hover);
+    box-shadow: 0 6px 12px var(--ahb-primary-shadow);
+    transform: translateY(-1px); /* Subtle lift effect on hover */
+}
+
+/* Secondary Action: "Previous" */
+#fbuilder .pbreak .pbPrevious {
+    background-color: var(--ahb-bg-main);
+    color: var(--ahb-text-main);
+    border: 1px solid var(--ahb-border-dark);
+}
+
+/* Secondary Action: Hover state */
+#fbuilder .pbreak .pbPrevious:hover {
+    background-color: var(--ahb-bg-hover);
+    border-color: var(--ahb-text-muted);
+}
