@@ -2115,11 +2115,18 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             {
                 if (!strpos($from_1,">"))
                     $from_1 = '"'.($from_name!=''?$from_name:$from_1).'" <'.$from_1.'>';
-                wp_mail(trim($item), $subject, $message,
-                    "From: ".$from_1."\r\n".
-                    ($replyto!=''?"Reply-To: ".$replyto."\r\n":'').
-                    $content_type.
-                    "X-Mailer: PHP/" . phpversion(), $attachments);                   
+                
+                $headers = array();
+                $headers[] = "From: " . $from;
+                if ($replyto!='')
+                    $headers[] = "Reply-To: " . $replyto;
+                $headers[] = "X-Mailer: PHP/" . phpversion();
+            
+                //wp_mail(trim($item), $subject, $message,
+                //    "From: ".$from_1."\r\n".
+                //    ($replyto!=''?"Reply-To: ".$replyto."\r\n":'').
+                //    $content_type.
+                //    "X-Mailer: PHP/" . phpversion(), $attachments);                   
 
                 wp_mail(trim($item), $subject, $message, $headers, $attachments);
             }
