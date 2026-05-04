@@ -320,3 +320,18 @@
     background-color: var(--ahb-bg-hover);
     border-color: var(--ahb-text-muted);
 }
+/* --- Form Fields (Inputs & Selects) --- */
+.ahb_m6 #fbuilder input[type="text"],
+.ahb_m6 #fbuilder input[type="email"],
+.ahb_m6 #fbuilder textarea,
+.ahb_m6 #fbuilder select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    font-size: 15px;
+    margin-bottom: 15px;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+    transition: border-color 0.2s ease;
+}
