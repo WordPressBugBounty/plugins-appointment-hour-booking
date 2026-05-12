@@ -287,15 +287,21 @@
 						   if (d.length==2)
 						   {
 							   items = [];
+                               const allowedTypes = [
+                                  "ftext", "fnumber", "femail", "fdate", "ftextarea", "fcheck", 
+                                  "fradio", "fdropdown", "ffile", "fpassword", "fPhone", 
+                                  "fCommentArea", "fSectionBreak", "fPageBreak","fapp","facceptance"
+                                ];                               
 							   for (var i=0;i<d[0].length;i++)
-							   {
-								   var obj = eval("new $.fbuilder.controls['"+d[0][i].ftype+"']();");
-								   obj = $.extend(true, {}, obj,d[0][i]);
-								   obj.name = obj.name+opt.identifier;
-								   obj.form_identifier = opt.identifier;
-								   obj.init();
-								   items[items.length] = obj;
-							   }
+                                   if (allowedTypes.includes(d[0][i].ftype)) 
+                                   {
+                                       var obj = eval("new $.fbuilder.controls['"+d[0][i].ftype+"']();");
+                                       obj = $.extend(true, {}, obj,d[0][i]);
+                                       obj.name = obj.name+opt.identifier;
+                                       obj.form_identifier = opt.identifier;
+                                       obj.init();
+                                       items[items.length] = obj;
+                                   }
 							   theForm = new fform();
 							   theForm = $.extend(theForm,d[1][0]);
 							   reloadItemsPublic();

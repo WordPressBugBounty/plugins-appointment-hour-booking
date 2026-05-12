@@ -33,9 +33,9 @@
 .choicesEdit .choice_down{position:absolute;top:5px;left2:255px;right:50px;cursor:pointer;}
 .choicesEdit .choice_up{position:absolute;top:5px;left2:266px;right:39px;cursor:pointer;}
 .addDep,
-.choicesEdit .choice_add{position:absolute;top:5px;left2:278px;right:27px;cursor:pointer;}
+.choicesEdit .choice_add{position:absolute;top:5px;left2:278px;right:22px;cursor:pointer;}
 .removeDep,
-.choicesEdit .choice_remove{position:absolute;top:5px;left2:293px;right:12px;cursor:pointer;}
+.choicesEdit .choice_remove{position:absolute;top:5px;left2:293px;right:7px;cursor:pointer;}
 .choicesEditDep .choice_addDep{position:absolute;top:5px;left2:278px;right:27px;cursor:pointer;}
 .choicesEditDep .choice_removeDep{position:absolute;top:5px;left2:293px;right:12px;cursor:pointer;}
 .services.choicesSet .choice_down,.services.choicesSet .choice_up,.services.choicesSet .choice_add,.services.choicesSet .choice_remove{top:75px;}
@@ -133,13 +133,13 @@ a.helpfbuilder,a.helpfbuilderfont{font-size:80%;text-decoration:underline;color:
 .choicesEdit input.service_price[type=text]{width:80px;margin-right:8px}
 .choicesEdit input.service_capacity[type=text]{width:60px;}
 .choicesEdit select.service_duration{width:87px;margin-right:2px;}
-.choicesEdit select.openhours_type{width: calc(100% - 253px);min-width: 56px;}
-.choicesEdit .specialcover{width:85px;display:inline-block}
-.choicesEdit .specialcover input{width:85px;}
+.choicesEdit select.openhours_type{width: calc((100% - 44px)/4);min-width: 56px;}
+.choicesEdit .specialcover{width:calc((100% - 44px)/4);display:inline-block}
+.choicesEdit .specialcover input{width:99%;}
 td.highlight a{background:#2271b1 !important;color:#fff !important}
-.choicesEdit select.openhours_from,.choicesEdit select.openhours_to{width:60px;}
-.choicesSet .labelT{width:calc(100% - 143px);float:left}
-.choicesSet .labelF{width:62px;float:left}
+.choicesEdit select.openhours_from,.choicesEdit select.openhours_to{width:calc((100% - 44px)/4);}
+.choicesSet .labelT{width:calc(50%);float:left}
+.choicesSet .labelF{width:20%;float:left}
 .choicesSet.openhours{max-height:400px;overflow:auto}
 .slots{border:1px solid #005;width:100%;padding:10px}
 .slots div{display:inline-block;border:1px solid #005;padding:5px;background:#fff;margin:5px}

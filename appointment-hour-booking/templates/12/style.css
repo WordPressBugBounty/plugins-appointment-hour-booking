@@ -132,6 +132,7 @@
    ========================================= */
 .ahb_m6 #fbuilder .slots { text-align: center; padding: 15px 5px 5px; border: 0px; box-shadow: none; }
 .ahb_m6 #fbuilder .slots div { border-color: transparent; margin: 8px 6px; display: inline-block; }
+.ahb_m6 #fbuilder .slots div.hide{display:none}
 
 .ahb_m6 #fbuilder .slots div a {
     display: block; width: 100%;

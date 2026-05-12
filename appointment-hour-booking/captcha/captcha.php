@@ -70,6 +70,14 @@ function appointment_hour_booking_get_captcha() {
 
     setCookie('rand_code'.sanitize_key($_GET["ps"]), $uidt, time()+36000,"/");
 
+    if (!function_exists('imagecreatetruecolor'))
+    {
+        header("Content-type: image/png");
+        readfile( dirname( __FILE__ ) . "/no-gd-library.png");
+        exit;
+    }
+
+
     $image = imagecreatetruecolor($imgX, $imgY);
     $backgr_col = imagecolorallocate($image, $bcolor["r"],$bcolor["g"],$bcolor["b"]);
     $border_col = imagecolorallocate($image, $border["r"],$border["g"],$border["b"]);
