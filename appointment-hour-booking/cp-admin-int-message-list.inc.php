@@ -312,7 +312,10 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
 
         <div class="tablenav-pages ahb-wp-pagination<?php if($total_pages <= 1) echo ' one-page'; ?>">
             <?php if ( $total_pages > 0 ) : ?>
-                <span class="displaying-num"><?php echo esc_html( sprintf( _n( '%s item', '%s items', $eventscount[0]->ck, 'appointment-hour-booking' ), number_format_i18n( $eventscount[0]->ck ) ) ); ?></span>
+                <span class="displaying-num"><?php
+	/* translators: %s: Number of items. */
+	echo esc_html( sprintf( _n( '%s item', '%s items', $eventscount[0]->ck, 'appointment-hour-booking' ), number_format_i18n( $eventscount[0]->ck ) ) );
+	?></span>
                 
                 <?php 
                 // Build the base URL for the pagination links
