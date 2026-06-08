@@ -332,7 +332,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
 
                     <span class="paging-input">
                         <label for="current-page-selector" class="screen-reader-text"><?php esc_html_e( 'Current Page', 'appointment-hour-booking' ); ?></label>
-                        <input class="current-page" id="current-page-selector" type="text" name="p" value="<?php echo esc_attr( $current_page ); ?>" size="<?php echo strlen( (string) $total_pages ); ?>" aria-describedby="table-paging" onkeydown="if(event.keyCode==13) { window.location.href='<?php echo esc_url_raw($base_url); ?>&p='+this.value; return false; }">
+                        <input class="current-page" id="current-page-selector" type="text" name="p" value="<?php echo esc_attr( $current_page ); ?>" size="<?php echo intval(strlen( (string) $total_pages )); ?>" aria-describedby="table-paging" onkeydown="if(event.keyCode==13) { window.location.href='<?php echo esc_url_raw($base_url); ?>&p='+this.value; return false; }">
                         <span class="tablenav-paging-text"> <?php esc_html_e( 'of', 'appointment-hour-booking' ); ?> <span class="total-pages"><?php echo esc_html( number_format_i18n( $total_pages ) ); ?></span></span>
                     </span>
 
