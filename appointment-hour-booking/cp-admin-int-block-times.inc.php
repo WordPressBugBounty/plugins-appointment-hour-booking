@@ -4,13 +4,20 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 $this->item = intval($_GET["cal"]);
 
-$current_user = wp_get_current_user();
-$current_user_access = current_user_can('manage_options');
+$current_user        = wp_get_current_user();
+$current_user_access = current_user_can( 'manage_options' );
 
-if ( !is_admin() || (!$current_user_access && !@in_array($current_user->ID, unserialize($this->get_option("cp_user_access","")))))
-{
-    echo 'Direct access not allowed.';
-    exit;
+$access_option = $this->get_option( 'cp_user_access', '' );
+$allowed_users = maybe_unserialize( $access_option );
+
+$has_custom_access = is_array( $allowed_users ) && in_array( $current_user->ID, $allowed_users );
+
+if ( ! is_admin() || ( ! $current_user_access && ! $has_custom_access ) ) {
+    wp_die( 
+        esc_html__( 'Direct access not allowed.', 'appointment-hour-booking' ), 
+        '', 
+        array( 'response' => 403 ) 
+    );
 }
 
 define('CPAPPHOURBK_BLOCK_TIMES', true);
@@ -116,12 +123,21 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
         <strong><?php esc_html_e('Booking Form','appointment-hour-booking'); ?>:</strong><br />
         <select name="selectedcalendar[]" id="selectedcalendar" multiple required>         
               <?php
-                $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );                                                                     
-                foreach ($myrows as $item)     
-                    if ( $current_user_access || @in_array($current_user->ID, unserialize( $item->cp_user_access )) )  
-                    {
-                        echo '<option value="'.intval($item->id).'"'.(!empty($selected) && is_array($selected) && in_array($item->id,$selected)?' selected':'').'>'.esc_html($item->form_name).'</option>';
+                    
+                $table_name = $wpdb->prefix . $this->table_items;
+                $myrows     = $wpdb->get_results( "SELECT * FROM {$table_name}" );                                                                     
+                foreach ( $myrows as $item ) {
+                    $allowed_users = maybe_unserialize( $item->cp_user_access );
+                    $has_user_access = is_array( $allowed_users ) && in_array( $current_user->ID, $allowed_users, true );
+
+                    if ( $current_user_access || $has_user_access ) {
+                       $is_selected = ( ! empty( $selected ) && is_array( $selected ) && in_array( $item->id, $selected  ) ) ? ' selected' : '';
+                        
+                        echo '<option value="' . intval( $item->id ) . '"' . $is_selected . '>';
+                        echo esc_html( $item->form_name );
+                        echo '</option>';
                     }
+                }                    
               ?>                          
         </select><br /><em><?php esc_html_e('CTRL+click to mark multiple','appointment-hour-booking'); ?></em><br /><br />
         
