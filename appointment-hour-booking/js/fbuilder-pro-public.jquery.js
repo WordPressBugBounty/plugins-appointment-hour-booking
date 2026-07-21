@@ -276,43 +276,50 @@
 					{
 					   return items;
 					},
-				loadData:function(f)
-					{
-						var d,
-							e = $("#"+f);
-						try{
-						this.formId = e.parents( 'form' ).attr( 'id' );
-						if ( d = $.parseJSON( e.val() ))
-						{
-						   if (d.length==2)
-						   {
-							   items = [];
-                               const allowedTypes = [
-                                  "ftext", "fnumber", "femail", "fdate", "ftextarea", "fcheck", 
-                                  "fradio", "fdropdown", "ffile", "fpassword", "fPhone", 
-                                  "fCommentArea", "fSectionBreak", "fPageBreak","fapp","facceptance"
-                                ];                               
-							   for (var i=0;i<d[0].length;i++)
-                                   if (allowedTypes.includes(d[0][i].ftype)) 
-                                   {
-                                       var obj = eval("new $.fbuilder.controls['"+d[0][i].ftype+"']();");
-                                       obj = $.extend(true, {}, obj,d[0][i]);
-                                       obj.name = obj.name+opt.identifier;
-                                       obj.form_identifier = opt.identifier;
-                                       obj.init();
-                                       items[items.length] = obj;
-                                   }
-							   theForm = new fform();
-							   theForm = $.extend(theForm,d[1][0]);
-							   reloadItemsPublic();
-						   }
-						}
-                        }catch(e){console.log(e)}
-						if( typeof window[ 'cpcff_load_defaults' ] != 'undefined' )
-                        {
-                            window[ 'cpcff_load_defaults' ]();
+				loadData:function(f) {
+                    var d, e;
+                    
+                    // 1. Identify if we are inside the Gutenberg iframe or the main document
+                    var $iframe = jQuery('iframe[name="editor-canvas"]');
+                    var $context = $iframe.length ? $iframe.contents() : jQuery(document);
+                    
+                    // 2. Search for the element specifically within that context
+                    e = jQuery("#" + f, $context);
+                    
+                    try {
+                        // 3. Extract the value and ensure it is not undefined/empty before parsing
+                        var formVal = e.val();
+                        
+                        if (formVal) {
+                            this.formId = e.parents("form").attr("id");
+                            d = jQuery.parseJSON(formVal);
+                            
+                            if (d && 2 == d.length) {
+                                items = [];
+                                const allowedTypes = ["ftext", "fnumber", "femail", "fdate", "ftextarea", "fcheck","fradio", "fdropdown", "ffile", "fpassword", "fPhone","fCommentArea", "fSectionBreak", "fPageBreak","fapp","facceptance"]; 
+                                
+                                for(var i = 0; i < d[0].length; i++) {
+                                    if (allowedTypes.includes(d[0][i].ftype)) {
+                                        var obj = eval("new jQuery.fbuilder.controls['" + d[0][i].ftype + "']();");
+                                        obj = jQuery.extend(!0, {}, obj, d[0][i]);
+                                        obj.name = obj.name + opt.identifier;
+                                        obj.form_identifier = opt.identifier;
+                                        obj.init();
+                                        items[items.length] = obj;
+                                    }
+                                }
+                                
+                                theForm = new fform();
+                                theForm = jQuery.extend(theForm, d[1][0]);
+                                reloadItemsPublic();
+                            }
                         }
-					}
+                    } catch(err) {
+                        console.log("JSON Parse Error:", err);
+                    }
+                    
+                    void 0 !== window.cpcff_load_defaults && window.cpcff_load_defaults();
+                }
 			};
 
 		$.fbuilder[ 'forms' ][ opt.identifier ] = ffunct;

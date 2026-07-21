@@ -3,7 +3,7 @@
 Plugin Name: Appointment Hour Booking
 Plugin URI: https://apphourbooking.dwbooster.com
 Description: Appointment Hour Booking is a plugin for creating booking forms for appointments with a start time and a defined duration.
-Version: 1.5.86
+Version: 1.5.87
 Author: CodePeople
 Author URI: https://apphourbooking.dwbooster.com
 License: GPLv2
@@ -146,18 +146,40 @@ if ( is_admin() ) {
 // register gutenberg block
 if (function_exists('register_block_type'))
 {
-    register_block_type('cpapphourbk/form-rendering', array(
-                        'attributes'      => array(
-                                'formId'    => array(
-                                    'type'      => 'string'
-                                ),
-                                'instanceId'    => array(
-                                    'type'      => 'string'
-                                ),
-                            ),
-                        'render_callback' => array($cp_appb_plugin, 'render_form_admin')
-                    ));
+    add_action( 'init', 'cpapphourbk_register_dynamic_block' );
+
+    function cpapphourbk_register_dynamic_block() {
+        global $cp_appb_plugin;
+
+        register_block_type( 'cpapphourbk/form-rendering', array(
+            'api_version'     => 3, // <-- ADD THIS LINE
+            'attributes'      => array(
+                'formId'      => array(
+                    'type' => 'string',
+                ),
+                'instanceId'  => array(
+                    'type' => 'string',
+                ),
+            ),
+            'render_callback' => array( $cp_appb_plugin, 'render_form_admin' ),
+        ) );
+    }
 }
+
+add_filter( 'block_categories_all', 'cpapphourbk_register_block_category', 10, 2 );
+
+function cpapphourbk_register_block_category( $categories, $post ) {
+    return array_merge(
+        $categories,
+        array(
+            array(
+                'slug'  => 'cpapphourbk',
+                'title' => __( 'Appointment Hour Booking', 'appointment-hour-booking' ),
+            ),
+        )
+    );
+}
+
 
 // banner
 $codepeople_promote_banner_plugins[ 'appointment-hour-booking' ] = array(

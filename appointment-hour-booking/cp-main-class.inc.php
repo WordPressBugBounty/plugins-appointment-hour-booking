@@ -1043,40 +1043,71 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     }
 
 
-    public function render_form_admin ($atts) {
-        global $wpdb;
-        $is_gutenberg_editor = defined( 'REST_REQUEST' ) && REST_REQUEST && ! empty( $_REQUEST['context'] ) && 'edit' === $_REQUEST['context'];
-        if (!$is_gutenberg_editor)
-        {
-            if (!isset($atts["formId"]))
-                return __('Please select a booking form.','appointment-hour-booking');
-            else
-            {
-                $myrows = $wpdb->get_results( $wpdb->prepare ("SELECT * FROM ".$wpdb->prefix.$this->table_items." WHERE id=%d" , $atts["formId"] )); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-                //if (!count($myrows))
-                //    return __('Please select a booking form.','appointment-hour-booking');
-                //else
-                    return $this->filter_content (array('id' => $atts["formId"]));
-            }
-        }
-        else if (isset($atts["formId"]) && $atts["formId"])
-        {
-            $myrows = $wpdb->get_results( $wpdb->prepare ("SELECT * FROM ".$wpdb->prefix.$this->table_items." WHERE id=%d" , $atts["formId"] )); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-            if (!count($myrows))
-                return __('Please select a booking form.','appointment-hour-booking');
-            else
-            {
-                $this->setId($atts["formId"]);
-                return '<input type="hidden" name="form_structure'.$atts["instanceId"].'" id="form_structure'.$atts["instanceId"].'" value="'.str_replace("\r","",str_replace("\n","",esc_attr($this->get_option('form_structure')))).'" /><fieldset class="ahbgutenberg_editor" disabled><div id="fbuilder"><div id="fbuilder_'.$atts["instanceId"].'"><div id="formheader_'.$atts["instanceId"].'"></div><div id="fieldlist_'.$atts["instanceId"].'"></div></div></div></fieldset>';
-            }
-        }
-        else
-        {
-            return __('Please select a booking form.','appointment-hour-booking');
-            //$atts["instanceId"] = '12365';
-            //return '<input type="hidden" name="form_structure'.$atts["instanceId"].'" id="form_structure'.$atts["instanceId"].'" value="'.str_replace("\r","",str_replace("\n","",esc_attr($this->get_option('form_structure')))).'" /><fieldset class="ahbgutenberg_editor" disabled><div id="fbuilder"><div id="fbuilder_'.$atts["instanceId"].'"><div id="formheader_'.$atts["instanceId"].'"></div><div id="fieldlist_'.$atts["instanceId"].'"></div></div></div></fieldset>';
-        }
+public function render_form_admin( $atts ) {
+    global $wpdb;
+
+    // 1. Check if formId is set. If not, bail early.
+    if ( empty( $atts['formId'] ) ) {
+        return __( 'Please select a booking form.', 'appointment-hour-booking' );
     }
+
+    $form_id = intval( $atts['formId'] );
+
+    // 2. Run the query ONCE, and only select the ID to save memory.
+    $table_name = $wpdb->prefix . $this->table_items;
+    $query      = $wpdb->prepare( "SELECT id FROM {$table_name} WHERE id = %d", $form_id );
+    $myrows     = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+    // If the form doesn't exist in the DB, bail early.
+    if ( empty( $myrows ) ) {
+        return __( 'Please select a booking form.', 'appointment-hour-booking' );
+    }
+
+    // 3. Determine if we are inside the Gutenberg Editor via the REST API
+    $is_gutenberg_editor = defined( 'REST_REQUEST' ) && REST_REQUEST && ! empty( $_REQUEST['context'] ) && 'edit' === $_REQUEST['context'];
+
+    // 4. Handle Frontend Output
+    if ( ! $is_gutenberg_editor ) {
+        return $this->filter_content( array( 'id' => $form_id ) );
+    }
+
+    // 5. Handle Editor Output
+    $this->setId( $form_id );
+
+    // Prevent PHP warning if instanceId is missing
+    $instance_id = ! empty( $atts['instanceId'] ) ? $atts['instanceId'] : wp_rand( 10000, 99999 );
+    $escaped_id  = esc_attr( $instance_id );
+
+    // Clean up the form structure string
+    $form_structure = esc_attr( $this->get_option( 'form_structure' ) );
+    $form_structure = str_replace( array( "\r", "\n" ), '', $form_structure );
+
+    // Use sprintf for a clean, readable HTML template
+    return sprintf(
+        '<div style="padding: 30px 20px; border: 2px dashed #c3c4c7; background-color: #f6f7f7; border-radius: 8px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Oxygen-Sans, Ubuntu, Cantarell, \'Helvetica Neue\', sans-serif;">
+            <span style="font-size: 32px; display: block; margin-bottom: 12px;">✅</span>
+            <strong style="font-size: 16px; color: #1d2327; display: block; margin-bottom: 8px;">%1$s</strong>
+            <span style="font-size: 14px; color: #50575e;">%2$s</span>
+        </div>',
+        esc_html__( 'OK, booking form selected. Great!', 'appointment-hour-booking' ),
+        esc_html__( 'The appointment booking form will appear here when viewed in the public website.', 'appointment-hour-booking' )
+    );
+    /**
+    return sprintf(
+        '<input type="hidden" name="form_structure%1$s" id="form_structure%1$s" value="%2$s" />
+        <fieldset class="ahbgutenberg_editor" disabled>
+            <div id="fbuilder">
+                <div id="fbuilder_%1$s">
+                    <div id="formheader_%1$s"></div>
+                    <div id="fieldlist_%1$s"></div>
+                </div>
+            </div>
+        </fieldset>',
+        $escaped_id,
+        $form_structure
+    );
+    */
+}
 
 
     function insert_adminScripts( $hook ) {
