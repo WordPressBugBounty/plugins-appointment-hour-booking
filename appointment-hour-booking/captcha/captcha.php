@@ -70,10 +70,18 @@ function appointment_hour_booking_get_captcha() {
 
     setCookie('rand_code'.sanitize_key($_GET["ps"]), $uidt, time()+36000,"/");
 
-    if (!function_exists('imagecreatetruecolor'))
-    {
-        header("Content-type: image/png");
-        readfile( dirname( __FILE__ ) . "/no-gd-library.png");
+    if ( ! function_exists( 'imagecreatetruecolor' ) ) {
+        header( 'Content-type: image/png' );
+        
+        // 1. Include the file API 
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        
+        // 2. Initialize WP_Filesystem
+        WP_Filesystem();
+        global $wp_filesystem;
+        
+        // 3. Get the contents and echo them
+        echo $wp_filesystem->get_contents( dirname( __FILE__ ) . '/no-gd-library.png' ); // phpcs:ignore WordPress.Security.EscapeOutput
         exit;
     }
 
@@ -137,14 +145,14 @@ function appointment_hour_booking_get_captcha() {
 
     // 2. Decorative Background Noise
     for ($i = 0; $i < 6; $i++) {
-        $shapeAlpha = imagecolorallocatealpha($image, rand(220, 245), rand(220, 245), rand(220, 245), 90);
-        imagefilledellipse($image, rand(0, $imgX), rand(0, $imgY), rand(20, $imgX), rand(20, $imgY), $shapeAlpha);
+        $shapeAlpha = imagecolorallocatealpha($image, wp_rand(220, 245), wp_rand(220, 245), wp_rand(220, 245), 90);
+        imagefilledellipse($image, wp_rand(0, $imgX), wp_rand(0, $imgY), wp_rand(20, $imgX), wp_rand(20, $imgY), $shapeAlpha);
     }
 
     // 3. Render Characters with Safe Positioning
     foreach ($charArray as $i => $char) {
-        $fontSize = rand($min_size, $max_size);
-        $angle = rand(-10, 10);
+        $fontSize = wp_rand($min_size, $max_size);
+        $angle = wp_rand(-10, 10);
         
         $bbox = imagettfbbox($fontSize, $angle, $font, $char);
         
@@ -156,20 +164,20 @@ function appointment_hour_booking_get_captcha() {
         $x = $leftPadding + ($i * $cellWidth) + ($cellWidth - $charWidth) / 2;
         
         // Y = Centered vertically with a slight random jitter for modern feel
-        $y = ($imgY / 2) + ($charHeight / 2) - rand(-2, 2);
+        $y = ($imgY / 2) + ($charHeight / 2) - wp_rand(-2, 2);
 
-        $textColor = imagecolorallocatealpha($image, rand(40, 70), rand(40, 70), rand(80, 110), 0);
+        $textColor = imagecolorallocatealpha($image, wp_rand(40, 70), wp_rand(40, 70), wp_rand(80, 110), 0);
         
         imagettftext($image, $fontSize, $angle, $x, $y, $textColor, $font, $char);
     }
 
     // 4. Fine Grain Noise
     for ($i = 0; $i < $noise; $i++) {
-        $noiseColor = imagecolorallocatealpha($image, 80, 80, 80, rand(90, 110));
-        $x1 = rand(0, $imgX);
-        $y1 = rand(0, $imgY);
+        $noiseColor = imagecolorallocatealpha($image, 80, 80, 80, wp_rand(90, 110));
+        $x1 = wp_rand(0, $imgX);
+        $y1 = wp_rand(0, $imgY);
         // Using noiselength to define the sprawl of the noise dots/lines
-        imageline($image, $x1, $y1, $x1 + rand(1, $noiselength), $y1 + rand(1, $noiselength), $noiseColor);
+        imageline($image, $x1, $y1, $x1 + wp_rand(1, $noiselength), $y1 + wp_rand(1, $noiselength), $noiseColor);
     }
 
     // 5. Border and Output

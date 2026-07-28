@@ -17,7 +17,7 @@ if ( !is_admin() || (!$current_user_access && !@in_array($current_user->ID, unse
 
 // pre-select time-slots
 $selection = array();
-$rows = $wpdb->get_results( $wpdb->prepare("SELECT time,posted_data FROM ".$wpdb->prefix.$this->table_messages." WHERE notifyto<>%s AND formid=%d ORDER BY time DESC LIMIT 0,100000", $this->blocked_by_admin_indicator, $this->item) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$rows = $wpdb->get_results( $wpdb->prepare("SELECT time,posted_data FROM ".$wpdb->prefix."cpappbk_messages WHERE notifyto<>%s AND formid=%d ORDER BY time DESC LIMIT 0,100000", $this->blocked_by_admin_indicator, $this->item) );  
 
 $yearly_incoming = array();
 $monthly_incoming = array();
@@ -28,7 +28,7 @@ $yearly = array();
 $monthly = array();
 $weekly = array();
 $daily = array();
-$currentdate = strtotime(date("Y-m-d"));
+$currentdate = strtotime(gmdate("Y-m-d"));
 
 
 $blockedstatuses = explode(",", get_option('cp_cpappb_statuses_block',',Attended'));
@@ -44,24 +44,24 @@ foreach($rows as $item)
                 if ($dt>=$currentdate)
                 {  
                     //$selection[] = array($app["date"]." ".$app["slot"], $app["date"], $app["slot"]);
-					if (!isset($yearly["x".date("Y",$dt)])) $yearly["x".date("Y",$dt)] = 0;
-                    $yearly["x".date("Y",$dt)]++;
-					if (!isset($monthly["x".date("Ym",$dt)])) $monthly["x".date("Ym",$dt)] = 0;
-                    $monthly["x".date("Ym",$dt)]++;
-					if (!isset($weekly["x".date("YW",$dt)])) $weekly["x".date("YW",$dt)] = 0;
-                    $weekly["x".date("YW",$dt)]++;
-					if (!isset($daily["x".date("Ymd",$dt)])) $daily["x".date("Ymd",$dt)] = 0;
-                    $daily["x".date("Ymd",$dt)]++;                                   
+					if (!isset($yearly["x".gmdate("Y",$dt)])) $yearly["x".gmdate("Y",$dt)] = 0;
+                    $yearly["x".gmdate("Y",$dt)]++;
+					if (!isset($monthly["x".gmdate("Ym",$dt)])) $monthly["x".gmdate("Ym",$dt)] = 0;
+                    $monthly["x".gmdate("Ym",$dt)]++;
+					if (!isset($weekly["x".gmdate("YW",$dt)])) $weekly["x".gmdate("YW",$dt)] = 0;
+                    $weekly["x".gmdate("YW",$dt)]++;
+					if (!isset($daily["x".gmdate("Ymd",$dt)])) $daily["x".gmdate("Ymd",$dt)] = 0;
+                    $daily["x".gmdate("Ymd",$dt)]++;                                   
                 }
-                if (empty($yearly_incoming["x".date("Y",$dt_incoming)])) $yearly_incoming["x".date("Y",$dt_incoming)] = 0;
-                if (empty($monthly_incoming["x".date("Ym",$dt_incoming)])) $monthly_incoming["x".date("Ym",$dt_incoming)] = 0;
-                if (empty($weekly_incoming["x".date("YW",$dt_incoming)])) $weekly_incoming["x".date("YW",$dt_incoming)] = 0;
-                if (empty($daily_incoming["x".date("Ymd",$dt_incoming)])) $daily_incoming["x".date("Ymd",$dt_incoming)] = 0;                
+                if (empty($yearly_incoming["x".gmdate("Y",$dt_incoming)])) $yearly_incoming["x".gmdate("Y",$dt_incoming)] = 0;
+                if (empty($monthly_incoming["x".gmdate("Ym",$dt_incoming)])) $monthly_incoming["x".gmdate("Ym",$dt_incoming)] = 0;
+                if (empty($weekly_incoming["x".gmdate("YW",$dt_incoming)])) $weekly_incoming["x".gmdate("YW",$dt_incoming)] = 0;
+                if (empty($daily_incoming["x".gmdate("Ymd",$dt_incoming)])) $daily_incoming["x".gmdate("Ymd",$dt_incoming)] = 0;                
                 
-                $yearly_incoming["x".date("Y",$dt_incoming)]++;
-                $monthly_incoming["x".date("Ym",$dt_incoming)]++;
-                $weekly_incoming["x".date("YW",$dt_incoming)]++;
-                $daily_incoming["x".date("Ymd",$dt_incoming)]++;                  
+                $yearly_incoming["x".gmdate("Y",$dt_incoming)]++;
+                $monthly_incoming["x".gmdate("Ym",$dt_incoming)]++;
+                $weekly_incoming["x".gmdate("YW",$dt_incoming)]++;
+                $daily_incoming["x".gmdate("Ymd",$dt_incoming)]++;                  
         }    
 }
 
@@ -70,12 +70,12 @@ function getMonthly($arr, $is_incoming = false)
 {
     $str = '';
     $dt = ($is_incoming ? strtotime("-11 months") : time());
-    $dt = strtotime(date("Y-m-01", $dt));
+    $dt = strtotime(gmdate("Y-m-01", $dt));
     $x = []; $y = [];
     for ($i=0;$i<12;$i++)
     {
-        $x[] = date("Ym",$dt);
-        $key = "x".date("Ym",$dt);
+        $x[] = gmdate("Ym",$dt);
+        $key = "x".gmdate("Ym",$dt);
         $y[] = (isset($arr[$key])?$arr[$key]:'0'); 
         $dt = strtotime( "+1 month" ,$dt);    
     }   
@@ -88,8 +88,8 @@ function getWeekly($arr, $is_incoming = false)
     $x = []; $y = [];
     for ($i=0;$i<12;$i++)
     {
-        $x[] = date("YW",$dt);
-        $key = "x".date("YW",$dt);
+        $x[] = gmdate("YW",$dt);
+        $key = "x".gmdate("YW",$dt);
         $y[] = (isset($arr[$key])?$arr[$key]:'0');         
         $dt = strtotime("+1 week",$dt);    
     }   
@@ -102,8 +102,8 @@ function getDaily($arr, $is_incoming = false)
     $x = []; $y = [];
     for ($i=0;$i<30;$i++)
     {
-        $x[] = date("Ymd",$dt);
-        $key = "x".date("Ymd",$dt); 
+        $x[] = gmdate("Ymd",$dt);
+        $key = "x".gmdate("Ymd",$dt); 
         $y[] = (isset($arr[$key])?$arr[$key]:'0'); 
         $dt = strtotime("+1 day",$dt);    
     }

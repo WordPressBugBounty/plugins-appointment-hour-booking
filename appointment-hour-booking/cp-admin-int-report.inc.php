@@ -27,7 +27,7 @@ $numberofdates = [];
 
 
 if ($this->item != 0)
-    $myform = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.$this->table_items .' WHERE id=%d', $this->item) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $myform = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.'cpappbk_forms WHERE id=%d', $this->item) );  
 
 
 $current_page = intval( (empty($_GET["p"])?0:$_GET["p"]));
@@ -46,20 +46,34 @@ if ($this->get_option('date_format', 'mm/dd/yy') == 'dd/mm/yy')
 }
 
 $cond = '';
-if (!empty($_GET["search"])) $cond .= " AND (data like '%".esc_sql(sanitize_text_field($_GET["search"]))."%' OR posted_data LIKE '%".esc_sql(sanitize_text_field($_GET["search"]))."%')";
-if ($rawfrom != '')
-{
-    $date_start = date("Y-m-d",strtotime($rawfrom));
-    $cond .= " AND (`time` >= '".esc_sql( $date_start )."')";
-}
-if ($rawto != '')
-{
-    $date_end = date("Y-m-d",strtotime($rawto));
-    $cond .= " AND (`time` <= '".esc_sql($date_end)." 23:59:59')";
-}
-if ($this->item != 0) $cond .= " AND formid=".intval($this->item);
 
-$events = $wpdb->get_results( "SELECT ipaddr,time,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+if ( ! empty( $_GET['search'] ) ) {
+    $search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+    $like = '%' . $wpdb->esc_like( $search ) . '%';
+    $cond .= $wpdb->prepare( ' AND (data LIKE %s OR posted_data LIKE %s)', $like, $like );
+}
+
+if ( $rawfrom != '' ) {
+    $date_start = gmdate( 'Y-m-d', strtotime( $rawfrom ) );
+    $cond      .= $wpdb->prepare( ' AND (`time` >= %s)', $date_start );
+}
+
+if ( $rawto != '' ) {
+    $date_end = gmdate( 'Y-m-d', strtotime( $rawto ) );
+    $cond    .= $wpdb->prepare( ' AND (`time` <= %s)', $date_end . ' 23:59:59' );
+}
+
+if ( $this->item != 0 ) {
+    $cond .= $wpdb->prepare( ' AND formid = %d', $this->item );
+}
+
+$table_name = $wpdb->prefix . 'cpappbk_messages';
+
+$events_query = "SELECT ipaddr, time, notifyto, posted_data FROM {$table_name} WHERE 1=1 {$cond} ORDER BY `time` DESC";
+
+// Ignore the sniffer warning since $cond contains properly prepared SQL snippets
+// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$events = $wpdb->get_results( $events_query );
 
 // general initialization
 $fields = array();
@@ -124,7 +138,7 @@ if ($date_start == '')
     if (count($kkeys))
         $date_start = substr(min($kkeys),1);
     else
-        $date_start = date("Y-m-d");
+        $date_start = gmdate("Y-m-d");
 }
 
 if ($date_end == '')
@@ -133,7 +147,7 @@ if ($date_end == '')
     if (count($kkeys))
         $date_end = substr(max($kkeys),1);
     else
-        $date_end = date("Y-m-d");    
+        $date_end = gmdate("Y-m-d");    
 }
 
 $daily_messages = '';
@@ -159,7 +173,7 @@ while ($date <= $date_end)
         $daily_revenue_str .= ',0';
     // --- MODIFICATION END ---
 
-    $date = date("Y-m-d",strtotime($date." +1 day"));
+    $date = gmdate("Y-m-d",strtotime($date." +1 day"));
 }
 $daily_messages = substr($daily_messages,1);
 $daily_revenue_str = substr($daily_revenue_str,1); // --- MODIFICATION: Trim string
@@ -207,7 +221,7 @@ else
 		<nobr><label><?php esc_html_e('Item','appointment-hour-booking'); ?>:</label> <select id="cal" name="cal">
           <?php if ($current_user_access) { ?> <option value="0">[<?php esc_html_e('All Items','appointment-hour-booking'); ?>]</option><?php } ?>
    <?php
-    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );
+    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" );
 	$saveditem = $this->item;
     foreach ($myrows as $item)
     {

@@ -61,7 +61,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
 			}
 
 			$rows = $wpdb->get_results(
-						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d", $form_id )  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_icalexport WHERE formid=%d", $form_id )  
 					);
 			if (!count($rows))
 			{
@@ -262,14 +262,17 @@ ahb_icalexp_checkorg();
         		/**
          * Create the database tables
          */
-        protected function update_database()
-		{
-			global $wpdb;
-			$charset_collate = $wpdb->get_charset_collate();
-			$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.$this->form_table." (
-					id mediumint(9) NOT NULL AUTO_INCREMENT,
-					formid INT NOT NULL,
-					cal_time_zone_modify varchar(255) DEFAULT '' NOT NULL ,
+        protected function update_database() {
+            global $wpdb;
+            
+            $charset_collate = $wpdb->get_charset_collate();
+            
+            $table_name = $wpdb->prefix . esc_sql( $this->form_table );
+            
+            $sql = "CREATE TABLE {$table_name} (
+                    id mediumint(9) NOT NULL AUTO_INCREMENT,
+                    formid INT NOT NULL,
+                    cal_time_zone_modify varchar(255) DEFAULT '' NOT NULL ,
                     observe_day_light varchar(255) DEFAULT '' NOT NULL ,
                     ical_daylight_zone varchar(255) DEFAULT '' NOT NULL ,
                     attachical varchar(10) DEFAULT '' NOT NULL ,
@@ -277,11 +280,13 @@ ahb_icalexp_checkorg();
                     base_description TEXT DEFAULT '' NOT NULL ,
                     cal_tzid TEXT DEFAULT '' NOT NULL ,
                     ical_uselocal TEXT DEFAULT '' NOT NULL ,
-					UNIQUE KEY id (id)
-				) $charset_collate;";
+                    UNIQUE KEY id (id)
+                ) $charset_collate;";
 
-			$wpdb->query($sql);  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		} // end update_database
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            dbDelta( $sql );
+
+        } // end update_database
 
         /************************ PRIVATE METHODS *****************************/
 
@@ -310,7 +315,7 @@ ahb_icalexp_checkorg();
             global $wpdb, $cp_appb_plugin;
 
             header("Content-type: text/calendar");
-            header("Content-Disposition: attachment; filename=events".date("Y-M-D_H.i.s").".ics");
+            header("Content-Disposition: attachment; filename=events".gmdate("Y-M-D_H.i.s").".ics");
 
             $updatefeaturetime = strtotime('2019-03-05');
 
@@ -319,13 +324,25 @@ ahb_icalexp_checkorg();
             echo "VERSION:2.0\n";
 
             $icalSettings = $wpdb->get_results(
-						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d", $form_id )   // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_icalexport WHERE formid=%d", $form_id )   
 					);
 
-            $from = date("Y-m-d",strtotime($date_from));
-            $to = date("Y-m-d",strtotime($date_to));
+            $from = gmdate("Y-m-d",strtotime($date_from));
+            $to = gmdate("Y-m-d",strtotime($date_to));
 
-            $rows = $wpdb->get_results( $wpdb->prepare("SELECT id,time,notifyto,posted_data,data,ipaddr FROM ".$wpdb->prefix.$cp_appb_plugin->table_messages." WHERE notifyto<>%s AND ".($form_id?'formid='.intval($form_id).' AND ':'')."time<=%s ORDER BY time DESC LIMIT 0,1000", $cp_appb_plugin->blocked_by_admin_indicator, $to) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $table_name = $wpdb->prefix . 'cpappbk_messages';
+            $sql  = "SELECT id, time, notifyto, posted_data, data, ipaddr FROM {$table_name} WHERE notifyto <> %s ";
+            $args = array( $cp_appb_plugin->blocked_by_admin_indicator );
+            if ( $form_id ) {
+                $sql   .= "AND formid = %d ";
+                $args[] = $form_id; 
+            }
+            $sql   .= "AND time <= %s ORDER BY time DESC LIMIT 0, 1000";
+            $args[] = $to;
+            
+            // Ignore the sniffer warning since $sql contains properly prepared SQL 
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared            
+            $rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ) ); 
 
             $blockedstatuses = explode(",", get_option('cp_cpappb_statuses_block',''));
             $blockedstatuses[] = '';
@@ -370,7 +387,7 @@ ahb_icalexp_checkorg();
                                     $dst_stop = strtotime('first Sunday GMT', strtotime("1 November $year GMT")); // First Sunday November
                                 }
                                 if ($full_date >= gmdate("Ymd",$dst_start) && $full_date < gmdate("Ymd",$dst_stop))
-                                    $datetime = date("Y-m-d H:i",strtotime($datetime." -1 hour")); // changed from -1 hour
+                                    $datetime = gmdate("Y-m-d H:i",strtotime($datetime." -1 hour")); // changed from -1 hour
                             }
 
                             $base_summary = $icalSettings[0]->base_summary;
@@ -425,7 +442,7 @@ ahb_icalexp_checkorg();
             $updatefeaturetime = strtotime('2019-03-05');
 
             $icalSettings = $wpdb->get_results(
-						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d", $form_id ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_icalexport WHERE formid=%d", $form_id ) 
 					);
 
             if ($icalSettings[0]->attachical != '1' && $icalSettings[0]->attachical != '2')
@@ -467,7 +484,7 @@ ahb_icalexp_checkorg();
                             $dst_stop = strtotime('last Sunday GMT', strtotime("1 November $year GMT"));
                         }
                         if ($full_date >= gmdate("Ymd",$dst_start) && $full_date < gmdate("Ymd",$dst_stop))
-                            $datetime = date("Y-m-d H:i",strtotime($datetime." -1 hour")); // changed from -1 hour
+                            $datetime = gmdate("Y-m-d H:i",strtotime($datetime." -1 hour")); // changed from -1 hour
                     }
 
                     $base_summary = $icalSettings[0]->base_summary;

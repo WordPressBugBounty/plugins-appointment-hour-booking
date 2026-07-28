@@ -22,7 +22,7 @@ if ( !is_admin() )
     exit;
 }
 
-$myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );
+$myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" );
 if (!$this->getId() && count ($myrows)) $this->setId($myrows[0]->id);
 
 // 07\edit_style.css
@@ -43,7 +43,7 @@ if( !is_null( $form_data ) ) {
             $file = $templatelist[ $form_data[ 1 ][ 0 ]->formtemplate ][ 'file' ];
         else 
             $file =  plugins_url( 'templates/edit_style.css', __FILE__ );
-        $path = parse_url($file, PHP_URL_PATH);
+        $path = wp_parse_url($file, PHP_URL_PATH);
         $desiredPart = substr($path, strpos($path, 'templates/'));
         $tpls_dir =  dir( plugin_dir_path( __FILE__ ) );          
         $ecssname = dirname($tpls_dir->path.$desiredPart)."/edit_style.css";
@@ -163,7 +163,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_csseditor' );
 	<div class="ahb-section">
 	  
       <form action="admin.php" method="get">
-        <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_csseditor_page" />           
+        <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_csseditor_page" />           
         <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />        
         <div style="float:left">
             <select id="ahbcalendar" name="ahbcalendar">        
@@ -173,13 +173,13 @@ $nonce = wp_create_nonce( 'cpappb_actions_csseditor' );
             {        
                 $this->setId($item->id);
                 if ($current_user_access || @in_array($current_user->ID, unserialize($this->get_option("cp_user_access",""))))
-                   echo '<option value="'.$item->id.'"'.(intval($item->id)==intval($saved_id)?" selected":"").'>'.esc_html($item->form_name).'</option>';
+                   echo '<option value="'.intval($item->id).'"'.(intval($item->id)==intval($saved_id)?" selected":"").'>'.esc_html($item->form_name).'</option>';
             }    
             $this->setId($saved_id);
            ?>
             </select>          
 		    <nobr>     
-			<input type="submit" name="<?php echo $this->prefix; ?>_load" value="<?php esc_html_e('Load Form','appointment-hour-booking'); ?>" class="button" style="margin-left:10px;float:right">			
+			<input type="submit" name="<?php echo esc_attr($this->prefix); ?>_load" value="<?php esc_html_e('Load Form','appointment-hour-booking'); ?>" class="button" style="margin-left:10px;float:right">			
 		    </nobr>
        </div>
        <br >       
@@ -188,7 +188,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_csseditor' );
       <div style="clear:both;margin-bottom:15px;"></div>           
       
       <form action="" name="saverestoreform" method="post" onsubmit="return confirmoption();">
-        <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>_csseditor_page" />  
+        <input type="hidden" name="page" value="<?php echo esc_attr($this->menu_parameter); ?>_csseditor_page" />  
         <input type="hidden" name="csseditionon" value="1" />          
         <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />        
         <div style="float:left">

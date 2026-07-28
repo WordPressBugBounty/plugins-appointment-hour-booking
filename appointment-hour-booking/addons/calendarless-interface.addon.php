@@ -28,9 +28,9 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 				isset( $_REQUEST[ 'CPAPPB_SingleDaysSelection_id' ] )
 			)
 			{
-			    $wpdb->delete( $wpdb->prefix.$this->form_table, array( 'formid' => $form_id ), array( '%d' ) );
+			    $wpdb->delete( $wpdb->prefix."cpappbk_SingleDaysSelection", array( 'formid' => $form_id ), array( '%d' ) );
 				$wpdb->insert(
-								$wpdb->prefix.$this->form_table,
+								$wpdb->prefix."cpappbk_SingleDaysSelection",
 								array(
 									'formid' => $form_id,
                                     'autosel_enable'	 => sanitize_text_field($_REQUEST["sds_autosel_enable"]),
@@ -50,7 +50,7 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 
 
 			$rows = $wpdb->get_results(
-						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d", $form_id )  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_SingleDaysSelection WHERE formid=%d", $form_id )  
 					);
 			if (!count($rows))
 			{
@@ -163,27 +163,31 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 		/**
          * Create the database tables
          */
-        protected function update_database()
-		{
-			global $wpdb;
+        protected function update_database() {
+            global $wpdb;
 
-			$charset_collate = $wpdb->get_charset_collate();
-			$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.$this->form_table." (
-					id mediumint(9) NOT NULL AUTO_INCREMENT,
+            $charset_collate = $wpdb->get_charset_collate();
+            $table_name      = $wpdb->prefix . 'cpappbk_SingleDaysSelection';
+
+            // Note: dbDelta does not use "IF NOT EXISTS"
+            $sql = "CREATE TABLE {$table_name} (
+                    id mediumint(9) NOT NULL AUTO_INCREMENT,
                     formid INT NOT NULL,
-					autosel_enable INT NOT NULL,
+                    autosel_enable INT NOT NULL,
                     numberOfDays INT NOT NULL,
                     numberOfSlots INT NOT NULL,
                     calendarCSSClass TEXT,
                     formatDate TEXT,
                     str_more_slots TEXT,
                     str_more_days TEXT,
-					UNIQUE KEY id (id)
-				) $charset_collate;";
+                    UNIQUE KEY id (id)
+                ) $charset_collate;";
 
-			$wpdb->query($sql);  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            // Include the WordPress upgrade library and run dbDelta
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            dbDelta( $sql );
 
-		} // end update_database
+        } // end update_database
 
 
 		/************************ PUBLIC METHODS  *****************************/
@@ -196,7 +200,7 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 
 
 
-            $myrow = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d AND autosel_enable=1", $formid ) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $myrow = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_SingleDaysSelection WHERE formid=%d AND autosel_enable=1", $formid ) );  
             if (!count($myrow))
                 return $CSSClass;
 
@@ -212,7 +216,7 @@ if( !class_exists( 'CPAPPB_SingleDaysSelection' ) )
 		{
             global $wpdb, $cp_appb_plugin;
 
-            $myrow = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d AND autosel_enable=1", $id ) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $myrow = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_SingleDaysSelection WHERE formid=%d AND autosel_enable=1", $id ) );  
             if (!count($myrow))
                 return $form_code;
 
@@ -340,7 +344,7 @@ jQuery(document).one('showHideDepEvent', function(){
 		{
             global $wpdb, $cp_appb_plugin;
 
-            $is_enable = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=%d AND autosel_enable=1", $id ) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $is_enable = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_SingleDaysSelection WHERE formid=%d AND autosel_enable=1", $id ) );  
             if (!count($is_enable))
                 return $form_code;
             ob_start();

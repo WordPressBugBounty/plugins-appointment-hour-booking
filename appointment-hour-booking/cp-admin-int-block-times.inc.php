@@ -97,10 +97,24 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
     <div class="ahb-adintsection<?php if (!$opensecond) { ?> ahb-adintsection-active"<?php } ?> data-step="1">
        <div class="inside"> 
 	   
-            <p><?php _e('This page is for <strong>blocking some of the available times</strong>. For services with multiple capacity be sure to select the "quantity" to be blocked.','appointment-hour-booking'); ?> <?php esc_html_e('To un-block times, delete the "blocked" entry from the','appointment-hour-booking'); ?> <a href="?page=<?php echo esc_attr($this->menu_parameter.'&cal='.$this->item); ?>&list=1"><?php esc_html_e('booking orders list','appointment-hour-booking'); ?></a>.</p> </p>
+            <p><?php echo wp_kses( 
+                                __( 'This page is for <strong>blocking some of the available times</strong>. For services with multiple capacity be sure to select the "quantity" to be blocked.', 'appointment-hour-booking' ), 
+                                array(
+                                    'strong' => array(),
+                                ) 
+                            ); ?> 
+               <?php esc_html_e('To un-block times, delete the "blocked" entry from the','appointment-hour-booking'); ?> <a href="?page=<?php echo esc_attr($this->menu_parameter.'&cal='.$this->item); ?>&list=1"><?php esc_html_e('booking orders list','appointment-hour-booking'); ?></a>.</p> </p>
             
             
-            <p><?php _e('If you want to block complete dates please use instead the <a href="https://apphourbooking.dwbooster.com/customdownloads/invalid-dates.png" target="_blank">invalid dates feature</a>.','appointment-hour-booking'); ?></p>
+            <p><?php echo wp_kses( 
+                                    __( 'If you want to block complete dates please use instead the <a href="https://apphourbooking.dwbooster.com/customdownloads/invalid-dates.png" target="_blank">invalid dates feature</a>.', 'appointment-hour-booking' ), 
+                                    array(
+                                        'a' => array(
+                                            'href'   => array(),
+                                            'target' => array(),
+                                        ),
+                                    ) 
+                                ); ?></p>
             
             <script>var cpapphourbk_in_admin=true;</script>
             
@@ -112,11 +126,31 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
     <div class="ahb-adintsection<?php if ($opensecond) { ?> ahb-adintsection-active"<?php } ?>" data-step="2">
       <div class="inside" id="fbuilder">   
 
-         <p><?php _e('This page is for <strong>blocking a range of time</strong> for ALL services and optionally for all booking forms.','appointment-hour-booking'); ?></p> 
+        <p>
+            <?php 
+            echo wp_kses( 
+                __( 'This page is for <strong>blocking a range of time</strong> for ALL services and optionally for all booking forms.', 'appointment-hour-booking' ),
+                array(
+                    'strong' => array(),
+                )
+            ); 
+            ?>
+        </p>
 
-
-         <p><?php _e('If you want to block complete dates please use instead the <a href="https://apphourbooking.dwbooster.com/customdownloads/invalid-dates.png" target="_blank">invalid dates feature</a>.','appointment-hour-booking'); ?></p> 
- 
+        <p>
+            <?php 
+            echo wp_kses( 
+                __( 'If you want to block complete dates please use instead the <a href="https://apphourbooking.dwbooster.com/customdownloads/invalid-dates.png" target="_blank">invalid dates feature</a>.', 'appointment-hour-booking' ),
+                array(
+                    'a' => array(
+                        'href'   => array(),
+                        'target' => array(),
+                    ),
+                )
+            ); 
+            ?>
+        </p>
+         
         <form class="cpp_form" name="cp_appbooking_pform_2" id="cp_appbooking_pform_2" action="" method="post" enctype="multipart/form-data" onsubmit="return validateblockedmultiple();">
         <input type="hidden" name="anonce" value="<?php echo esc_attr($nonce); ?>" />
         <input type="hidden" name="<?php echo esc_attr($this->prefix); ?>_blockmultiple" value="1" />
@@ -124,8 +158,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
         <select name="selectedcalendar[]" id="selectedcalendar" multiple required>         
               <?php
                     
-                $table_name = $wpdb->prefix . $this->table_items;
-                $myrows     = $wpdb->get_results( "SELECT * FROM {$table_name}" );                                                                     
+                $myrows     = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" );                                                                     
                 foreach ( $myrows as $item ) {
                     $allowed_users = maybe_unserialize( $item->cp_user_access );
                     $has_user_access = is_array( $allowed_users ) && in_array( $current_user->ID, $allowed_users, true );
@@ -133,7 +166,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
                     if ( $current_user_access || $has_user_access ) {
                        $is_selected = ( ! empty( $selected ) && is_array( $selected ) && in_array( $item->id, $selected  ) ) ? ' selected' : '';
                         
-                        echo '<option value="' . intval( $item->id ) . '"' . $is_selected . '>';
+                        echo '<option value="' . intval( $item->id ) . '"' . esc_html($is_selected) . '>';
                         echo esc_html( $item->form_name );
                         echo '</option>';
                     }

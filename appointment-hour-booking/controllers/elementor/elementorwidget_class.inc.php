@@ -90,7 +90,7 @@ class Elementor_CPAppHourBK_Widget extends \Elementor\Widget_Base {
 
         
         $forms = array();
-        $rows = $wpdb->get_results("SELECT id,form_name FROM ".$wpdb->prefix.$cp_appb_plugin->table_items." ORDER BY form_name"); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $rows = $wpdb->get_results("SELECT id,form_name FROM ".$wpdb->prefix."cpappbk_forms ORDER BY form_name"); 
         foreach ($rows as $item)
            $forms[$item->id] = $item->form_name;
                 

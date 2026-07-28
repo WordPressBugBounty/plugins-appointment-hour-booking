@@ -145,7 +145,16 @@ jQuery(function(){
 <!-- TAB 1 -->
 <div class="ahb-tab<?php if ($gotab == '') echo ' tab-active'; ?>" data-tab="1">
 	<h2><?php esc_html_e('Automatic Email Reports','appointment-hour-booking'); ?></h2>
-	<p><?php _e('Automatic email reports for <b>ALL forms</b>: Send submissions in CSV format via email.','appointment-hour-booking'); ?></p>
+	<p>
+    <?php 
+    echo wp_kses( 
+        __( 'Automatic email reports for <b>ALL forms</b>: Send submissions in CSV format via email.', 'appointment-hour-booking' ),
+        array(
+            'b' => array(),
+        )
+    ); 
+    ?>
+    </p>
 	<form name="updatereportsettings" action="" method="post">
      <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
      <input name="gotab" type="hidden" value="" />
@@ -285,7 +294,12 @@ jQuery(function(){
 	    			</th>
 	    			<td>
 	    				<input name="bocsvexclude" type="text" value="<?php echo esc_attr(get_option('cp_cpappb_bocsvexclude',"")); ?>" /><br />
-                        <em><?php _e('Enter field names comma separated, example: <b>final_price,referrer,fieldname1,fieldname2<b>','appointment-hour-booking'); ?></em>
+                        <em><?php echo wp_kses( 
+                                __( 'Enter field names comma separated, example: <b>final_price,referrer,fieldname1,fieldname2</b>', 'appointment-hour-booking' ), 
+                                array(
+                                    'b' => array(),
+                                ) 
+                            ); ?></em>
 	    			</td>
 	    		</tr>
 	    		<tr valign="top">
@@ -294,7 +308,12 @@ jQuery(function(){
 	    			</th>
 	    			<td>
 	    				<input name="schcsvexclude" type="text" value="<?php echo esc_attr(get_option('cp_cpappb_schcsvexclude',"")); ?>" /><br />
-                        <em><?php _e('Enter field names comma separated, example: <b>paid,cancelled<b>','appointment-hour-booking'); ?></em>
+                        <em><?php echo wp_kses( 
+                                                __( 'Enter field names comma separated, example: <b>paid,cancelled</b>', 'appointment-hour-booking' ), 
+                                                array(
+                                                    'b' => array(),
+                                                ) 
+                                            ); ?></em>
 	    			</td>
 	    		</tr>
 	    	</tbody>

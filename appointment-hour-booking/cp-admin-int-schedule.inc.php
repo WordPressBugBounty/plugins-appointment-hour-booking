@@ -16,7 +16,7 @@ if ( !is_admin() || (!$current_user_access && !@in_array($current_user->ID, unse
 $firstday = 0;
 if ($this->item != 0)
 {
-    $myform = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.$this->table_items .' WHERE id=%d' ,$this->item) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $myform = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.'cpappbk_forms WHERE id=%d' ,$this->item) ); 
     $raw_form_str = $this->cleanJSON( $myform[0]->form_structure );
     $form_data = json_decode( $raw_form_str );
     foreach($form_data[0] as $item)
@@ -29,8 +29,8 @@ if ($this->item != 0)
     }
 }
 
-$default_from = date("Y-m-d",strtotime("today -10 days"));
-$default_to = date("Y-m-d",strtotime("today +30 days"));
+$default_from = gmdate("Y-m-d",strtotime("today -10 days"));
+$default_to = gmdate("Y-m-d",strtotime("today +30 days"));
 
 $rawfrom = (isset($_GET["dfrom"]) ? sanitize_text_field($_GET["dfrom"]) : '');
 $rawto = (isset($_GET["dto"]) ? sanitize_text_field(@$_GET["dto"]) : '');
@@ -44,13 +44,13 @@ if ($this->get_option('date_format', 'mm/dd/yy') == 'dd/mm/yy' || $this->get_opt
     $rawto = str_replace('/','.',$rawto);
 }
 
-$dfrom = ($rawfrom != '' ? date("Y-m-d", strtotime($rawfrom)) : $default_from);
-$dto = ($rawto != '' ? date("Y-m-d", strtotime($rawto)) : $default_to);
+$dfrom = ($rawfrom != '' ? gmdate("Y-m-d", strtotime($rawfrom)) : $default_from);
+$dto = ($rawto != '' ? gmdate("Y-m-d", strtotime($rawto)) : $default_to);
 
 if ($this->get_option('date_format', 'mm/dd/yy') == 'd M, y')
 {
-	$dfrom_formatted = date("d/m/Y", strtotime($dfrom));
-    $dto_formatted = date("d/m/Y", strtotime($dto));
+	$dfrom_formatted = gmdate("d/m/Y", strtotime($dfrom));
+    $dto_formatted = gmdate("d/m/Y", strtotime($dto));
 }
 else
 {
@@ -93,7 +93,7 @@ else
 		<nobr><label><?php esc_html_e('Item','appointment-hour-booking'); ?>:</label> <select id="cal" name="cal">
           <?php if ($current_user_access) { ?> <option value="0">[<?php esc_html_e('All Items','appointment-hour-booking'); ?>]</option><?php } ?>
    <?php
-    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" );  
     $saved_id = $this->item;
     foreach ($myrows as $item)
     {
@@ -159,7 +159,28 @@ echo $this->filter_list( array(   // phpcs:ignore WordPress.Security.EscapeOutpu
 
 <div id="cpabc_printable_contents">
 
-<p><?php _e('The purpose of this page is to <strong>display the bookings/schedule in a calendar view</strong>. You can add bookings from the public booking form or','appointment-hour-booking'); ?> <a href="?page=<?php echo esc_attr($this->menu_parameter); ?>&cal=<?php echo intval($this->item); ?>&addbk=1"><?php esc_html_e('add bookings from the dashboard','appointment-hour-booking'); ?></a> <?php _e('and the bookings will appear in this calendar.<br />For CSV export, print and filter options switch to the "<strong>List View</strong>" with the button above this text.','appointment-hour-booking'); ?> </p>
+<p>
+    <?php 
+    echo wp_kses( 
+        __( 'The purpose of this page is to <strong>display the bookings/schedule in a calendar view</strong>. You can add bookings from the public booking form or', 'appointment-hour-booking' ),
+        array(
+            'strong' => array(),
+        )
+    ); 
+    ?> 
+    <a href="?page=<?php echo esc_attr( $this->menu_parameter ); ?>&cal=<?php echo intval( $this->item ); ?>&addbk=1">
+        <?php esc_html_e( 'add bookings from the dashboard', 'appointment-hour-booking' ); ?>
+    </a> 
+    <?php 
+    echo wp_kses( 
+        __( 'and the bookings will appear in this calendar.<br />For CSV export, print and filter options switch to the "<strong>List View</strong>" with the button above this text.', 'appointment-hour-booking' ),
+        array(
+            'br'     => array(),
+            'strong' => array(),
+        )
+    ); 
+    ?> 
+</p>
 <div class="clearer"></div>
 
             <script type="text/javascript">

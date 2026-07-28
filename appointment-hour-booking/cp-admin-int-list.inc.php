@@ -22,7 +22,7 @@ if (isset($_GET['a']) && $_GET['a'] == '1' && $current_user_access)
     define('CP_APPBOOK_DEFAULT_fp_from_email', get_the_author_meta('user_email', get_current_user_id()) );
     define('CP_APPBOOK_DEFAULT_fp_destination_emails', CP_APPBOOK_DEFAULT_fp_from_email);
 
-    $wpdb->insert( $wpdb->prefix.$this->table_items, array(
+    $wpdb->insert( $wpdb->prefix."cpappbk_forms", array(
                                       'form_name' => stripcslashes(sanitize_text_field($_GET["name"])),
 
                                       'form_structure' => CP_APPBOOK_DEFAULT_form_structure,
@@ -71,21 +71,21 @@ if (isset($_GET['a']) && $_GET['a'] == '1' && $current_user_access)
 else if (isset($_GET['u']) && $_GET['u'] != '' && $current_user_access)
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_list');
-    $wpdb->query( $wpdb->prepare('UPDATE `'.$wpdb->prefix.$this->table_items.'` SET form_name=%s WHERE id=%d', sanitize_text_field($_GET["name"]), sanitize_text_field($_GET['u'])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $wpdb->query( $wpdb->prepare('UPDATE `'.$wpdb->prefix.'cpappbk_forms` SET form_name=%s WHERE id=%d', sanitize_text_field($_GET["name"]), sanitize_text_field($_GET['u'])) ); 
     $message = "Item updated";
 }
 else if (isset($_GET['d']) && $_GET['d'] != '' && $current_user_access)
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_list');
-    $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.$this->table_items.'` WHERE id=%d', sanitize_text_field($_GET['d'])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_forms` WHERE id=%d', sanitize_text_field($_GET['d'])) ); 
     $message = "Item deleted";
 } else if (isset($_GET['c']) && $_GET['c'] != '' && $current_user_access)
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_list');
-    $myrows = $wpdb->get_row( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$this->table_items." WHERE id=%d", sanitize_text_field($_GET['c']) ) , ARRAY_A); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $myrows = $wpdb->get_row( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_forms WHERE id=%d", sanitize_text_field($_GET['c']) ) , ARRAY_A); 
     unset($myrows["id"]);
     $myrows["form_name"] = 'Cloned: '.$myrows["form_name"];
-    $wpdb->insert( $wpdb->prefix.$this->table_items, $myrows);
+    $wpdb->insert( $wpdb->prefix.'cpappbk_forms', $myrows);
     $message = "Item duplicated/cloned";
 }
 
@@ -187,7 +187,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_list' );
 <?php
 
   $current_user = wp_get_current_user();
-  $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+  $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" ); 
   foreach ($myrows as $item)
   {
    $options = !empty($item->cp_user_access) ? unserialize($item->cp_user_access) : array();

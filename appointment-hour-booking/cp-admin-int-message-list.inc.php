@@ -41,7 +41,7 @@ else if (isset($_GET['delmark']) && $_GET['delmark'] != '')
     for ($i=0; $i<=$records_per_page; $i++)
     if (isset($_GET['c'.$i]) && $_GET['c'.$i] != '') {
         do_action( 'cpappb_item_deleted', intval($_GET['c'.$i]) );
-        $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.$this->table_messages.'` WHERE id=%d', sanitize_text_field($_GET['c'.$i])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE id=%d', sanitize_text_field($_GET['c'.$i])) ); 
     }
     do_action( 'cpappb_cache_clean', $this->item );
     $message = __('Marked items deleted','appointment-hour-booking');
@@ -50,26 +50,26 @@ else if (isset($_GET['del']) && $_GET['del'] == 'all')
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
     if ($this->item == '' || $this->item == '0')
-        $wpdb->query('DELETE FROM `'.$wpdb->prefix.$this->table_messages.'`'); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $wpdb->query('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages`'); 
     else
-        $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->prefix.$this->table_messages.'` WHERE formid=%d', $this->item)); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE formid=%d', $this->item)); 
     $message = __('All items deleted','appointment-hour-booking');
 }
 else if (isset($_GET['lu']) && $_GET['lu'] != '')
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE id=%d", sanitize_text_field($_GET['lu'])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", sanitize_text_field($_GET['lu'])) ); 
     $params = unserialize($myrows[0]->posted_data);
     $params["paid"] = sanitize_text_field($_GET["status"]);
     $params["payment_type"] = __('Manually updated','appointment-hour-booking');
-    $wpdb->query( $wpdb->prepare('UPDATE `'.$wpdb->prefix.$this->table_messages.'` SET posted_data=%s WHERE id=%d', serialize($params), sanitize_text_field($_GET['lu'])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $wpdb->query( $wpdb->prepare('UPDATE `'.$wpdb->prefix.'cpappbk_messages` SET posted_data=%s WHERE id=%d', serialize($params), sanitize_text_field($_GET['lu'])) ); 
     $message = __('Item updated','appointment-hour-booking');
 }
 else if (isset($_GET['ld']) && $_GET['ld'] != '')
 {
     $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
     do_action( 'cpappb_item_deleted', intval($_GET['ld']) );
-    $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.$this->table_messages.'` WHERE id=%d', sanitize_text_field($_GET['ld'])) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE id=%d', sanitize_text_field($_GET['ld'])) ); 
     $message = __('Item deleted','appointment-hour-booking');
 }
 else if (isset($_GET['ud']) && $_GET['ud'] != '')
@@ -92,7 +92,7 @@ else if (isset($_GET['ud']) && $_GET['ud'] != '')
 }
 
 if ($this->item != 0)
-    $myform = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.$this->table_items .' WHERE id=%d' ,$this->item) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    $myform = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.'cpappbk_forms WHERE id=%d' ,$this->item) ); 
 
 $rawfrom = (isset($_GET["dfrom"]) ? sanitize_text_field($_GET["dfrom"]) : '');
 $rawto = (isset($_GET["dto"]) ? sanitize_text_field(@$_GET["dto"]) : '');
@@ -103,21 +103,46 @@ if ($this->get_option('date_format', 'mm/dd/yy') == 'dd/mm/yy')
 }
 
 $cond = '';
-if (!empty($_GET["search"])) $cond .= " AND (data like '%".esc_sql(sanitize_text_field($_GET["search"]))."%' OR posted_data LIKE '%".esc_sql(sanitize_text_field($_GET["search"]))."%')";
-if ($rawfrom != '') $cond .= " AND (`time` >= '".esc_sql( date("Y-m-d",strtotime($rawfrom)))."')";
-if ($rawto != '') $cond .= " AND (`time` <= '".esc_sql(date("Y-m-d",strtotime($rawto)))." 23:59:59')";
-if ($this->item != 0) $cond .= " AND formid=".intval($this->item);
 
+if ( ! empty( $_GET['search'] ) ) {
+    $search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+    $like   = '%' . $wpdb->esc_like( $search ) . '%';    
+    $cond .= $wpdb->prepare( ' AND (data LIKE %s OR posted_data LIKE %s)', $like, $like );
+}
 
-$events_query = "SELECT count(id) as ck FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC";
-$eventscount = $wpdb->get_results( $events_query );
-$total_pages = ceil($eventscount[0]->ck / $records_per_page);
+if ( $rawfrom != '' ) {
+    $date_start = gmdate( 'Y-m-d', strtotime( $rawfrom ) );
+    $cond      .= $wpdb->prepare( ' AND (`time` >= %s)', $date_start );
+}
 
-$events_query = "SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC LIMIT ".intval(($current_page-1)*$records_per_page).",".intval($records_per_page);
+if ( $rawto != '' ) {
+    $date_end = gmdate( 'Y-m-d', strtotime( $rawto ) );
+    $cond    .= $wpdb->prepare( ' AND (`time` <= %s)', $date_end . ' 23:59:59' );
+}
+
+if ( $this->item != 0 ) {
+    $cond .= $wpdb->prepare( ' AND formid = %d', $this->item );
+}
+
+$table_name = $wpdb->prefix . 'cpappbk_messages';
+
+// First Query: Pagination Count
+$count_query = "SELECT count(id) as ck FROM {$table_name} WHERE 1=1 {$cond} ORDER BY `time` DESC";
+// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$eventscount = $wpdb->get_results( $count_query );
+
+$total_pages = ceil( $eventscount[0]->ck / $records_per_page );
+
+$offset       = ( $current_page - 1 ) * $records_per_page;
+$limit_clause = $wpdb->prepare( " LIMIT %d, %d", $offset, $records_per_page );
+
+$events_query = "SELECT * FROM {$table_name} WHERE 1=1 {$cond} ORDER BY `time` DESC {$limit_clause}";
 
 $events_query = apply_filters( 'cpappb_messages_query', $events_query );
-$events = $wpdb->get_results( $events_query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
+// Second Query: Items
+// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$events = $wpdb->get_results( $events_query );
 $nonce = wp_create_nonce( 'cpappb_actions_booking' );
 
 ?>
@@ -263,7 +288,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
                 <select id="cal" name="cal" class="selectmh">
                     <?php if ($current_user_access) { ?> <option value="0">[<?php esc_html_e('All Items','appointment-hour-booking'); ?>]</option><?php } ?>
                     <?php
-                    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" ); 
                     $saved_id = $this->item;
                     foreach ($myrows as $item) {
                         $this->setId($item->id);
@@ -388,7 +413,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_booking' );
                   <tr class="<?php if ( $cancelled && $cancelled == count( $posted_data["apps"] ) && $status != 'Attended') { echo 'cpappb_cancelled'; } ?>" valign="top">
                     <th scope="row" class="check-column"><input type="checkbox" name="c<?php echo intval($i); ?>" value="<?php echo intval($events[$i]->id); ?>" /></th>
                     <td><?php echo intval($events[$i]->id); ?></td>
-                    <td><?php echo esc_html($this->format_date(substr($events[$i]->time,0,16)).date(" H:i",strtotime($events[$i]->time))); ?></td>
+                    <td><?php echo esc_html($this->format_date(substr($events[$i]->time,0,16)).gmdate(" H:i",strtotime($events[$i]->time))); ?></td>
                     <td><a href="mailto:<?php echo esc_attr(sanitize_email($events[$i]->notifyto)); ?>"><?php echo esc_html(sanitize_email($events[$i]->notifyto)); ?></a></td>
                     <td class="ahbmessage">
                       <div class="ahbmessagemw">

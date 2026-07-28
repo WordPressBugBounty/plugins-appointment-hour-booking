@@ -157,19 +157,31 @@ if( !class_exists( 'CPAPPB_DashboardWidget' ) )
 
             $cond = '1=1';
 
-            $cond = apply_filters( 'cpappb_the_availability_filter_second', $cond,  intval($cp_appb_plugin->getId()) );
+            // The filter modifies raw SQL, so we leave it as is to preserve backward compatibility.
+            $cond = apply_filters( 'cpappb_the_availability_filter_second', $cond, intval( $cp_appb_plugin->getId() ) );
 
-            if ($calendar)
-                $cond .= " AND formid=".intval($calendar);
+            if ( $calendar ) {
+                $cond .= $wpdb->prepare( ' AND formid = %d', $calendar );
+            }
+            
+            $from = gmdate( 'Y-m-d', strtotime( $datefrom ) );
+            $to   = gmdate( 'Y-m-d', strtotime( $dateto ) );
+           
+            $table_messages = $wpdb->prefix . "cpappbk_messages";
+            $table_items    = $wpdb->prefix . "cpappbk_forms";
 
-            // calculate dates
-            $from = gmdate("Y-m-d",strtotime($datefrom));
-            $to = gmdate("Y-m-d",strtotime($dateto));
+            $events_query = "
+                SELECT * 
+                FROM {$table_messages} 
+                INNER JOIN {$table_items} 
+                    ON {$table_messages}.formid = {$table_items}.id 
+                WHERE {$cond} 
+                ORDER BY time DESC
+            ";
 
-            $events_query = "SELECT * FROM ".$wpdb->prefix.$cp_appb_plugin->table_messages." INNER JOIN ".$wpdb->prefix.$cp_appb_plugin->table_items." ON ".$wpdb->prefix.$cp_appb_plugin->table_messages.".formid=".$wpdb->prefix.$cp_appb_plugin->table_items.".id".
-                           " WHERE ".$cond." ORDER BY time DESC";
-
-            $events = $wpdb->get_results($events_query);  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            // Ignore the final prepare warning because $cond contains filtered raw SQL
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $events = $wpdb->get_results( $events_query ); 
 
             // pre-select time-slots
             $selection = array();

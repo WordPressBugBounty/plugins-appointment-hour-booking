@@ -58,7 +58,7 @@ class CP_APPBOOK_BaseClass {
         else
             $url = get_home_url( $blog );
 
-        $url = parse_url($url);
+        $url = wp_parse_url($url);
         if ( isset( $url["path"] ) ) {
             $url = rtrim($url["path"],"/");
         } else {
@@ -149,7 +149,7 @@ class CP_APPBOOK_BaseClass {
         $results = $wpdb->get_results( $wpdb->prepare("SHOW columns FROM `".$this->sanitizeTableName($table)."` where field=%s", $field));  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         if (!count($results))
         {
-            $wpdb->query( "ALTER TABLE  `".$this->sanitizeTableName($table)."` ADD `".$this->sanitizeTableName($field)."` ".$this->sanitizeTableName($type) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $wpdb->query( "ALTER TABLE  `".$this->sanitizeTableName($table)."` ADD `".$this->sanitizeTableName($field)."` ".$this->sanitizeTableName($type) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         }
     }
 
@@ -173,7 +173,7 @@ class CP_APPBOOK_BaseClass {
             $value = (property_exists($this->option_buffered_item, $field) && isset($this->option_buffered_item->$field) ? @$this->option_buffered_item->$field : '');
         else
         {
-           $myrows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix.$this->table_items." WHERE id=%d", $this->item) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+           $myrows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms WHERE id=%d", $this->item) ); 
            if (count($myrows))
            {
                $value = @$myrows[0]->$field;

@@ -206,7 +206,12 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 <br />      
        <br />
         <div style="padding:10px;background-color:#ffffdd;border:1px dotted black;">
-            <p><?php _e('<STRONG>In this version</STRONG> the form builder supports <STRONG>calendar, text, email and acceptance checkbox fields</STRONG>.','appointment-hour-booking'); ?></p>
+            <p><?php echo wp_kses( 
+                        __( '<STRONG>In this version</STRONG> the form builder supports <STRONG>calendar, text, email and acceptance checkbox fields</STRONG>.', 'appointment-hour-booking' ), 
+                        array(
+                            'STRONG' => array(),
+                        ) 
+                    ); ?></p>
             <p><button type="button" onclick="window.open('<?php echo esc_js($this->plugin_download_URL); ?>?src=activatebtn');" style="cursor:pointer;height:35px;color:#20A020;font-weight:bold;"><?php esc_html_e('Activate the FULL form builder','appointment-hour-booking'); ?></button>
                <p style="font-weight:bold"><?php esc_html_e('The full set of fields also supports:','appointment-hour-booking'); ?>
                <ul>
@@ -836,7 +841,13 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
         $printed = false;
     	if( count( $cpappb_addons_active_list ) )
     	{
-    		_e( '<h2>Add-Ons Settings:</h2><hr />', 'appointment-hour-booking' );
+    		echo wp_kses( 
+                            __( '<h2>Add-Ons Settings:</h2><hr />', 'appointment-hour-booking' ), 
+                            array(
+                                'h2' => array(),
+                                'hr' => array(),
+                            ) 
+                        );
             ob_start();
     		foreach( $cpappb_addons_active_list as $addon_id ) if( isset( $cpappb_addons_objs_list[ $addon_id ] ) ) print $cpappb_addons_objs_list[ $addon_id ]->get_addon_form_settings( $this->item ); // phpcs:ignore WordPress.Security.EscapeOutput
             $printed = ob_get_contents() != '';
@@ -848,7 +859,12 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
             ?>
             <p><?php esc_html_e('You can optionally','appointment-hour-booking'); ?> <a target="_blank" href="?page=cp_apphourbooking_addons"><?php esc_html_e('activate add ons in the add ons section','appointment-hour-booking'); ?></a>.</p>
             <p><?php esc_html_e('The add ons can be enabled to add new features','appointment-hour-booking'); ?>.</p>
-            <p><?php _e('If you don\'t want to enable add ons now then <strong>continue saving these settings and publishing the booking form</strong>.','appointment-hour-booking'); ?></p>
+            <p><?php echo wp_kses( 
+                                    __( 'If you don\'t want to enable add ons now then <strong>continue saving these settings and publishing the booking form</strong>.', 'appointment-hour-booking' ), 
+                                    array(
+                                        'strong' => array(),
+                                    ) 
+                                ); ?></p>
             <?php
         }
      ?>

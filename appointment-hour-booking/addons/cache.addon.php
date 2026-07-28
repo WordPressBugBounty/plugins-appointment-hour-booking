@@ -61,20 +61,21 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 			global $wpdb;
 
 			$charset_collate = $wpdb->get_charset_collate();
-			$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->prefix.$this->form_table." (
-					id mediumint(9) NOT NULL AUTO_INCREMENT,
-                    formid INT NOT NULL,				
-                    cachedquery mediumtext, 
-                    cacheddata mediumtext,                    
-					UNIQUE KEY id (id)
-				) $charset_collate;";
-            
-			$wpdb->query($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $table_name      = $wpdb->prefix . esc_sql( $this->form_table );
+
+            // Note: dbDelta does not need "IF NOT EXISTS"
+            $sql = "CREATE TABLE {$table_name} (
+                    id mediumint(9) NOT NULL AUTO_INCREMENT,
+                    formid INT NOT NULL,
+                    cachedquery mediumtext,
+                    cacheddata mediumtext,
+                    UNIQUE KEY id (id)
+                ) $charset_collate;";
+
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            dbDelta( $sql );
             
 		} // end update_database
-      
-               
-
 
 
 		/************************ PUBLIC METHODS  *****************************/
@@ -87,7 +88,12 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 		{
             global $wpdb, $cp_appb_plugin;
             
-            $wpdb->query( "UPDATE ".$wpdb->prefix.$this->form_table." SET cacheddata='' WHERE formid=".intval($formid) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $wpdb->query( 
+                $wpdb->prepare( 
+                    "UPDATE {$wpdb->prefix}cpappbk_cache SET cacheddata = '' WHERE formid = %d", 
+                    $formid 
+                ) 
+            ); 
 		} // end cache_clean  
         
         
@@ -99,7 +105,7 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 		{
             global $wpdb, $cp_appb_plugin;
             
-            $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$cp_appb_plugin->table_messages." WHERE id=%d", $itemnumber) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", $itemnumber) ); 
             
             if (is_array($myrows) && count($myrows))
                 $this->cache_clean( $myrows[0]->formid );
@@ -114,7 +120,7 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 		{
             global $wpdb, $cp_appb_plugin;
             
-            $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$cp_appb_plugin->table_messages." WHERE id=%d", $itemnumber) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", $itemnumber) ); 
             
             if (is_array($myrows) && count($myrows))
                 $this->cache_clean( $myrows[0]->formid );
@@ -142,10 +148,16 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 		{
             global $wpdb, $cp_appb_plugin;
             
-            $is_cached = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=".intval($formid)." AND cachedquery='".esc_sql(md5($dataquery))."' AND cacheddata<>''" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $is_cached = $wpdb->get_results( 
+                $wpdb->prepare( 
+                    "SELECT * FROM {$wpdb->prefix}cpappbk_cache WHERE formid = %d AND cachedquery = %s AND cacheddata <> ''", 
+                    $formid, 
+                    md5( $dataquery ) 
+                ) 
+            );
             if (count($is_cached))
             {
-                echo $is_cached[0]->cacheddata;
+                echo $is_cached[0]->cacheddata; // phpcs:ignore WordPress.Security.EscapeOutput
                 exit;
             }
 		} // end cache_check  
@@ -159,10 +171,16 @@ if( !class_exists( 'CPAPPB_Cache' ) )
             global $wpdb, $cp_appb_plugin;
             
             $queryhash = md5($dataquery);
-            $is_cached = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->form_table." WHERE formid=".intval($formid)." AND cachedquery='".esc_sql($queryhash)."'" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $is_cached = $wpdb->get_results( 
+                $wpdb->prepare( 
+                    "SELECT * FROM {$wpdb->prefix}cpappbk_cache WHERE formid = %d AND cachedquery = %s", 
+                    $formid, 
+                    $queryhash 
+                ) 
+            ); 
             if (!count($is_cached))
-                $wpdb->insert($wpdb->prefix.$this->form_table, array('formid' => intval($formid), 'cachedquery' => ($queryhash) ) ); 
-            $wpdb->update($wpdb->prefix.$this->form_table, array('cacheddata' => ($dataoutput) ), array('formid' => intval($formid), 'cachedquery' => ($queryhash) ) );
+                $wpdb->insert($wpdb->prefix."cpappbk_cache", array('formid' => intval($formid), 'cachedquery' => ($queryhash) ) ); 
+            $wpdb->update($wpdb->prefix."cpappbk_cache", array('cacheddata' => ($dataoutput) ), array('formid' => intval($formid), 'cachedquery' => ($queryhash) ) );
 		} // end cache_store          
         
 
@@ -171,19 +189,7 @@ if( !class_exists( 'CPAPPB_Cache' ) )
 		 */
 		private function _log($adarray = array())
 		{
-			$h = fopen( __DIR__.'/logs.txt', 'a' );
-			$log = "";
-			foreach( $_REQUEST as $KEY => $VAL )
-			{
-				$log .= $KEY.": ".$VAL."\n";
-			}
-			foreach( $adarray as $KEY => $VAL )
-			{
-				$log .= $KEY.": ".$VAL."\n";
-			}
-			$log .= "================================================\n";
-			fwrite( $h, $log );
-			fclose( $h );
+			// not needed right now
 		}
         
 

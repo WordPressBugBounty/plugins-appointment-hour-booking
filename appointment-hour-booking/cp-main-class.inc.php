@@ -46,119 +46,105 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     public function _install() {
         global $wpdb;
 
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         $charset_collate = $wpdb->get_charset_collate();
 
-        $results = $wpdb->get_results("SHOW TABLES LIKE '".$wpdb->prefix.$this->table_messages."'"); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        if ( !count( $results ) )
-        {
-            $sql = "CREATE TABLE ".$wpdb->prefix.$this->table_messages." (
-                id int(10) NOT NULL AUTO_INCREMENT,
-                formid INT NOT NULL,
-                time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-                ipaddr VARCHAR(250) DEFAULT '' NOT NULL,
-                notifyto VARCHAR(250) DEFAULT '' NOT NULL,
-                data mediumtext,
-                posted_data mediumtext,
-                whoadded VARCHAR(250) DEFAULT '' NOT NULL,
-                UNIQUE KEY id (id)
-            )".$charset_collate.";";
-            $wpdb->query($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        }
+        $table_messages = $wpdb->prefix . 'cpappbk_messages';
+        $sql_messages   = "CREATE TABLE {$table_messages} (
+            id int(10) NOT NULL AUTO_INCREMENT,
+            formid INT NOT NULL,
+            time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+            ipaddr VARCHAR(250) DEFAULT '' NOT NULL,
+            notifyto VARCHAR(250) DEFAULT '' NOT NULL,
+            data mediumtext,
+            posted_data mediumtext,
+            whoadded VARCHAR(250) DEFAULT '' NOT NULL,
+            UNIQUE KEY id (id)
+        ) {$charset_collate};";
 
-        $results = $wpdb->get_results("SHOW TABLES LIKE '".$wpdb->prefix.$this->table_items."'"); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        if ( !count( $results ) )
-        {
-            $sql = "CREATE TABLE ".$wpdb->prefix.$this->table_items." (
-                 id mediumint(9) NOT NULL AUTO_INCREMENT,
+        dbDelta( $sql_messages );
 
-                 form_name VARCHAR(250) DEFAULT '' NOT NULL,
+        $table_forms = $wpdb->prefix . 'cpappbk_forms';
+        $sql_forms   = "CREATE TABLE {$table_forms} (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            form_name VARCHAR(250) DEFAULT '' NOT NULL,
+            form_structure mediumtext,
+            calendar_language VARCHAR(250) DEFAULT '' NOT NULL,
+            date_format VARCHAR(250) DEFAULT '' NOT NULL,
+            product_name VARCHAR(250) DEFAULT '' NOT NULL,
+            pay_later_label VARCHAR(250) DEFAULT '' NOT NULL,
+            defaultstatus VARCHAR(250) DEFAULT '' NOT NULL,
+            defaultpaidstatus VARCHAR(250) DEFAULT '' NOT NULL,
+            fp_from_email VARCHAR(250) DEFAULT '' NOT NULL,
+            fp_from_name text,
+            fp_destination_emails text,
+            fp_subject text,
+            fp_inc_additional_info VARCHAR(10) DEFAULT '' NOT NULL,
+            fp_return_page VARCHAR(250) DEFAULT '' NOT NULL,
+            fp_message text,
+            fp_emailformat VARCHAR(10) DEFAULT '' NOT NULL,
+            fp_emailtomethod VARCHAR(10) DEFAULT '' NOT NULL,
+            fp_destination_emails_field VARCHAR(200) DEFAULT '' NOT NULL,
+            cu_enable_copy_to_user VARCHAR(10) DEFAULT '' NOT NULL,
+            cu_user_email_field VARCHAR(250) DEFAULT '' NOT NULL,
+            cu_subject VARCHAR(250) DEFAULT '' NOT NULL,
+            cu_message text,
+            cu_emailformat VARCHAR(10) DEFAULT '' NOT NULL,
+            fp_emailfrommethod VARCHAR(10) DEFAULT '' NOT NULL,
+            vs_text_maxapp TEXT,
+            vs_text_is_required TEXT,
+            vs_text_is_email TEXT,
+            vs_text_datemmddyyyy TEXT,
+            vs_text_dateddmmyyyy TEXT,
+            vs_text_number TEXT,
+            vs_text_digits TEXT,
+            vs_text_max TEXT,
+            vs_text_min TEXT,
+            vs_text_pageof TEXT,
+            vs_text_submitbtn TEXT,
+            vs_text_previousbtn TEXT,
+            vs_text_nextbtn TEXT,
+            vs_text_quantity TEXT,
+            vs_text_cancel TEXT,
+            vs_text_cost TEXT,
+            vs_text_nomore TEXT,
+            vs_text_nmore TEXT,
+            cp_user_access text,
+            cp_user_access_settings VARCHAR(10) DEFAULT '' NOT NULL,
+            display_emails_endtime VARCHAR(10) DEFAULT '' NOT NULL,
+            rep_enable VARCHAR(10) DEFAULT '' NOT NULL,
+            rep_days VARCHAR(10) DEFAULT '' NOT NULL,
+            rep_hour VARCHAR(10) DEFAULT '' NOT NULL,
+            rep_emails text,
+            rep_subject text,
+            rep_emailformat VARCHAR(10) DEFAULT '' NOT NULL,
+            rep_message text,
+            cv_enable_captcha VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_width VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_height VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_chars VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_font VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_min_font_size VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_max_font_size VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_noise VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_noise_length VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_background VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_border VARCHAR(20) DEFAULT '' NOT NULL,
+            cv_text_enter_valid_captcha VARCHAR(200) DEFAULT '' NOT NULL,
+            UNIQUE KEY id (id)
+        ) {$charset_collate};";
 
-                 form_structure mediumtext,
+        dbDelta( $sql_forms );
 
-                 calendar_language VARCHAR(250) DEFAULT '' NOT NULL,
-                 date_format VARCHAR(250) DEFAULT '' NOT NULL,
-                 product_name VARCHAR(250) DEFAULT '' NOT NULL,
-                 pay_later_label VARCHAR(250) DEFAULT '' NOT NULL,
-
-                 defaultstatus VARCHAR(250) DEFAULT '' NOT NULL,
-                 defaultpaidstatus VARCHAR(250) DEFAULT '' NOT NULL,
-
-                 fp_from_email VARCHAR(250) DEFAULT '' NOT NULL,
-                 fp_from_name text,
-                 fp_destination_emails text,
-                 fp_subject text,
-                 fp_inc_additional_info VARCHAR(10) DEFAULT '' NOT NULL,
-                 fp_return_page VARCHAR(250) DEFAULT '' NOT NULL,
-                 fp_message text,
-                 fp_emailformat VARCHAR(10) DEFAULT '' NOT NULL,
-
-                 fp_emailtomethod VARCHAR(10) DEFAULT '' NOT NULL,
-                 fp_destination_emails_field VARCHAR(200) DEFAULT '' NOT NULL,
-                 cu_enable_copy_to_user VARCHAR(10) DEFAULT '' NOT NULL,
-                 cu_user_email_field VARCHAR(250) DEFAULT '' NOT NULL,
-                 cu_subject VARCHAR(250) DEFAULT '' NOT NULL,
-                 cu_message text,
-                 cu_emailformat VARCHAR(10) DEFAULT '' NOT NULL,
-                 fp_emailfrommethod VARCHAR(10) DEFAULT '' NOT NULL,
-
-                 vs_text_maxapp TEXT,
-                 vs_text_is_required TEXT,
-                 vs_text_is_email TEXT,
-                 vs_text_datemmddyyyy TEXT,
-                 vs_text_dateddmmyyyy TEXT,
-                 vs_text_number TEXT,
-                 vs_text_digits TEXT,
-                 vs_text_max TEXT,
-                 vs_text_min TEXT,
-                 vs_text_pageof TEXT,
-                 vs_text_submitbtn TEXT,
-                 vs_text_previousbtn TEXT,
-                 vs_text_nextbtn TEXT,
-
-                 vs_text_quantity TEXT,
-                 vs_text_cancel TEXT,
-                 vs_text_cost TEXT,
-				 vs_text_nomore TEXT,
-                 vs_text_nmore TEXT,
-
-                 cp_user_access text,
-                 cp_user_access_settings VARCHAR(10) DEFAULT '' NOT NULL,
-                 display_emails_endtime VARCHAR(10) DEFAULT '' NOT NULL,
-                 rep_enable VARCHAR(10) DEFAULT '' NOT NULL,
-                 rep_days VARCHAR(10) DEFAULT '' NOT NULL,
-                 rep_hour VARCHAR(10) DEFAULT '' NOT NULL,
-                 rep_emails text,
-                 rep_subject text,
-                 rep_emailformat VARCHAR(10) DEFAULT '' NOT NULL,
-                 rep_message text,
-
-                 cv_enable_captcha VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_width VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_height VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_chars VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_font VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_min_font_size VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_max_font_size VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_noise VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_noise_length VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_background VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_border VARCHAR(20) DEFAULT '' NOT NULL,
-                 cv_text_enter_valid_captcha VARCHAR(200) DEFAULT '' NOT NULL,
-
-                 UNIQUE KEY id (id)
-            )".$charset_collate.";";
-            $wpdb->query($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        }
 
         // insert initial data
-        $count = $wpdb->get_var(  "SELECT COUNT(id) FROM ".$wpdb->prefix.$this->table_items  ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $count = $wpdb->get_var(  "SELECT COUNT(id) FROM ".$wpdb->prefix."cpappbk_forms"  ); 
         if ( !$count )
         {
             define('CP_APPBOOK_DEFAULT_fp_from_email', get_the_author_meta('user_email', get_current_user_id()) );
             define('CP_APPBOOK_DEFAULT_fp_destination_emails', CP_APPBOOK_DEFAULT_fp_from_email);
-            $wpdb->insert( $wpdb->prefix.$this->table_items, array( 'id' => 1,
+            $wpdb->insert( $wpdb->prefix."cpappbk_forms", array( 'id' => 1,
                                       'form_name' => 'Form 1',
 
                                       'form_structure' => $this->get_option('form_structure', CP_APPBOOK_DEFAULT_form_structure),
@@ -250,7 +236,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     public function update_status($id, $status, $indexonly = '-1')
     {
         global $wpdb;
-        $events = $wpdb->get_results( $wpdb->prepare('SELECT * FROM `'.$wpdb->prefix.$this->table_messages.'` WHERE id=%d', $id) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $events = $wpdb->get_results( $wpdb->prepare('SELECT * FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE id=%d', $id) ); 
         $posted_data = unserialize($events[0]->posted_data);  
         if (!is_array($posted_data)) // no data to change status
             return;
@@ -271,7 +257,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         if ($something_changed)    
         {
             $posted_data = serialize($posted_data);
-            $wpdb->update ( $wpdb->prefix.$this->table_messages, array( 'posted_data' => $posted_data ), array( 'id' => $id ));        
+            $wpdb->update ( $wpdb->prefix."cpappbk_messages", array( 'posted_data' => $posted_data ), array( 'id' => $id ));        
             do_action( 'cpappb_update_status', $id, $status ); 
         }
     }
@@ -339,41 +325,59 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         }
 
         // calculate dates
-        $from = date("Y-m-d",$this->localtimezone_strtotime($from));
-        $to = date("Y-m-d",$this->localtimezone_strtotime($to));
-        $to_query = date("Y-m-d",$this->localtimezone_strtotime($to." +1 day"));
+        $from = gmdate("Y-m-d",$this->localtimezone_strtotime($from));
+        $to = gmdate("Y-m-d",$this->localtimezone_strtotime($to));
+        $to_query = gmdate("Y-m-d",$this->localtimezone_strtotime($to." +1 day"));
 
 
 
 
-        $calquery = '';
-        $calendar = explode (",",$calendar);
-        foreach ($calendar as $cal)
-            if (trim($cal))
-            {
-                $calquery .= ($calquery!=''?' OR ':'').'formid='.intval(trim($cal));
-                $this->setId(intval(trim($cal)));
-            }
-        if ($calquery != '')
-            $calquery = '('.$calquery.') AND ';
+        $table_name = $wpdb->prefix . 'cpappbk_messages';
 
-        if (strtolower($onlycurrentuser) == 'yes' || strtolower($onlycurrentuser) == 'true')
-        {
+        $sql  = "SELECT notifyto, posted_data, data, formid, id, time FROM {$table_name} WHERE notifyto <> %s AND ";
+        $args = array( $this->blocked_by_admin_indicator );
+
+        if ( strtolower( $onlycurrentuser ) === 'yes' || strtolower( $onlycurrentuser ) === 'true' ) {
             $current_user = wp_get_current_user();
-            if ($current_user->ID)
-                $user_query = " whoadded='".esc_sql($current_user->ID)."' AND ";
-            else
-                $user_query = "(1=0) AND "; // if no logged in user then no current user bookings
+            if ( $current_user->ID ) {
+                $sql   .= "whoadded = %d AND ";
+                $args[] = $current_user->ID;
+            } else {
+                $sql   .= "(1=0) AND "; // if no logged in user then no current user bookings
+            }
         }
-        else
-            $user_query = '';
 
-        if ($email != '')
-           $user_query .= " (notifyto='".esc_sql($email)."') AND ";
+        if ( $email !== '' ) {
+            $sql   .= "(notifyto = %s) AND ";
+            $args[] = $email;
+        }
 
-        // pre-select time-slots
+        $cal_ids      = array();
+        $calendar_arr = explode( ',', $calendar );
+
+        foreach ( $calendar_arr as $cal ) {
+            $cal_clean = trim( $cal );
+            if ( $cal_clean ) {
+                $cal_int   = intval( $cal_clean );
+                $cal_ids[] = $cal_int;               
+                $this->setId( $cal_int ); 
+            }
+        }
+
+        if ( ! empty( $cal_ids ) ) {            
+            $placeholders = implode( ', ', array_fill( 0, count( $cal_ids ), '%d' ) );
+            $sql .= "(formid IN ({$placeholders})) AND ";
+            $args = array_merge( $args, $cal_ids );
+        }
+
+        $sql   .= "time <= %s ORDER BY time DESC LIMIT 0, %d";
+        $args[] = $to_query;
+        $args[] = intval( $limit );
+
         $selection = array();
-        $rows = $wpdb->get_results( $wpdb->prepare("SELECT notifyto,posted_data,data,formid,id,time FROM ".$wpdb->prefix.$this->table_messages." WHERE notifyto<>%s AND ".$user_query.$calquery."time<=%s ORDER BY time DESC LIMIT 0,".intval($limit), $this->blocked_by_admin_indicator, $to_query) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ) );
 
         foreach($rows as $item)
         {
@@ -437,7 +441,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
                         echo intval($i)+1;
                         break;
                     case 'weekday':
-                        echo esc_html(ucfirst(__(date('l',strtotime($selection[$i][1])),'appointment-hour-booking')));
+                        echo esc_html(ucfirst(__(gmdate('l',strtotime($selection[$i][1])),'appointment-hour-booking')));
                         break;
                     case 'date':
                         echo esc_html($this->format_date($selection[$i][1]));
@@ -693,7 +697,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         		$templatelist = $this->available_templates();
                 $form_template = substr(md5($form_data[ 1 ][ 0 ]->formtemplate),0,10);
         		if(  isset( $templatelist[ $form_data[ 1 ][ 0 ]->formtemplate ] ) )
-        		print '<link rel=\'stylesheet\' media="all" href="'.esc_attr( esc_url( $templatelist[ $form_data[ 1 ][ 0 ]->formtemplate ][ 'file' ] ) ).'" type="text/css" />';
+        		print '<link rel=\'stylesheet\' media="all" href="'.esc_attr( esc_url( $templatelist[ $form_data[ 1 ][ 0 ]->formtemplate ][ 'file' ] ) ).'" type="text/css" />'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
         	}
             
             if (get_option('AHB_CUSTOM_CSS_'.$this->getId().$form_template) != '') {
@@ -715,24 +719,24 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             ?>
                  <?php $plugin_url = plugins_url('', __FILE__); ?>
                  <!--noptimize-->
-                 <link href="<?php echo esc_attr(plugins_url('css/stylepublic.css', __FILE__)); ?>" type="text/css" rel="stylesheet" />
-                 <link href="<?php echo esc_attr($this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=css')); ?>" type="text/css" rel="stylesheet" />
-                 <link href="<?php echo esc_attr(plugins_url('css/cupertino/calendar.css', __FILE__)); ?>" type="text/css" rel="stylesheet" />
-                 <script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/jquery.js'); ?>'></script>
-                 <script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'core.min.js'); ?>'></script>
-                 <script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'datepicker.min.js'); ?>'></script>
-<?php if (@file_exists(dirname( __FILE__ ).'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'widget.min.js')) { ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'widget.min.js'); ?>'></script><?php } ?>
-<?php if (@file_exists(dirname( __FILE__ ).'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'position.min.js')) { ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'position.min.js'); ?>'></script><?php } ?>
-                 <script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'tooltip.min.js'); ?>'></script>
-                 <?php if ($calendar_language != '' && file_exists(dirname( __FILE__ ).'/js/languages/jquery.ui.datepicker-'.$calendar_language.'.js')) { ?><script type='text/javascript' src='<?php echo esc_attr(plugins_url('js/languages/jquery.ui.datepicker-'.$calendar_language.'.js', __FILE__)); ?>'></script><?php } ?>
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><link href="<?php echo esc_attr(plugins_url('css/stylepublic.css', __FILE__)); ?>" type="text/css" rel="stylesheet" />
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><link href="<?php echo esc_attr($this->fixurl($this->get_site_url( false ),'cp_cpappb_resources=css')); ?>" type="text/css" rel="stylesheet" />
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><link href="<?php echo esc_attr(plugins_url('css/cupertino/calendar.css', __FILE__)); ?>" type="text/css" rel="stylesheet" />
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/jquery.js'); ?>'></script>
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'core.min.js'); ?>'></script>
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'datepicker.min.js'); ?>'></script>
+<?php if (@file_exists(dirname( __FILE__ ).'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'widget.min.js')) { ?><?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'widget.min.js'); ?>'></script><?php } ?>
+<?php if (@file_exists(dirname( __FILE__ ).'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'position.min.js')) { ?><?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'position.min.js'); ?>'></script><?php } ?>
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($plugin_url.'/../../../wp-includes/js/jquery/ui/'.$prefix_ui.'tooltip.min.js'); ?>'></script>
+                 <?php if ($calendar_language != '' && file_exists(dirname( __FILE__ ).'/js/languages/jquery.ui.datepicker-'.$calendar_language.'.js')) { ?><?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr(plugins_url('js/languages/jquery.ui.datepicker-'.$calendar_language.'.js', __FILE__)); ?>'></script><?php } ?>
                  <script type='text/javascript'>
                  /* <![CDATA[ */
                  var <?php echo esc_html($this->prefix); ?>_fbuilder_config<?php echo esc_html('_'.$this->print_counter); ?> = {"obj":"{\"pub\":true,\"identifier\":\"<?php echo esc_html('_'.$this->print_counter); ?>\",\"messages\": {\n    \t                \t\"required\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_is_required', CP_APPBOOK_DEFAULT_vs_text_is_required));?>\",\"maxapp\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_maxapp', CP_APPBOOK_DEFAULT_vs_text_maxapp));?>\",\"language\": \"<?php echo str_replace(array('"'),array('\\"'),$calendar_language);?>\",\"date_format\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('date_format', 'mm/dd/yy'));?>\",\n    \t                \t\"email\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_is_email', CP_APPBOOK_DEFAULT_vs_text_is_email));?>\",\n    \t                \t\"datemmddyyyy\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_datemmddyyyy', CP_APPBOOK_DEFAULT_vs_text_datemmddyyyy));?>\",\n    \t                \t\"dateddmmyyyy\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_dateddmmyyyy', CP_APPBOOK_DEFAULT_vs_text_dateddmmyyyy));?>\",\n    \t                \t\"number\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_number', CP_APPBOOK_DEFAULT_vs_text_number));?>\",\n    \t                \t\"digits\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_digits', CP_APPBOOK_DEFAULT_vs_text_digits));?>\",\n    \t                \t\"max\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_max', CP_APPBOOK_DEFAULT_vs_text_max));?>\",\n    \t                \t\"min\": \"<?php echo str_replace(array('"'),array('\\"'),$this->get_option('vs_text_min', CP_APPBOOK_DEFAULT_vs_text_min));?>\",\"previous\": \"<?php echo str_replace(array('"'),array('\\"'),$previous_label); ?>\",\"next\": \"<?php echo str_replace(array('"'),array('\\"'),$next_label); // phpcs:ignore WordPress.Security.EscapeOutput
                  ?>\"\n    \t                }}"};
                  /* ]]> */
                  </script>
-                 <script type='text/javascript' src='<?php echo esc_attr($this->fixurl($this->get_site_url( false ) ,'cp_cpappb_resources=public')); ?>'></script>
-                 <script type='text/javascript' src='<?php echo esc_attr($this->fixurl($this->get_site_url( false ) ,'cp_cpappb_resources=customjs')); ?>'></script>
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($this->fixurl($this->get_site_url( false ) ,'cp_cpappb_resources=public')); ?>'></script>
+                 <?php // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Fallback alternative if wp_head() or wp_footer() are missing from the theme. ?><script type='text/javascript' src='<?php echo esc_attr($this->fixurl($this->get_site_url( false ) ,'cp_cpappb_resources=customjs')); ?>'></script>
                  <!--/noptimize-->
             <?php
         }
@@ -893,7 +897,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     function insert_button() {
         global $wpdb;
         $options = '';
-        $calendars = $wpdb->get_results( 'SELECT * FROM '.$wpdb->prefix.$this->table_items); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $calendars = $wpdb->get_results( 'SELECT * FROM '.$wpdb->prefix."cpappbk_forms"); 
         foreach($calendars as $item)
             $options .= '<option value="'.intval($item->id).'">'.esc_html($item->form_name).'</option>';
 
@@ -917,7 +921,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         global $wpdb;
         $current_user = wp_get_current_user();
         $current_user_access = current_user_can('manage_options');
-        $rows = $wpdb->get_results("SELECT id,form_name,cp_user_access FROM ".$wpdb->prefix.$this->table_items." ORDER BY form_name"); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $rows = $wpdb->get_results("SELECT id,form_name,cp_user_access FROM ".$wpdb->prefix."cpappbk_forms ORDER BY form_name"); 
         $forms = array();
 
         $forms[] = array (
@@ -1053,10 +1057,11 @@ public function render_form_admin( $atts ) {
 
     $form_id = intval( $atts['formId'] );
 
-    // 2. Run the query ONCE, and only select the ID to save memory.
-    $table_name = $wpdb->prefix . $this->table_items;
-    $query      = $wpdb->prepare( "SELECT id FROM {$table_name} WHERE id = %d", $form_id );
-    $myrows     = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+    // 2. Run the query ONCE, and only select the ID to save memory.    
+    $table_name = $wpdb->prefix . 'cpappbk_forms';
+    $myrows = $wpdb->get_results( 
+        $wpdb->prepare( "SELECT id FROM {$table_name} WHERE id = %d", $form_id ) 
+    );
 
     // If the form doesn't exist in the DB, bail early.
     if ( empty( $myrows ) ) {
@@ -1316,12 +1321,12 @@ public function render_form_admin( $atts ) {
 
 
         function _php2MySqlTime( $phpDate ) {
-            return date("Y-m-d H:i:s", $phpDate);
+            return gmdate("Y-m-d H:i:s", $phpDate);
         }
 
 
         function _php2JsTime( $phpDate ) {
-            return @date("m/d/Y H:i", $phpDate);
+            return @gmdate("m/d/Y H:i", $phpDate);
         }
 
 
@@ -1347,8 +1352,8 @@ public function render_form_admin( $atts ) {
         $ret['error'] = null;
         $d1 = _js2PhpTime(sanitize_text_field($_POST["startdate"]));
         $d2 = _js2PhpTime(sanitize_text_field($_POST["enddate"]));
-        $d1 = mktime(0, 0, 0,  date("m", $d1), date("d", $d1), date("Y", $d1));
-        $d2 = mktime(0, 0, 0, date("m", $d2), date("d", $d2), date("Y", $d2))+24*60*60-1;
+        $d1 = mktime(0, 0, 0,  gmdate("m", $d1), gmdate("d", $d1), gmdate("Y", $d1));
+        $d2 = mktime(0, 0, 0, gmdate("m", $d2), gmdate("d", $d2), gmdate("Y", $d2))+24*60*60-1;
         $ret["start"] = _php2JsTime($d1);
         $ret["end"] = _php2JsTime($d2);
 
@@ -1377,7 +1382,7 @@ public function render_form_admin( $atts ) {
         }
         $dataoutput = json_encode($ret);
         do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
-        echo $dataoutput;
+        echo $dataoutput; // phpcs:ignore WordPress.Security.EscapeOutput
         exit;
     }
 
@@ -1427,13 +1432,15 @@ public function render_form_admin( $atts ) {
             }
 
             if ($_REQUEST['cp_app_action'] != 'mv' || get_option('cp_cpappb_sch_admin_blockedt','') == 'Yes')
-                $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." where formid=%d", $formid); 
+                $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix."cpappbk_messages where formid=%d", $formid); 
             else
-                $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." where formid=%d AND notifyto<>%s", $formid, $this->blocked_by_admin_indicator);
+                $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix."cpappbk_messages where formid=%d AND notifyto<>%s", $formid, $this->blocked_by_admin_indicator);
             
             do_action( 'cpappb_cache_check', $formid, $dataquery );
             
-            $myrows = $wpdb->get_results( $dataquery ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            // Ignore the sniffer, the query is properly prepared, but it has to be passed to the cache action 
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $myrows = $wpdb->get_results( $dataquery ); 
             
             $tmp2 = array();
 
@@ -1480,7 +1487,8 @@ public function render_form_admin( $atts ) {
             else {
                 $dataoutput = json_encode($tmp2);
                 do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
-                echo $dataoutput; //{type:"all",d:"",h1:8,m1:0,h2:17,m2:0}                
+                echo $dataoutput; // phpcs:ignore WordPress.Security.EscapeOutput
+                //{type:"all",d:"",h1:8,m1:0,h2:17,m2:0}                
             }
 		    exit;
         }
@@ -1655,7 +1663,7 @@ public function render_form_admin( $atts ) {
         $params = array();
         $params["final_price"] = $price;
         $params["final_price_short"] = number_format($price,0);
-        $params["request_timestamp"] = $this->format_date(date("Y-m-d", current_time('timestamp'))). " ". (date("H:i:s", current_time('timestamp')));
+        $params["request_timestamp"] = $this->format_date(gmdate("Y-m-d", current_time('timestamp'))). " ". (gmdate("H:i:s", current_time('timestamp')));
         $params["apps"] = $apps;
         foreach ($apps as $appitem)
         {
@@ -1716,7 +1724,7 @@ public function render_form_admin( $atts ) {
         //---------------------------
         $current_user = wp_get_current_user();
         $params["username"] = $current_user->user_login;
-        $this->add_field_verify($wpdb->prefix.$this->table_messages, "whoadded");
+        $this->add_field_verify($wpdb->prefix."cpappbk_messages", "whoadded");
 
         $to = $this->get_option('cu_user_email_field', CP_APPBOOK_DEFAULT_cu_user_email_field);
         $sanitized_email = sanitize_email( ( !empty($posted_items[$to.$sequence]) ? $posted_items[$to.$sequence] : '' ) );
@@ -1729,7 +1737,7 @@ public function render_form_admin( $atts ) {
             return; // in the case it shouldn't break the whole process
         }
 
-        $rows_affected = $wpdb->insert( $wpdb->prefix.$this->table_messages, array( 'formid' => $this->item,
+        $rows_affected = $wpdb->insert( $wpdb->prefix."cpappbk_messages", array( 'formid' => $this->item,
                                                                                     'time' => current_time('mysql'),
                                                                                     'ipaddr' => ( get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP)? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '' ),
                                                                                     'notifyto' => $sanitized_email,
@@ -1743,7 +1751,7 @@ public function render_form_admin( $atts ) {
             exit;
         }
 
-        // $myrows = $wpdb->get_results( "SELECT MAX(id) as max_id FROM ".$wpdb->prefix.$this->table_messages );
+        // $myrows = $wpdb->get_results( "SELECT MAX(id) as max_id FROM ".$wpdb->prefix."cpappbk_messages" );
         $item_number = $wpdb->insert_id; // $myrows[0]->max_id;
 
 	    // Call action for data processing
@@ -1756,7 +1764,7 @@ public function render_form_admin( $atts ) {
 	     */
 	    do_action_ref_array( 'cpappb_process_data', array(&$params) );
 
-        $wpdb->update( $wpdb->prefix.$this->table_messages,
+        $wpdb->update( $wpdb->prefix."cpappbk_messages",
                        array( 'posted_data' => serialize($params) ),
                        array ( 'id' => $item_number),
                        array( '%s' ),
@@ -1795,7 +1803,7 @@ public function render_form_admin( $atts ) {
 
         // START: custom modification to verify double booking
         $blockedstatuses = explode(",", ',Attended');
-        $latestitems = $wpdb->get_results($wpdb->prepare("SELECT posted_data FROM ".$wpdb->prefix.$this->table_messages." WHERE formid=%d ORDER BY ID DESC LIMIT 2000",$this->item));  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $latestitems = $wpdb->get_results($wpdb->prepare("SELECT posted_data FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d ORDER BY ID DESC LIMIT 2000",$this->item));  
         foreach ($latestitems as $latestitem)
         {
             $latestdata = unserialize($latestitem->posted_data);
@@ -1828,7 +1836,7 @@ public function render_form_admin( $atts ) {
                         return true;  // OK, spaces available
                     }
                     if ($is_double_check)
-                        $wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix.$this->table_messages." WHERE id=%d",$is_double_check));  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                        $wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d",$is_double_check));  
                     return false; // wrong, already booked
                 }
 
@@ -1843,9 +1851,16 @@ public function render_form_admin( $atts ) {
         global $wpdb;
         $count = 0;
         // verification for the latest 1000 submissions
+        $like_date = '%' . $wpdb->esc_like( $date ) . '%';
+
         $latestitems = $wpdb->get_results(
-                           $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE formid=%d AND posted_data like '%".esc_sql($date)."%' ORDER BY ID DESC LIMIT 0,1000",$this->item) 
-                         ); 
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cpappbk_messages WHERE formid = %d AND posted_data LIKE %s ORDER BY ID DESC LIMIT 0, 1000",
+                $this->item,
+                $like_date
+            )
+        );                         
+                         
         foreach ($latestitems as $item)
         {
             $latestdata = unserialize($item->posted_data);
@@ -1932,7 +1947,7 @@ public function render_form_admin( $atts ) {
     public function extract_appointments( $form, $data, $sequence ) {
         $apps = array();
         $subid = 0;
-        if (is_admin() || (isset($_POST["bccf_payment_option_paypal"]) && $_POST["bccf_payment_option_paypal"] == '0') || defined('CPAPPHOURBK_BLOCK_TIMES_PROCESS'))
+        if (is_admin() || defined('CPAPPHOURBK_BLOCK_TIMES_PROCESS'))
 		{
             if (is_admin() && isset($_POST["statusbox"]))
                 $status = sanitize_text_field($_POST["statusbox"]);
@@ -1962,8 +1977,8 @@ public function render_form_admin( $atts ) {
                                          'serviceindex' => $item_split[2],
                                          'service' => $field->services[ $item_split[2] ]->name,
                                          'duration' => $field->services[ $item_split[2] ]->duration,
-                                         'price' => 0, //$field->services[ $item_split[2] ]->price,
-                                         'date' =>  date("Y-m-d", $sdate),
+                                         'price' => $field->services[ $item_split[2] ]->price,
+                                         'date' =>  gmdate("Y-m-d", $sdate),
                                          'slot' => sanitize_text_field($item_split[1]),
                                          'military' => (!empty($field->militaryTime) ? $field->militaryTime : 0),
                                          'field' => $field->name,
@@ -1972,7 +1987,7 @@ public function render_form_admin( $atts ) {
                                          );
                 }
                 //if ($fieldtotalcost < $fieldpostedcost)      // this is to support javascript price calculations
-                    $apps[count($apps)-1]["price"] = $fieldpostedcost;
+                //    $apps[count($apps)-1]["price"] = $fieldpostedcost;
             }
         return $apps;
     }
@@ -2031,10 +2046,10 @@ public function render_form_admin( $atts ) {
         $format = str_replace( 'DD', 'K', $format );
         $format = str_replace( 'MM', 'Q', $format );
 
-        $dconv = date( $format, strtotime($date) );
+        $dconv = gmdate( $format, strtotime($date) );
 
-        $dconv = str_replace( 'K', ucfirst ( __( date( 'l', strtotime( $date ) ) ,'appointment-hour-booking') ), $dconv );
-        $dconv = str_replace( 'Q', ucfirst ( __( date( 'F', strtotime( $date ) ) ,'appointment-hour-booking') ), $dconv );
+        $dconv = str_replace( 'K', ucfirst ( __( gmdate( 'l', strtotime( $date ) ) ,'appointment-hour-booking') ), $dconv );
+        $dconv = str_replace( 'Q', ucfirst ( __( gmdate( 'F', strtotime( $date ) ) ,'appointment-hour-booking') ), $dconv );
 
         return $dconv;
     }
@@ -2043,9 +2058,9 @@ public function render_form_admin( $atts ) {
 
         global $wpdb;
 
-        $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE id=%d", $itemnumber) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", $itemnumber) ); 
         $params = unserialize($myrows[0]->posted_data);
-        $mycalendarrows = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.$this->table_items.' WHERE `id`=%d', $myrows[0]->formid) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $mycalendarrows = $wpdb->get_results( $wpdb->prepare('SELECT * FROM '.$wpdb->prefix.'cpappbk_forms WHERE `id`=%d', $myrows[0]->formid) ); 
 
         $this->item = intval($myrows[0]->formid);
 
@@ -2058,7 +2073,7 @@ public function render_form_admin( $atts ) {
                   ."*********************************\n";
 
             $basic_data = "IP: ".$myrows[0]->ipaddr."\n"
-              ."Server Time:  ".date("Y-m-d H:i:s", current_time('timestamp'))."\n";
+              ."Server Time:  ".gmdate("Y-m-d H:i:s", current_time('timestamp'))."\n";
 
 		    /**
 		     *	Includes additional information to the email's message,
@@ -2066,7 +2081,7 @@ public function render_form_admin( $atts ) {
 		     */
 		    $basic_data = apply_filters( 'cpappb_additional_information',  $basic_data, $myrows[0]->ipaddr );
 		    $params["additional"] = $basic_data;
-            $params["server_time"] = date("Y-m-d H:i:s", current_time('timestamp'));
+            $params["server_time"] = gmdate("Y-m-d H:i:s", current_time('timestamp'));
 		    $buffer .= $basic_data;
         }
 
@@ -2211,7 +2226,7 @@ public function render_form_admin( $atts ) {
         
         foreach ($attachments as $item)
             if (substr($item,0,strlen(WP_CONTENT_DIR . '/uploads/')) == WP_CONTENT_DIR . '/uploads/' && pathinfo($item, PATHINFO_EXTENSION) == 'ics')
-                @unlink($item);
+                wp_delete_file($item);
 
     }
 
@@ -2286,7 +2301,7 @@ public function render_form_admin( $atts ) {
                     $this->setId($calendar);
                 else
                 {
-                    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items ); 
+                    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" ); 
                     $this->setId($myrows[0]->id);
                 }
                 
@@ -2295,8 +2310,8 @@ public function render_form_admin( $atts ) {
                 
                     if ($this->get_option('date_format', 'mm/dd/yy') == 'dd/mm/yy')
                         $rawfrom = str_replace('/','.',$rawfrom);
-                    $from = date("Y-m-d H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])));
-                    $to = date("Y-m-d H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"])));
+                    $from = gmdate("Y-m-d H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])));
+                    $to = gmdate("Y-m-d H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"])));
                     $duration = ceil((strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"])) -  strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])))  / 60);
                             
                     
@@ -2307,8 +2322,8 @@ public function render_form_admin( $atts ) {
                                       'service' => __('[all services]','appointment-hour-booking'),
                                       'duration' => $duration,
                                       'price' => 0, //$field->services[ $item_split[2] ]->price,
-                                      'date' => date("Y-m-d", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"]))),
-                                      'slot' => date("H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])))."/". date("H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"]))),
+                                      'date' => gmdate("Y-m-d", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"]))),
+                                      'slot' => gmdate("H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])))."/". gmdate("H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"]))),
                                       'military' => 0,
                                       'field' => '',
                                       'quant' => 0
@@ -2320,7 +2335,7 @@ public function render_form_admin( $atts ) {
                      $params = array();
                      $params["apps"] = $apps;
                      $current_user = wp_get_current_user();
-                     $rows_affected = $wpdb->insert( $wpdb->prefix.$this->table_messages, array( 'formid' => $calendar,
+                     $rows_affected = $wpdb->insert( $wpdb->prefix."cpappbk_messages", array( 'formid' => $calendar,
                                                                                                  'time' => current_time('mysql'),
                                                                                                  'ipaddr' => (get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP)?$_SERVER['REMOTE_ADDR']:''),
                                                                                                  'notifyto' => $this->blocked_by_admin_indicator,
@@ -2386,7 +2401,7 @@ public function render_form_admin( $atts ) {
             if ($posted_items["cccharsets"] != '')
             {
                 $target_charset = str_replace('`','``',sanitize_text_field($posted_items["cccharsets"]));
-                $tables = array( $wpdb->prefix.$this->table_messages, $wpdb->prefix.$this->table_items );
+                $tables = array( $wpdb->prefix."cpappbk_messages", $wpdb->prefix."cpappbk_forms" );
                 foreach ($tables as $tab)
                 {
                     $myrows = $wpdb->get_results( "DESCRIBE `".$this->sanitizeTableName($tab)."`" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
@@ -2422,19 +2437,19 @@ public function render_form_admin( $atts ) {
 
         if (false == get_option('AHB_ONE_TIME_3UPDATE',false))
         {
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'fp_from_name');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_nmore');
-			$this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_nomore');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_cost');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_cancel');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_quantity');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'calendar_language');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'date_format');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'vs_text_maxapp');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'defaultstatus');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'defaultpaidstatus');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'cp_user_access_settings');
-            $this->add_field_verify($wpdb->prefix.$this->table_items, 'display_emails_endtime');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'fp_from_name');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'vs_text_nmore');
+			$this->add_field_verify($wpdb->prefix."cpappbk_forms", 'vs_text_nomore');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'vs_text_cost');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'vs_text_cancel');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'vs_text_quantity');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'calendar_language');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'date_format');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'vs_text_maxapp');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'defaultstatus');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'defaultpaidstatus');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'cp_user_access_settings');
+            $this->add_field_verify($wpdb->prefix."cpappbk_forms", 'display_emails_endtime');
             update_option('AHB_ONE_TIME_3UPDATE',true);
         }
         $_pdata = $_POST;
@@ -2517,10 +2532,10 @@ public function render_form_admin( $atts ) {
                       'cv_text_enter_valid_captcha' => sanitize_text_field($_pdata['cv_text_enter_valid_captcha'])
     	);
 
-        $wpdb->update( $wpdb->prefix.$this->table_items, $data, array( 'id' => $this->item ));
+        $wpdb->update( $wpdb->prefix."cpappbk_forms", $data, array( 'id' => $this->item ));
 
         $data = array( 'fp_from_name' => sanitize_text_field($_pdata['fp_from_name']) );
-        $wpdb->update( $wpdb->prefix.$this->table_items, $data, array( 'id' => $this->item ));
+        $wpdb->update( $wpdb->prefix."cpappbk_forms", $data, array( 'id' => $this->item ));
 
         if (isset($_pdata["savepublish"]))
         {
@@ -2584,28 +2599,47 @@ public function render_form_admin( $atts ) {
             $form = array();
 
         $cond = '';
-        if ($this->get_param("search")) $cond .= " AND (data like '%".esc_sql($this->get_param("search"))."%' OR posted_data LIKE '%".esc_sql($this->get_param("search"))."%')";
 
-        $rawfrom = (isset($_GET["dfrom"]) ? sanitize_text_field($_GET["dfrom"]) : '');
-        $rawto = (isset($_GET["dto"]) ? sanitize_text_field(@$_GET["dto"]) : '');
-        if ($this->get_option('date_format', 'mm/dd/yy') == 'dd/mm/yy')
-        {
-            $rawfrom = str_replace('/','.',$rawfrom);
-            $rawto = str_replace('/','.',$rawto);
+        if ( $this->get_param( 'search' ) ) {
+            $search = $this->get_param( 'search' );
+            $like   = '%' . $wpdb->esc_like( $search ) . '%';           
+            $cond .= $wpdb->prepare( ' AND (data LIKE %s OR posted_data LIKE %s)', $like, $like );
         }
 
-        if ($this->get_param("dfrom")) $cond .= " AND (`time` >= '".esc_sql(date("Y-m-d",strtotime($rawfrom)))."')";
-        if ($this->get_param("dto")) $cond .= " AND (`time` <= '".esc_sql(date("Y-m-d",strtotime($rawto)))." 23:59:59')";
-        if ($this->item != 0) $cond .= " AND formid=".intval($this->item);
+        $rawfrom = isset( $_GET['dfrom'] ) ? sanitize_text_field( wp_unslash( $_GET['dfrom'] ) ) : '';
+        $rawto   = isset( $_GET['dto'] )   ? sanitize_text_field( wp_unslash( $_GET['dto'] ) ) : '';
 
+        if ( $this->get_option( 'date_format', 'mm/dd/yy' ) === 'dd/mm/yy' ) {
+            $rawfrom = str_replace( '/', '.', $rawfrom );
+            $rawto   = str_replace( '/', '.', $rawto );
+        }
 
-	    $events_query = "SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC";
-	    /**
-	     * Allows modify the query of messages, passing the query as parameter
-	     * returns the new query
-	     */
-	    $events_query = apply_filters( 'cpappb_csv_query', $events_query );
-	    $events = $wpdb->get_results( $events_query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        if ( $this->get_param( 'dfrom' ) ) {
+            $date_start = gmdate( 'Y-m-d', strtotime( $rawfrom ) );
+            $cond      .= $wpdb->prepare( ' AND (`time` >= %s)', $date_start );
+        }
+
+        if ( $this->get_param( 'dto' ) ) {
+            $date_end = gmdate( 'Y-m-d', strtotime( $rawto ) );
+            $cond    .= $wpdb->prepare( ' AND (`time` <= %s)', $date_end . ' 23:59:59' );
+        }
+
+        if ( $this->item != 0 ) {
+            $cond .= $wpdb->prepare( ' AND formid = %d', $this->item );
+        }
+
+        $table_name = $wpdb->prefix . 'cpappbk_messages';
+        $events_query = "SELECT * FROM {$table_name} WHERE 1=1 {$cond} ORDER BY `time` DESC";
+
+        /**
+         * Allows modify the query of messages, passing the query as parameter
+         * returns the new query
+         */
+        $events_query = apply_filters( 'cpappb_csv_query', $events_query );
+
+        // Ignore the sniffer warning since $cond contains properly prepared SQL snippets and is filtered
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $events = $wpdb->get_results( $events_query );
 
         if ($this->include_user_data_csv)
             $fields = array("ID", "Form", "Time", "IP Address", "email");
@@ -2685,7 +2719,7 @@ public function render_form_admin( $atts ) {
         $separator = get_option('CP_APPB_CSV_SEPARATOR',",");
         if ($separator == '') $separator = ',';
 
-        $filename = $this->generateSafeFileName(strtolower($this->get_option('form_name','export'))).'_'.date("m_d_y");
+        $filename = $this->generateSafeFileName(strtolower($this->get_option('form_name','export'))).'_'.gmdate("m_d_y");
 
         header("Content-type: application/octet-stream");
         header("Content-Disposition: attachment; filename=".$filename.".csv");
@@ -2747,12 +2781,30 @@ public function render_form_admin( $atts ) {
         $from = str_replace(',',' ',$from);
         $to = str_replace(',',' ',$to);
         
-        $from = date("Y-m-d",strtotime($from));
-        $to = date("Y-m-d",strtotime($to));
+        $from = gmdate("Y-m-d",strtotime($from));
+        $to = gmdate("Y-m-d",strtotime($to));
 
         // pre-select time-slots
         $selection = array();
-        $rows = $wpdb->get_results( $wpdb->prepare("SELECT notifyto,posted_data,data FROM ".$wpdb->prefix.$this->table_messages." WHERE ".($calendar?'formid='.intval($calendar).' AND ':'')."time<=%s ORDER BY time DESC LIMIT 0,10000", $to) );  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+        $table_name = $wpdb->prefix . 'cpappbk_messages';
+        if ( $calendar ) {
+            $rows = $wpdb->get_results( 
+                $wpdb->prepare( 
+                    "SELECT notifyto, posted_data, data FROM {$table_name} WHERE formid = %d AND time <= %s ORDER BY time DESC LIMIT 0, 10000", 
+                    $calendar, 
+                    $to 
+                ) 
+            );
+        } else {
+            $rows = $wpdb->get_results( 
+                $wpdb->prepare( 
+                    "SELECT notifyto, posted_data, data FROM {$table_name} WHERE time <= %s ORDER BY time DESC LIMIT 0, 10000", 
+                    $to 
+                ) 
+            );
+        }
+ 
         foreach($rows as $item)
         {
             $data = unserialize($item->posted_data);
@@ -2796,7 +2848,7 @@ public function render_form_admin( $atts ) {
         else
             $form = array();
 
-        $filename = $this->generateSafeFileName(strtolower($this->get_option('form_name','export'))).'_'.date("m_d_y");
+        $filename = $this->generateSafeFileName(strtolower($this->get_option('form_name','export'))).'_'.gmdate("m_d_y");
 
         header("Content-type: application/octet-stream");
         header("Content-Disposition: attachment; filename=".$filename.".csv");
@@ -2979,7 +3031,7 @@ public function render_form_admin( $atts ) {
 
         $last_sent_id = get_option('cp_cpappb_last_sent_id_'.$formid, '0');
         $events = $wpdb->get_results(
-                             $wpdb->prepare("SELECT * FROM ".$wpdb->prefix.$this->table_messages." WHERE formid=%d AND id>%d ORDER BY id ASC",$formid,$last_sent_id) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                             $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d AND id>%d ORDER BY id ASC",$formid,$last_sent_id) 
                                      );
 
         if ($wpdb->num_rows <= 0) // if no rows, return empty
@@ -3106,9 +3158,9 @@ public function render_form_admin( $atts ) {
         global $wpdb;
 
         $last_verified = get_option( 'cp_cpappb_last_verified', '' );
-        if ( $skip_verification || $last_verified == '' || $last_verified < date("Y-m-d H:i:s", strtotime("-1 minutes")) )  // verification to don't check too fast to avoid overloading the site
+        if ( $skip_verification || $last_verified == '' || $last_verified < gmdate("Y-m-d H:i:s", strtotime("-1 minutes")) )  // verification to don't check too fast to avoid overloading the site
         {
-            update_option('cp_cpappb_last_verified',date("Y-m-d H:i:s"));
+            update_option('cp_cpappb_last_verified',gmdate("Y-m-d H:i:s"));
             
             $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
 
@@ -3116,13 +3168,13 @@ public function render_form_admin( $atts ) {
             if (get_option('cp_cpappb_rep_enable', 'no') == 'yes' && get_option('cp_cpappb_rep_days', '') != '' && get_option('cp_cpappb_rep_emails', '') != '' )
             {
                 $formid = 0;
-                $verify_after = date("Y-m-d H:i:s", strtotime("-".get_option('cp_cpappb_rep_days', '')." days"));
+                $verify_after = gmdate("Y-m-d H:i:s", strtotime("-".get_option('cp_cpappb_rep_days', '')." days"));
                 $last_sent = get_option('cp_cpappb_last_sent'.$formid, '');
                 if ($last_sent == '' || $last_sent < $verify_after)  // check if this form needs to check for a new report
                 {
-                    update_option('cp_cpappb_last_sent'.$formid, date("Y-m-d ".(get_option('cp_cpappb_rep_hour', '')<'10'?'0':'').get_option('cp_cpappb_rep_hour', '').":00:00"));
+                    update_option('cp_cpappb_last_sent'.$formid, gmdate("Y-m-d ".(get_option('cp_cpappb_rep_hour', '')<'10'?'0':'').get_option('cp_cpappb_rep_hour', '').":00:00"));
                     $text = '';
-                    $forms = $wpdb->get_results("SELECT id,fp_from_email,form_name,rep_days,rep_hour,rep_emails,rep_subject,rep_emailformat,rep_message,rep_enable FROM ".$wpdb->prefix.$this->table_items);  // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                    $forms = $wpdb->get_results("SELECT id,fp_from_email,form_name,rep_days,rep_hour,rep_emails,rep_subject,rep_emailformat,rep_message,rep_enable FROM ".$wpdb->prefix."cpappbk_forms");  
                     // " WHERE rep_emails<>'' AND rep_enable='yes'"
                     $attachments = array();
                     foreach ($forms as $form)  // for each form with the reports enabled
@@ -3131,11 +3183,12 @@ public function render_form_admin( $atts ) {
                         if ($csv != '')
                         {
                             $text = "- ".substr_count($csv,",\n\"").' submissions from '.$form->form_name."\n";
-                            $filename = $this->generateSafeFileName(strtolower($form->form_name)).'_'.date("m_d_y");
-                            $filename = $tmp_dir . '/'.$filename .'.csv';
-                            $handle = fopen($filename, 'w');
-                            fwrite($handle,$csv);
-                            fclose($handle);
+                            $filename = $this->generateSafeFileName(strtolower($form->form_name)).'_'.gmdate("m_d_y");
+                            $filename = $tmp_dir . '/' . $filename . '.csv';
+                            require_once ABSPATH . 'wp-admin/includes/file.php';
+                            WP_Filesystem();
+                            global $wp_filesystem;
+                            $wp_filesystem->put_contents( $filename, $csv, FS_CHMOD_FILE );
                             $attachments[] = $filename;
                         }
                     }
@@ -3155,28 +3208,29 @@ public function render_form_admin( $atts ) {
                                     
                                     
                     foreach ($attachments as $file)
-                        @unlink($file);                                      
+                        wp_delete_file($file);                                      
                 }
             }
 
             // reports for specific forms
-            $forms = $wpdb->get_results("SELECT id,form_name,fp_from_email,rep_days,rep_hour,rep_emails,rep_subject,rep_emailformat,rep_message,rep_enable FROM ".$wpdb->prefix.$this->table_items." WHERE rep_emails<>'' AND rep_enable='yes'"); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $forms = $wpdb->get_results("SELECT id,form_name,fp_from_email,rep_days,rep_hour,rep_emails,rep_subject,rep_emailformat,rep_message,rep_enable FROM ".$wpdb->prefix."cpappbk_forms WHERE rep_emails<>'' AND rep_enable='yes'"); 
             foreach ($forms as $form)  // for each form with the reports enabled
             {
                 $formid = $form->id;
-                $verify_after = date("Y-m-d H:i:s", strtotime("-".$form->rep_days." days"));
+                $verify_after = gmdate("Y-m-d H:i:s", strtotime("-".$form->rep_days." days"));
                 $last_sent = get_option('cp_cpappb_last_sent'.$formid, '');
                 if ($skip_verification || $last_sent == '' || $last_sent < $verify_after)  // check if this form needs to check for a new report
                 {
-                    update_option('cp_cpappb_last_sent'.$formid, date("Y-m-d ".($form->rep_hour<'10'?'0':'').$form->rep_hour.":00:00"));
+                    update_option('cp_cpappb_last_sent'.$formid, gmdate("Y-m-d ".($form->rep_hour<'10'?'0':'').$form->rep_hour.":00:00"));
                     $csv = $this->get_records_csv($formid, $form->form_name);
                     if ($csv != '')
                     {
-                        $filename = $this->generateSafeFileName(strtolower($form->form_name)).'_'.date("m_d_y");
+                        $filename = $this->generateSafeFileName(strtolower($form->form_name)).'_'.gmdate("m_d_y");
                         $filename = $tmp_dir . '/'.$filename .'.csv';
-                        $handle = fopen($filename, 'w');
-                        fwrite($handle,$csv);
-                        fclose($handle);
+                        require_once ABSPATH . 'wp-admin/includes/file.php';
+                        WP_Filesystem();
+                        global $wp_filesystem;
+                        $wp_filesystem->put_contents( $filename, $csv, FS_CHMOD_FILE );
                         $attachments = array( $filename );
                         
                         $is_html_frep = ('html' == $form->rep_emailformat);
@@ -3192,7 +3246,7 @@ public function render_form_admin( $atts ) {
                         if ( $is_html_frep ) { remove_filter( 'wp_mail_content_type', $html_filter ); }
                         
                         foreach ( $attachments as $file )
-                            @unlink( $file );                                  
+                            wp_delete_file( $file );                                  
                     }
                 }
             } // end foreach
