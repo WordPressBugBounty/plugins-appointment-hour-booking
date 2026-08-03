@@ -1965,10 +1965,20 @@ public function render_form_admin( $atts ) {
                 $fieldpostedcost = floatval(@$data["tcost".$field->name.$sequence]);
                 foreach($apps_text as $app_item_text)
                 {
-                    $item_split = explode(' ',$app_item_text);
-                    $subid++;
+                    $item_split = explode(' ',$app_item_text);  
+                    if (!isset($item_split[2])) {
+                            continue; 
+                    }                    
                     $item_split[2] = intval($item_split[2]);
-                    $fieldtotalcost += floatval($field->services[ $item_split[2] ]->price);
+                    if (!isset($field->services[ $item_split[2] ])) {
+                        continue;
+                    }
+                    $quant = min(intval($item_split[3] ?? 1), intval($field->services[ $item_split[2] ]->capacity));
+                    if ($quant < 0) {
+                        $quant = 1;
+                    }
+                    $subid++;
+                    $fieldtotalcost += (floatval($field->services[ $item_split[2] ]->price) * $quant);
                     $sdate = strtotime($item_split[0]);
                     if ($sdate > 0)
                         $apps[] = array (
@@ -1977,12 +1987,12 @@ public function render_form_admin( $atts ) {
                                          'serviceindex' => $item_split[2],
                                          'service' => $field->services[ $item_split[2] ]->name,
                                          'duration' => $field->services[ $item_split[2] ]->duration,
-                                         'price' => $field->services[ $item_split[2] ]->price,
+                                         'price' => floatval($field->services[ $item_split[2] ]->price) * $quant,
                                          'date' =>  gmdate("Y-m-d", $sdate),
                                          'slot' => sanitize_text_field($item_split[1]),
                                          'military' => (!empty($field->militaryTime) ? $field->militaryTime : 0),
                                          'field' => $field->name,
-                                         'quant' => intval($item_split[3]),
+                                         'quant' => $quant,
                                          'sid' => (isset($field->services[ $item_split[2] ]->idx)?$field->services[ $item_split[2] ]->idx:'')  // service ID
                                          );
                 }

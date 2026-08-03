@@ -1,6 +1,6 @@
 <?php
 /*
-Documentation: https://goo.gl/w3kKoH
+Documentation: https://apphourbooking.dwbooster.com/documentation#mollie-addon
 */
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 

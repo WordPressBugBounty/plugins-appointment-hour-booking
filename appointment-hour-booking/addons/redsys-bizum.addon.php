@@ -1,6 +1,6 @@
 <?php
 /*
-Documentation: https://goo.gl/w3kKoH
+Documentation: 
 https://pagosonline.redsys.es/entornosPruebas.html
 https://pagosonline.redsys.es/codigosRespuesta.html
 */
