@@ -267,25 +267,24 @@ ahb_icalexp_checkorg();
             
             $charset_collate = $wpdb->get_charset_collate();
             
-            $table_name = $wpdb->prefix . esc_sql( $this->form_table );
+            $table_name = $wpdb->prefix . sanitize_key( $this->form_table );
             
             $sql = "CREATE TABLE {$table_name} (
-                    id mediumint(9) NOT NULL AUTO_INCREMENT,
-                    formid INT NOT NULL,
-                    cal_time_zone_modify varchar(255) DEFAULT '' NOT NULL ,
-                    observe_day_light varchar(255) DEFAULT '' NOT NULL ,
-                    ical_daylight_zone varchar(255) DEFAULT '' NOT NULL ,
-                    attachical varchar(10) DEFAULT '' NOT NULL ,
-                    base_summary TEXT DEFAULT '' NOT NULL ,
-                    base_description TEXT DEFAULT '' NOT NULL ,
-                    cal_tzid TEXT DEFAULT '' NOT NULL ,
-                    ical_uselocal TEXT DEFAULT '' NOT NULL ,
-                    UNIQUE KEY id (id)
-                ) $charset_collate;";
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                formid int NOT NULL,
+                cal_time_zone_modify varchar(255) DEFAULT '' NOT NULL,
+                observe_day_light varchar(255) DEFAULT '' NOT NULL,
+                ical_daylight_zone varchar(255) DEFAULT '' NOT NULL,
+                attachical varchar(10) DEFAULT '' NOT NULL,
+                base_summary text,
+                base_description text,
+                cal_tzid text,
+                ical_uselocal text,
+                UNIQUE KEY id (id)
+            ) $charset_collate;";
 
             require_once ABSPATH . 'wp-admin/includes/upgrade.php';
             dbDelta( $sql );
-
         } // end update_database
 
         /************************ PRIVATE METHODS *****************************/

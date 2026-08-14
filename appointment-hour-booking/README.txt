@@ -3,8 +3,8 @@ Contributors: codepeople
 Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 5.3.0
-Tested up to: 7.0
-Stable tag: 1.5.90
+Tested up to: 7.1
+Stable tag: 1.5.91
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -859,7 +859,12 @@ Please note that the pro features aren't advised as part of the free plugin in t
 = 1.5.90 =
 * Improved capacity validation
 
+= 1.5.91 =
+* iCal queries fix
+* Compatible with WordPress 7.1
+
 == Upgrade Notice ==
 
-= 1.5.90 =
-* Improved capacity validation
+= 1.5.91 =
+* iCal queries fix
+* Compatible with WordPress 7.1
