@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 5.3.0
 Tested up to: 7.1
-Stable tag: 1.5.91
+Stable tag: 1.5.92
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,9 @@ To install **Appointment Hour Booking**, follow these steps:
 5.	To insert the appointment hour booking calendar form into some content or post use the icon that will appear when editing contents
 
 == Frequently Asked Questions ==
+
+= Where do I report security bugs found in this plugin? =
+Please report security bugs found in the source code of the plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/10c78572-0fe0-409d-955d-1c5f28227d3a). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 = Q: What means each field in the appointment hour booking calendar settings area? =
 
@@ -863,8 +866,10 @@ Please note that the pro features aren't advised as part of the free plugin in t
 * iCal queries fix
 * Compatible with WordPress 7.1
 
+= 1.5.92 =
+* Report modification
+
 == Upgrade Notice ==
 
-= 1.5.91 =
-* iCal queries fix
-* Compatible with WordPress 7.1
+= 1.5.92 =
+* Report modification

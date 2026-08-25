@@ -32,7 +32,7 @@ if ($this->item != 0)
 
 $current_page = intval( (empty($_GET["p"])?0:$_GET["p"]));
 if (!$current_page) $current_page = 1;
-$records_per_page = 50;
+$records_per_page = 100;
 
 $date_start = '';
 $date_end = '';
