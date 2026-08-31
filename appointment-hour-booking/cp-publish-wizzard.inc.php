@@ -134,32 +134,6 @@ if ($this->get_param('cp_apphourbooking_do_action_loaded') == 'wizard') {
                         <?php esc_html_e('You can also publish the form in a post/page, use the dedicated icon','appointment-hour-booking'); ?> <?php echo '<img hspace="5" src="'.esc_attr(plugins_url('/images/cp_form.gif', __FILE__)).'" alt="'.esc_attr(__('Insert Appointment Hour Booking','appointment-hour-booking')).'" /></a>';     ?>
                         <?php esc_html_e('which has been added to your Upload/Insert Menu, just below the title of your Post/Page', 'appointment-hour-booking'); ?>
 
-                         <!-- <select name="publishpage">
-                         <?php
-                             $pages = get_pages();
-                             foreach ( $pages as $page ) {
-                               echo '<option value="' .  esc_attr($page->ID)  . '">';
-                               echo esc_html($page->post_title);
-                               echo '</option>';
-                             }
-                         ?>
-                        </select>
-                        -->
-                    </td>
-                </tr>
-                <tr valign="top" id="ppost" style="display:none">
-                    <th><label><?php esc_html_e('Select post','appointment-hour-booking'); ?></label></th>
-					<td>
-                        <select name="publishpost">
-                         <?php
-                             $pages = get_posts();
-                             foreach ( $pages as $page ) {
-                               echo '<option value="' .  intval($page->ID)  . '">';
-                               echo esc_html($page->post_title);
-                               echo '</option>';
-                             }
-                         ?>
-                        </select>
                     </td>
                 </tr>
             <tbody>
@@ -189,7 +163,6 @@ function mvpublish_displayviews(sel) {
 }
 
 function mvpublish_displayoption(sel) {
-    document.getElementById("ppost").style.display = 'none';
     document.getElementById("ppage").style.display = 'none';
     document.getElementById("posttitle").style.display = 'none';
     document.getElementById("subbtnnow").style.display = '';
