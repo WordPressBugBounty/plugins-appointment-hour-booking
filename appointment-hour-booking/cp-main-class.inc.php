@@ -1821,12 +1821,31 @@ public function render_form_admin( $atts ) {
                     //|| $latestdata["apps"][0]["cancelled"] == 'Pending'
                    )  // this checks for the latest submission in the database
                 {
+                    /** 
                     if (isset($_POST[$params["apps"][0]["field"].$sequence."_capacity"]))
                         $cap = sanitize_text_field($_POST[$params["apps"][0]["field"].$sequence."_capacity"]);
                     else
                         $cap = '';
                     $quantity = explode(';', $cap);
-                    $c1 = (isset($quantity[$params["apps"][0]["serviceindex"]]) ? intval($quantity[$params["apps"][0]["serviceindex"]]) : 0);
+                    $c1 = (isset($quantity[$params["apps"][0]["serviceindex"]]) ? intval($quantity[$params["apps"][0]["serviceindex"]]) : 0); 
+                    */
+
+                    // changed to get server side settings
+                    $c1 = 0;
+                    $field_name = isset($params["apps"][0]["field"]) ? $params["apps"][0]["field"] : '';
+                    $service_index = isset($params["apps"][0]["serviceindex"]) ? intval($params["apps"][0]["serviceindex"]) : -1;
+
+                    $form_data = json_decode($this->cleanJSON($this->get_option('form_structure', CP_APPBOOK_DEFAULT_form_structure)));
+
+                    if (is_array($form_data) && isset($form_data[0])) {
+                        foreach ($form_data[0] as $field) {
+                            if (isset($field->name) && $field->name === $field_name && isset($field->services[$service_index])) {
+                                $c1 = intval($field->services[$service_index]->capacity);
+                                break;
+                            }
+                        }
+                    }
+                    
                     if ($c1 == 0) $c1 = 1;
                     $selected_capacity = $c1 + ($is_double_check?1:0);
                     if (!$selected_capacity)
