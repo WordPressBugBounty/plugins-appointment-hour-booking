@@ -13,7 +13,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     public $table_messages = "cpappbk_messages";
     public $print_counter = 1;
     private $include_user_data_csv = false;
-    private $booking_form_nonce = false;
+    private $booking_form_nonce = true;
     public $CP_CFPP_global_templates;
     protected $postURL;
 
@@ -1801,72 +1801,117 @@ public function render_form_admin( $atts ) {
     public function performAdvancedDoubleBookingVerification( $params, $sequence = "_1", $is_double_check = false ) {
         global $wpdb;
 
-        // START: custom modification to verify double booking
-        $blockedstatuses = explode(",", ',Attended');
-        $latestitems = $wpdb->get_results($wpdb->prepare("SELECT posted_data FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d ORDER BY ID DESC LIMIT 2000",$this->item));  
-        foreach ($latestitems as $latestitem)
-        {
-            $latestdata = unserialize($latestitem->posted_data);
-            if (isset($latestdata["apps"]) && isset($latestdata["apps"][0]) && isset($params["apps"][0]) && $latestdata["apps"][0] && isset($latestdata["apps"][0]["date"]))
-            {
-                if (
-                    $latestdata["apps"][0]["date"] == $params["apps"][0]["date"] &&
-                    $latestdata["apps"][0]["slot"] == $params["apps"][0]["slot"] &&
-                    $latestdata["apps"][0]["service"] == $params["apps"][0]["service"] &&
-                    (  $latestdata["apps"][0]["cancelled"] == '' ||
-                       $latestdata["apps"][0]["cancelled"] == 'Attended' ||
-                       isset($latestdata["lock"]) ||
-                       in_array($latestdata["apps"][0]["cancelled"],$blockedstatuses)
-                       )
-                    //|| $latestdata["apps"][0]["cancelled"] == 'Pending'
-                   )  // this checks for the latest submission in the database
-                {
-                    /** 
-                    if (isset($_POST[$params["apps"][0]["field"].$sequence."_capacity"]))
-                        $cap = sanitize_text_field($_POST[$params["apps"][0]["field"].$sequence."_capacity"]);
-                    else
-                        $cap = '';
-                    $quantity = explode(';', $cap);
-                    $c1 = (isset($quantity[$params["apps"][0]["serviceindex"]]) ? intval($quantity[$params["apps"][0]["serviceindex"]]) : 0); 
-                    */
+        // If there are no appointments in the cart, it's valid
+        if (!isset($params["apps"]) || !is_array($params["apps"]) || empty($params["apps"])) {
+            return true;
+        }
 
-                    // changed to get server side settings
-                    $c1 = 0;
-                    $field_name = isset($params["apps"][0]["field"]) ? $params["apps"][0]["field"] : '';
-                    $service_index = isset($params["apps"][0]["serviceindex"]) ? intval($params["apps"][0]["serviceindex"]) : -1;
+        // 1. Group submitted appointments to handle duplicates within the same cart
+        $requested_slots = array();
+        foreach ($params["apps"] as $current_app) {
+            if (!isset($current_app["date"]) || !isset($current_app["slot"]) || !isset($current_app["service"])) {
+                continue;
+            }
+            
+            // Create a unique key for the specific date, time, and service
+            $key = $current_app["date"] . '|' . $current_app["slot"] . '|' . $current_app["service"];
+            $quant = isset($current_app["quant"]) ? intval($current_app["quant"]) : 1;
+            
+            if (!isset($requested_slots[$key])) {
+                $requested_slots[$key] = array(
+                    'date' => $current_app["date"],
+                    'field' => isset($current_app["field"]) ? $current_app["field"] : '',
+                    'serviceindex' => isset($current_app["serviceindex"]) ? intval($current_app["serviceindex"]) : -1,
+                    'requested_quant' => 0
+                );
+            }
+            $requested_slots[$key]['requested_quant'] += $quant;
+        }
 
-                    $form_data = json_decode($this->cleanJSON($this->get_option('form_structure', CP_APPBOOK_DEFAULT_form_structure)));
+        if (empty($requested_slots)) {
+            return true;
+        }
 
-                    if (is_array($form_data) && isset($form_data[0])) {
-                        foreach ($form_data[0] as $field) {
-                            if (isset($field->name) && $field->name === $field_name && isset($field->services[$service_index])) {
-                                $c1 = intval($field->services[$service_index]->capacity);
-                                break;
-                            }
-                        }
+        // 2. Fetch recent bookings exactly ONCE to prevent N+1 queries
+        $latestitems = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, posted_data FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d ORDER BY ID DESC LIMIT 2000",
+                $this->item
+            )
+        );
+
+        // 3. Tally existing bookings for ONLY the requested slots in memory
+        $already_booked = array();
+        foreach ($latestitems as $item) {
+            // If verifying post-insert, skip the row we just inserted so we don't double-count it
+            if ($is_double_check && $item->id == $is_double_check) {
+                continue; 
+            }
+            
+            $latestdata = unserialize($item->posted_data);
+            if (!isset($latestdata["apps"]) || !is_array($latestdata["apps"])) continue;
+
+            // Check if the overall submission is locked (e.g., pending payment checkout)
+            $has_lock = isset($latestdata["lock"]);
+
+            // Check every stored appointment
+            foreach ($latestdata["apps"] as $app) {
+                $status = isset($app["cancelled"]) ? $app["cancelled"] : '';
+                
+                // Only count the slot if it has a valid occupied status or is actively locked
+                $is_occupied = $has_lock || $status === '' || $status === 'Pending' || $status === 'Attended';
+                
+                if (!$is_occupied) continue;
+                if (!isset($app["date"]) || !isset($app["slot"]) || !isset($app["service"])) continue;
+                
+                $key = $app["date"] . '|' . $app["slot"] . '|' . $app["service"];
+                
+                // If it matches a slot the user wants, add it to our memory map
+                if (isset($requested_slots[$key])) {
+                    if (!isset($already_booked[$key])) {
+                        $already_booked[$key] = 0;
                     }
-                    
-                    if ($c1 == 0) $c1 = 1;
-                    $selected_capacity = $c1 + ($is_double_check?1:0);
-                    if (!$selected_capacity)
-                        return true;
-                    if ($selected_capacity > 1 && $this->countBookingsFor($params["apps"][0]["date"], $params["apps"][0]["slot"], $params["apps"][0]["service"]) < $selected_capacity) // make additional verification
-                    {
-                        return true;  // OK, spaces available
-                    }
-                    if ($is_double_check)
-                        $wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d",$is_double_check));  
-                    return false; // wrong, already booked
+                    $quant = isset($app["quant"]) ? intval($app["quant"]) : 1;
+                    $already_booked[$key] += $quant;
                 }
-
             }
         }
+
+        // 4. Get form configuration for capacities
+        $form_data = json_decode($this->cleanJSON($this->get_option('form_structure', CP_APPBOOK_DEFAULT_form_structure)));
+
+        // 5. Verify every requested slot against its capacity
+        foreach ($requested_slots as $key => $slot_data) {
+            $capacity = 0; 
+            
+            if (is_array($form_data) && isset($form_data[0])) {
+                foreach ($form_data[0] as $field) {
+                    if (isset($field->name) && $field->name === $slot_data['field'] && isset($field->services[$slot_data['serviceindex']])) {
+                        $capacity = intval($field->services[$slot_data['serviceindex']]->capacity);
+                        break;
+                    }
+                }
+            }
+            // Fallback if capacity isn't found (identical to original logic)
+            if ($capacity == 0) $capacity = 1;
+
+            $current_booked = isset($already_booked[$key]) ? $already_booked[$key] : 0;
+            
+            // Fail if the capacity limit is exceeded
+            if (($current_booked + $slot_data['requested_quant']) > $capacity) {
+                // If this is a post-insertion check, delete the invalid row just like the original code did
+                if ($is_double_check) {
+                    $wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", $is_double_check));
+                }
+                return false; 
+            }
+        }
+
         return true;
-        // END: custom modification to verify double booking
     }
 
 
-    private function countBookingsFor( $date, $slot, $service ) {
+private function countBookingsFor( $date, $slot, $service ) {
         global $wpdb;
         $count = 0;
         // verification for the latest 1000 submissions
@@ -1883,13 +1928,18 @@ public function render_form_admin( $atts ) {
         foreach ($latestitems as $item)
         {
             $latestdata = unserialize($item->posted_data);
-            foreach ($latestdata["apps"] as $app)
+            if (!isset($latestdata["apps"]) || !is_array($latestdata["apps"])) continue;
+            
+            foreach ($latestdata["apps"] as $app) {
                 if ($app["date"] == $date &&
                     $app["slot"] == $slot &&
                     $app["service"] == $service &&
                     ($app["cancelled"] == '' || $app["cancelled"] == 'Pending' || $app["cancelled"] == 'Attended')
-                   )
-                   $count++;
+                   ) {
+                   $quant = isset($app["quant"]) ? intval($app["quant"]) : 1;
+                   $count += $quant;
+                }
+            }
         }
         return $count;
     }
