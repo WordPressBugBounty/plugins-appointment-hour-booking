@@ -13,7 +13,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     public $table_messages = "cpappbk_messages";
     public $print_counter = 1;
     private $include_user_data_csv = false;
-    private $booking_form_nonce = true;
+    private $booking_form_nonce = false;
     public $CP_CFPP_global_templates;
     protected $postURL;
 
