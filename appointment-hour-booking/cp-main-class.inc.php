@@ -1471,8 +1471,8 @@ public function render_form_admin( $atts ) {
                             if ($_REQUEST['cp_app_action'] == 'mv' && $this->check_current_user_access($formid))
                             {
                                 $data["INFO"] = $this->sanitize($myrows[$i]->data);
-                                $tmp2[count($tmp2)-1]["info"] = $this->replace_tags( $this->sanitize($t_content_admin), $data, false, $k);  //   $myrows[$i]->data;
-                                $tmp2[count($tmp2)-1]["e"] = $this->replace_tags( $this->sanitize($t_title_admin), $data, false, $k);  // sanitize_email($myrows[$i]->notifyto);
+                                $tmp2[count($tmp2)-1]["info"] = $this->replace_tags( $this->sanitize($t_content_admin), $data, false, $k, true);  //   $myrows[$i]->data;
+                                $tmp2[count($tmp2)-1]["e"] = $this->replace_tags( $this->sanitize($t_title_admin), $data, false, $k, true);  // sanitize_email($myrows[$i]->notifyto);
                             }
                         }
                 }
@@ -1945,7 +1945,7 @@ private function countBookingsFor( $date, $slot, $service ) {
     }
 
 
-    public function replace_tags ( $message, $params, $urlencode = false, $slotindex = '' ) {
+    public function replace_tags ( $message, $params, $urlencode = false, $slotindex = '', $strongs = false ) {
         if ($slotindex !== '' && isset($params["apps"][$slotindex]))
         {
             $slotindex++;
@@ -1963,8 +1963,10 @@ private function countBookingsFor( $date, $slot, $service ) {
         {
             if ($urlencode)
                 $value = urlencode( (is_array($value)?'':$value) );
-            $message = @str_replace('<'.'%'.$item.'%'.'>',(is_array($value)?($this->recursive_implode(", ",$value)):($value)),$message);
-            $message = @str_replace('%'.$item.'%',(is_array($value)?($this->recursive_implode(", ",$value)):($value)),$message);
+            $value = (is_array($value)?($this->recursive_implode(", ",$value)):($value));
+            if ($strongs) $value = esc_html($value);
+            $message = @str_replace('<'.'%'.$item.'%'.'>', $value, $message);
+            $message = @str_replace('%'.$item.'%', $value, $message);
         }
 
         for ($i=0;$i<500;$i++)
