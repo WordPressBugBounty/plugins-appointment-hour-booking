@@ -39,10 +39,16 @@ if ( ! is_admin() ) { echo 'Direct access not allowed.'; exit; }
     </style>
 
     <script>
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }    
         function filterHelp() {
             const input = document.getElementById("ahb-search-input");
             const filter = input.value.trim().toUpperCase();
+            const rawFilter = input.value.trim();
             const lists = document.querySelectorAll('.ahb-help-list');
+            
+            const safeFilter = escapeRegExp(rawFilter);
 
             lists.forEach(list => {
                 const items = list.querySelectorAll('li');
@@ -57,7 +63,7 @@ if ( ! is_admin() ) { echo 'Direct access not allowed.'; exit; }
                         item.style.display = ""; // Show
                         if (filter !== '') {
                             // Highlight matching text cleanly using Regex
-                            const regex = new RegExp(`(${filter})`, "gi");
+                            const regex = new RegExp(`(${safeFilter})`, "gi");
                             link.innerHTML = text.replace(regex, "<span class='highlight'>$1</span>");
                         }
                     } else {
