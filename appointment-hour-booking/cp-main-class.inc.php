@@ -1151,7 +1151,7 @@ public function render_form_admin( $atts ) {
                 wp_enqueue_style('cpahb-jquery-schedcalstylemv', plugins_url('/mv/css/main.css', __FILE__));
                 
                 wp_enqueue_script('underscore', includes_url('/js/underscore.min.js'), array('jquery'), null, true);
-                wp_enqueue_script('cpahb-schedcal-rrule', plugins_url('/mv/js/rrule.js', __FILE__));  
+                //wp_enqueue_script('cpahb-schedcal-rrule', plugins_url('/mv/js/rrule.js', __FILE__));  
                 wp_enqueue_script('cpahb-schedcal-common', plugins_url('/mv/js/Common.js', __FILE__));  
                 
                 if (file_exists(dirname( __FILE__ ).'/mv/language/multiview_lang_'.$this->mv_autodetect_language().'.js'))
