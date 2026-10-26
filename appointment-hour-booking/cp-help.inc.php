@@ -270,59 +270,61 @@ if ( ! is_admin() ) { echo 'Direct access not allowed.'; exit; }
     <li><span class="item-number">80 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/invalid-dates.png" target="_blank">invalid dates</a></li>
     <li><span class="item-number">81 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/license.png" target="_blank">license</a></li>
     <li><span class="item-number">82 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/load-speed-cache.png" target="_blank">load speed cache</a></li>
-    <li><span class="item-number">83 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/max-appointments.png" target="_blank">max appointments</a></li>
-    <li><span class="item-number">84 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/military-time.png" target="_blank">military time</a></li>
-    <li><span class="item-number">85 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/min-date-max-date.png" target="_blank">min date max date</a></li>
-    <li><span class="item-number">86 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/min-date-mixed.png" target="_blank">min date mixed</a></li>
-    <li><span class="item-number">87 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/mycred_activating_and_settings.png" target="_blank">mycred activating and settings</a></li>
-    <li><span class="item-number">88 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/mycred_enabling.png" target="_blank">mycred enabling</a></li>
-    <li><span class="item-number">89 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/mycred_visual_settings.png" target="_blank">mycred visual settings</a></li>
-    <li><span class="item-number">90 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/only-date-rule.png" target="_blank">only date rule</a></li>
-    <li><span class="item-number">91 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/order-payment-options-add-on.png" target="_blank">order payment options add on</a></li>
-    <li><span class="item-number">92 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/order-payment-options.png" target="_blank">order payment options</a></li>
-    <li><span class="item-number">93 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/overwrite-price-edit-edition.png" target="_blank">overwrite price edit edition</a></li>
-    <li><span class="item-number">94 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/padding-time.png" target="_blank">padding time</a></li>
-    <li><span class="item-number">95 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/paid-later-status.png" target="_blank">paid later status</a></li>
-    <li><span class="item-number">96 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/pay-later-label.png" target="_blank">pay later label</a></li>
-    <li><span class="item-number">97 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/payment-add-ons-settings.png" target="_blank">payment add ons settings</a></li>
-    <li><span class="item-number">98 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/payment-product-name.png" target="_blank">payment product name</a></li>
-    <li><span class="item-number">99 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/paypal-add-ons-settings.png" target="_blank">paypal add ons settings</a></li>
-    <li><span class="item-number">100 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/pdf-invoice-attached.png" target="_blank">pdf invoice attached</a></li>
-    <li><span class="item-number">101 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/pending-status-expiration.png" target="_blank">pending status expiration</a></li>
-    <li><span class="item-number">102 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/plugin-version-number.png" target="_blank">plugin version number</a></li>
-    <li><span class="item-number">103 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/query-monitor.png" target="_blank">query monitor</a></li>
-    <li><span class="item-number">104 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/razorpay.png" target="_blank">razorpay</a></li>
-    <li><span class="item-number">105 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/read-only-access.png" target="_blank">read only access</a></li>
-    <li><span class="item-number">106 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/revolut-payments.png" target="_blank">revolut payments</a></li>
-    <li><span class="item-number">107 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/sales-force-add-on-settings.png" target="_blank">sales force add on settings</a></li>
-    <li><span class="item-number">108 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-calendar-add-on-configuration.png" target="_blank">schedule calendar add on configuration</a></li>
-    <li><span class="item-number">109 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-calendar-add-on-enabling.png" target="_blank">schedule calendar add on enabling</a></li>
-    <li><span class="item-number">110 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-calendar-view.png" target="_blank">schedule calendar view</a></li>
-    <li><span class="item-number">111 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-colors-per-calendar.png" target="_blank">schedule colors per calendar</a></li>
-    <li><span class="item-number">112 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-list-view.png" target="_blank">schedule list view</a></li>
-    <li><span class="item-number">113 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/shortcode-quote-characters.png" target="_blank">shortcode quote characters</a></li>
-    <li><span class="item-number">114 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/show-total-cost.png" target="_blank">show total cost</a></li>
-    <li><span class="item-number">115 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/single-days-selection-interface.png" target="_blank">single days selection interface</a></li>
-    <li><span class="item-number">116 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/sms-button.png" target="_blank">sms button</a></li>
-    <li><span class="item-number">117 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/split-day-hours.png" target="_blank">split day hours</a></li>
-    <li><span class="item-number">118 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/square-settings.png" target="_blank">square settings</a></li>
-    <li><span class="item-number">119 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/stripe-add-on-settings.png" target="_blank">stripe add on settings</a></li>
-    <li><span class="item-number">120 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/submit-label.png" target="_blank">submit label</a></li>
-    <li><span class="item-number">121 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/summary-field-configuration.png" target="_blank">summary field configuration</a></li>
-    <li><span class="item-number">122 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/summary-field.png" target="_blank">summary field</a></li>
-    <li><span class="item-number">123 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/text-em-all-add-on.png" target="_blank">text em all add on</a></li>
-    <li><span class="item-number">124 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/troubleshoot-area.png" target="_blank">troubleshoot area</a></li>
-    <li><span class="item-number">125 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/twilio-sms.png" target="_blank">twilio sms</a></li>
-    <li><span class="item-number">126 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/uppercase-capitalize.png" target="_blank">uppercase capitalize</a></li>
-    <li><span class="item-number">127 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/user-registration-addon.png" target="_blank">user registration addon</a></li>
-    <li><span class="item-number">128 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/validation-texts.png" target="_blank">validation texts</a></li>
-    <li><span class="item-number">129 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/whatsapp-button-addon.png" target="_blank">whatsapp button addon</a></li>
-    <li><span class="item-number">130 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/widget.png" target="_blank">widget</a></li>
-    <li><span class="item-number">131 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/woocommerce-billing-autofill.png" target="_blank">woocommerce billing autofill</a></li>
-    <li><span class="item-number">132 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/working-dates.png" target="_blank">working dates</a></li>
-    <li><span class="item-number">133 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/zoom-oauth-permissions-scopes.png" target="_blank">zoom oauth permissions scopes</a></li>
-    <li><span class="item-number">134 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/zoom-oauth-setup-II.png" target="_blank">zoom oauth setup II</a></li>
-    <li><span class="item-number">135 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/zoom-oauth-setup.png" target="_blank">zoom oauth setup</a></li>
+    <li><span class="item-number">83 -</span><a href="https://apphourbooking.dwbooster.com/customdownloads/logs-addon.png" target="_blank">logs addon</a></li>
+    <li><span class="item-number">84 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/max-appointments.png" target="_blank">max appointments</a></li>
+    <li><span class="item-number">85 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/military-time.png" target="_blank">military time</a></li>
+    <li><span class="item-number">86 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/min-date-max-date.png" target="_blank">min date max date</a></li>
+    <li><span class="item-number">87 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/min-date-mixed.png" target="_blank">min date mixed</a></li>
+    <li><span class="item-number">88 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/mycred_activating_and_settings.png" target="_blank">mycred activating and settings</a></li>
+    <li><span class="item-number">89 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/mycred_enabling.png" target="_blank">mycred enabling</a></li>
+    <li><span class="item-number">90 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/mycred_visual_settings.png" target="_blank">mycred visual settings</a></li>
+    <li><span class="item-number">91 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/only-date-rule.png" target="_blank">only date rule</a></li>
+    <li><span class="item-number">92 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/order-payment-options-add-on.png" target="_blank">order payment options add on</a></li>
+    <li><span class="item-number">93 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/order-payment-options.png" target="_blank">order payment options</a></li>
+    <li><span class="item-number">94 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/overwrite-price-edit-edition.png" target="_blank">overwrite price edit edition</a></li>
+    <li><span class="item-number">95 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/padding-time.png" target="_blank">padding time</a></li>
+    <li><span class="item-number">96 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/paid-later-status.png" target="_blank">paid later status</a></li>
+    <li><span class="item-number">97 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/pay-later-label.png" target="_blank">pay later label</a></li>
+    <li><span class="item-number">98 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/payment-add-ons-settings.png" target="_blank">payment add ons settings</a></li>
+    <li><span class="item-number">99 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/payment-product-name.png" target="_blank">payment product name</a></li>
+    <li><span class="item-number">100 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/paypal-add-ons-settings.png" target="_blank">paypal add ons settings</a></li>
+    <li><span class="item-number">101 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/pdf-invoice-attached.png" target="_blank">pdf invoice attached</a></li>
+    <li><span class="item-number">102 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/pending-status-expiration.png" target="_blank">pending status expiration</a></li>
+    <li><span class="item-number">103 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/plugin-version-number.png" target="_blank">plugin version number</a></li>
+    <li><span class="item-number">104 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/query-monitor.png" target="_blank">query monitor</a></li>
+    <li><span class="item-number">105 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/razorpay.png" target="_blank">razorpay</a></li>
+    <li><span class="item-number">106 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/read-only-access.png" target="_blank">read only access</a></li>
+    <li><span class="item-number">107 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/revolut-payments.png" target="_blank">revolut payments</a></li>
+    <li><span class="item-number">108 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/sales-force-add-on-settings.png" target="_blank">sales force add on settings</a></li>
+    <li><span class="item-number">109 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-calendar-add-on-configuration.png" target="_blank">schedule calendar add on configuration</a></li>
+    <li><span class="item-number">110 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-calendar-add-on-enabling.png" target="_blank">schedule calendar add on enabling</a></li>
+    <li><span class="item-number">111 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-calendar-view.png" target="_blank">schedule calendar view</a></li>
+    <li><span class="item-number">112 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-colors-per-calendar.png" target="_blank">schedule colors per calendar</a></li>
+    <li><span class="item-number">113 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/schedule-list-view.png" target="_blank">schedule list view</a></li>
+    <li><span class="item-number">114 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/shortcode-quote-characters.png" target="_blank">shortcode quote characters</a></li>
+    <li><span class="item-number">115 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/show-total-cost.png" target="_blank">show total cost</a></li>
+    <li><span class="item-number">116 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/single-days-selection-interface.png" target="_blank">single days selection interface</a></li>
+    <li><span class="item-number">117 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/sms-button.png" target="_blank">sms button</a></li>
+    <li><span class="item-number">118 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/split-day-hours.png" target="_blank">split day hours</a></li>
+    <li><span class="item-number">119 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/square-settings.png" target="_blank">square settings</a></li>
+    <li><span class="item-number">120 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/stripe-add-on-settings.png" target="_blank">stripe add on settings</a></li>
+    <li><span class="item-number">121 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/submit-label.png" target="_blank">submit label</a></li>
+    <li><span class="item-number">122 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/summary-field-configuration.png" target="_blank">summary field configuration</a></li>
+    <li><span class="item-number">123 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/summary-field.png" target="_blank">summary field</a></li>
+    <li><span class="item-number">124 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/text-em-all-add-on.png" target="_blank">text em all add on</a></li>
+    <li><span class="item-number">125 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/troubleshoot-area.png" target="_blank">troubleshoot area</a></li>
+    <li><span class="item-number">126 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/twilio-sms.png" target="_blank">twilio sms</a></li>
+    <li><span class="item-number">127 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/uppercase-capitalize.png" target="_blank">uppercase capitalize</a></li>
+    <li><span class="item-number">128 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/user-registration-addon.png" target="_blank">user registration addon</a></li>
+    <li><span class="item-number">129 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/validation-texts.png" target="_blank">validation texts</a></li>
+    <li><span class="item-number">130 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/waiting-list-addon.png" target="_blank">waiting list addon</a></li>
+    <li><span class="item-number">131 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/whatsapp-button-addon.png" target="_blank">whatsapp button addon</a></li>
+    <li><span class="item-number">132 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/widget.png" target="_blank">widget</a></li>
+    <li><span class="item-number">133 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/woocommerce-billing-autofill.png" target="_blank">woocommerce billing autofill</a></li>
+    <li><span class="item-number">134 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/working-dates.png" target="_blank">working dates</a></li>
+    <li><span class="item-number">135 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/zoom-oauth-permissions-scopes.png" target="_blank">zoom oauth permissions scopes</a></li>
+    <li><span class="item-number">136 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/zoom-oauth-setup-II.png" target="_blank">zoom oauth setup II</a></li>
+    <li><span class="item-number">137 -</span> <a href="https://apphourbooking.dwbooster.com/customdownloads/zoom-oauth-setup.png" target="_blank">zoom oauth setup</a></li>
 </ul>
         </div>
     </div>
