@@ -590,7 +590,7 @@ $.extend(
                                 {
 		                            var current = me.getMinDate;
 		                        	var currenttime = current.getTime()-me.tzf(d)*60*60*1000;			                        
-			                        if (compactUsedSlots[i].t > currenttime)
+			                        if (compactUsedSlots[i].t >= currenttime)
 			                        {   
 		    	                        v = true;
 		    	                    }
