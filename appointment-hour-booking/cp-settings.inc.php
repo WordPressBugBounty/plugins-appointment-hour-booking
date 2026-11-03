@@ -179,6 +179,22 @@ jQuery(function(){
            ?>
           </select>
         </td>
+        </tr>
+        <!-- NEW: Report Content Mode Setting -->
+        <tr valign="top">
+        <th scope="row"><?php esc_html_e('Report Content Mode','appointment-hour-booking'); ?></th>
+        <td>
+          <?php $rep_mode = get_option('cp_cpappb_rep_mode', 'new'); ?>
+          <label style="font-weight:normal; display:block; margin-bottom:6px;">
+            <input type="radio" name="cp_cpappb_rep_mode" value="new" <?php checked($rep_mode, 'new'); ?> />
+            <?php esc_html_e('Only new/unread submissions (Current behavior)','appointment-hour-booking'); ?>
+          </label>
+          <label style="font-weight:normal; display:block;">
+            <input type="radio" name="cp_cpappb_rep_mode" value="active" <?php checked($rep_mode, 'active'); ?> />
+            <?php esc_html_e('Complete active booking list for the calendar','appointment-hour-booking'); ?>
+          </label>
+        </td>
+        </tr>
         <tr valign="top">
         <th scope="row"><?php esc_html_e('Send email from','appointment-hour-booking'); ?></th>
         <td><input type="text" name="cp_cpappb_fp_from_email" size="70" value="<?php echo esc_attr(get_option('cp_cpappb_fp_from_email', get_the_author_meta('user_email', get_current_user_id()) )); ?>" /></td>

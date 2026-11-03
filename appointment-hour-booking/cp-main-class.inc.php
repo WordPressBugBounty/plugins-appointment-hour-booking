@@ -1234,6 +1234,9 @@ public function render_form_admin( $atts ) {
    public function data_management_pluginsloaded() {
        
        cpappb_loading_add_ons();     
+
+       add_action( 'wp_ajax_cpappb_generate_ai_reply', array( $this, 'handle_generate_ai_reply_ajax' ) );
+       add_action( 'wp_ajax_cpappb_send_reply', array( $this, 'handle_send_reply_ajax' ) );
             
        if (isset($_GET["cp_cpappb_resources"]))
        {
@@ -1887,7 +1890,7 @@ public function render_form_admin( $atts ) {
             if (is_array($form_data) && isset($form_data[0])) {
                 foreach ($form_data[0] as $field) {
                     if (isset($field->name) && $field->name === $slot_data['field'] && isset($field->services[$slot_data['serviceindex']])) {
-                        $capacity = intval($field->services[$slot_data['serviceindex']]->capacity);
+                        $capacity = intval($field->services[$slot_data['serviceindex']]->capacity ?? 1);
                         break;
                     }
                 }
@@ -2044,8 +2047,9 @@ private function countBookingsFor( $date, $slot, $service ) {
                     if (!isset($field->services[ $item_split[2] ])) {
                         continue;
                     }
-                    $quant = min(intval($item_split[3] ?? 1), intval($field->services[ $item_split[2] ]->capacity));
-                    if ($quant < 0) {
+                    $service_capacity = max(1, intval($field->services[ $item_split[2] ]->capacity ?? 1));
+                    $quant = min(intval($item_split[3] ?? 1), $service_capacity);
+                    if ($quant <= 0) {
                         $quant = 1;
                     }
                     $subid++;
@@ -2443,6 +2447,7 @@ private function countBookingsFor( $date, $slot, $service ) {
             update_option( 'cp_cpappb_rep_enable', sanitize_text_field($posted_items["cp_cpappb_rep_enable"]));
             update_option( 'cp_cpappb_rep_days', sanitize_text_field($posted_items["cp_cpappb_rep_days"]));
             update_option( 'cp_cpappb_rep_hour', sanitize_text_field($posted_items["cp_cpappb_rep_hour"]));
+            update_option( 'cp_cpappb_rep_mode', (isset($posted_items["cp_cpappb_rep_mode"]) && $posted_items["cp_cpappb_rep_mode"] === 'active') ? 'active' : 'new');
             update_option( 'cp_cpappb_rep_emails', sanitize_text_field($posted_items["cp_cpappb_rep_emails"]));
             update_option( 'cp_cpappb_fp_from_email', sanitize_text_field($posted_items["cp_cpappb_fp_from_email"]));
             update_option( 'cp_cpappb_rep_subject', $this->clean_sanitize($posted_items["cp_cpappb_rep_subject"]));
@@ -3110,10 +3115,26 @@ private function countBookingsFor( $date, $slot, $service ) {
         $saved_item = $this->item;
         $this->item = $formid;
 
+        $rep_mode = get_option('cp_cpappb_rep_mode', 'new');
         $last_sent_id = get_option('cp_cpappb_last_sent_id_'.$formid, '0');
-        $events = $wpdb->get_results(
-                             $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d AND id>%d ORDER BY id ASC",$formid,$last_sent_id) 
-                                     );
+
+        if ($rep_mode === 'active') {
+            $events = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d AND notifyto<>%s ORDER BY id ASC",
+                    $formid,
+                    $this->blocked_by_admin_indicator
+                )
+            );
+        } else {
+            $events = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d AND id>%d ORDER BY id ASC",
+                    $formid,
+                    $last_sent_id
+                )
+            );
+        }
 
         if ($wpdb->num_rows <= 0) // if no rows, return empty
         {
@@ -3151,10 +3172,36 @@ private function countBookingsFor( $date, $slot, $service ) {
                $newfields[] = $fields[$j];
         $fields = $newfields;
 
-
+        $today = gmdate("Y-m-d", current_time('timestamp'));
         $values = array();
+
         foreach ($events as $item)
         {
+            if ($item->posted_data)
+                $data = unserialize($item->posted_data);
+            else
+                $data = array();
+
+            // In 'active' mode, include only submissions with at least one active, upcoming booking
+            if ($rep_mode === 'active') {
+                $has_active_booking = false;
+                if (isset($data["apps"]) && is_array($data["apps"])) {
+                    foreach ($data["apps"] as $app) {
+                        $app_status = isset($app["cancelled"]) ? $app["cancelled"] : '';
+                        $is_cancelled = in_array($app_status, array('Cancelled', 'Cancelled by customer', 'Rejected'), true);
+                        $is_upcoming = !empty($app["date"]) && $app["date"] >= $today;
+
+                        if (!$is_cancelled && $is_upcoming) {
+                            $has_active_booking = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$has_active_booking) {
+                    continue;
+                }
+            }
+
             $value = array();
             if (in_array('Submission ID',$fields)) $value[] = $item->id;
             if (in_array('Form',$fields)) $value[] = $this->get_option('form_name','');
@@ -3164,14 +3211,10 @@ private function countBookingsFor( $date, $slot, $service ) {
             if (in_array('email',$fields)) $value[] = sanitize_email($item->notifyto);
 
             $last_sent_id = $item->id;
-            if ($item->posted_data)
-                $data = unserialize($item->posted_data);
-            else
-                $data = array();
 
             $end = count($fields);
             for ($i=0; $i<$end; $i++)
-            { //if (isset($data[$fields[$i]]) ){
+            {
                 if (isset($data[$fields[$i]]))
                     $d = $data[$fields[$i]];
                 else if (!isset($value[$i]))
@@ -3202,7 +3245,16 @@ private function countBookingsFor( $date, $slot, $service ) {
                 }
             $values[] = $value;
         }
-        update_option('cp_cpappb_last_sent_id_'.$formid, $last_sent_id);
+
+        // If no matching bookings remain after filtering, return empty so no blank CSV is sent
+        if (empty($values)) {
+            $this->item = $saved_item;
+            return '';
+        }
+
+        if ($rep_mode !== 'active') {
+            update_option('cp_cpappb_last_sent_id_'.$formid, $last_sent_id);
+        }
 
 
         $separator = get_option('CP_APPB_CSV_SEPARATOR',",");
@@ -3347,6 +3399,134 @@ private function countBookingsFor( $date, $slot, $service ) {
             return $text;
     }
 
+
+    /**
+     * AJAX Handler: Generate Reply with Free Keyless AI (Pollinations.ai)
+     */
+    public function handle_generate_ai_reply_ajax() {
+        check_ajax_referer( 'cpappb_reply_nonce', 'nonce' );
+
+        $cal_id = isset( $_POST['cal_id'] ) ? intval( $_POST['cal_id'] ) : 0;
+        if ( ! current_user_can( 'edit_pages' ) && ! $this->check_current_user_access( $cal_id ) ) {
+            wp_send_json_error( __( 'Unauthorized access.', 'appointment-hour-booking' ) );
+        }
+
+        $original_message = isset( $_POST['original_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['original_message'] ) ) : '';
+        $instructions     = isset( $_POST['instructions'] ) && trim( $_POST['instructions'] ) !== ''
+            ? sanitize_text_field( wp_unslash( $_POST['instructions'] ) )
+            : 'Write a polite, helpful, and professional reply regarding their appointment booking.';
+
+        if ( empty( $original_message ) ) {
+            wp_send_json_error( __( 'Original booking message is empty.', 'appointment-hour-booking' ) );
+        }
+
+        $site_name     = get_bloginfo( 'name' );
+        $system_prompt = "You are a helpful customer support and booking assistant for '{$site_name}'. "
+                       . "Draft a direct email reply to the customer's booking submission below. "
+                       . "Follow the same language used by the customer unless instructed otherwise. "
+                       . "Output ONLY the email body text without a 'Subject:' line.";
+
+        $user_prompt = "Customer Booking Submission:\n{$original_message}\n\nAdmin Instructions for Reply:\n{$instructions}";
+
+        $url = 'https://text.pollinations.ai/' . rawurlencode( $system_prompt . "\n\n" . $user_prompt );
+
+        $response = wp_remote_get( $url, array(
+            'timeout' => 30,
+            'headers' => array(
+                'User-Agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_site_url(),
+            ),
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            wp_send_json_error( 'Error connecting to AI service: ' . $response->get_error_message() );
+        }
+
+        $status_code = wp_remote_retrieve_response_code( $response );
+        $body        = wp_remote_retrieve_body( $response );
+
+        if ( $status_code !== 200 || empty( trim( $body ) ) ) {
+            wp_send_json_error( 'AI service is temporarily busy (HTTP ' . $status_code . '). Please try again.' );
+        }
+
+        wp_send_json_success( array( 'reply' => trim( $body ) ) );
+    }
+
+
+    /**
+     * AJAX Handler: Send Email Reply & Log it in the Database
+     */
+    public function handle_send_reply_ajax() {
+        global $wpdb;
+        check_ajax_referer( 'cpappb_reply_nonce', 'nonce' );
+
+        $message_id = isset( $_POST['message_id'] ) ? intval( $_POST['message_id'] ) : 0;
+        $to_email   = isset( $_POST['to_email'] ) ? sanitize_email( wp_unslash( $_POST['to_email'] ) ) : '';
+        $subject    = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : '';
+        $reply_body = isset( $_POST['reply_body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reply_body'] ) ) : '';
+
+        $msg_row = null;
+        $form_id = 0;
+        if ( $message_id > 0 ) {
+            $msg_row = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cpappbk_messages WHERE id = %d",
+                $message_id
+            ) );
+            if ( $msg_row ) {
+                $form_id = intval( $msg_row->formid );
+            }
+        }
+
+        if ( ! current_user_can( 'edit_pages' ) && ! $this->check_current_user_access( $form_id ) ) {
+            wp_send_json_error( __( 'Unauthorized access.', 'appointment-hour-booking' ) );
+        }
+
+        if ( ! is_email( $to_email ) ) {
+            wp_send_json_error( __( 'Invalid recipient email address.', 'appointment-hour-booking' ) );
+        }
+        if ( empty( $subject ) || empty( $reply_body ) ) {
+            wp_send_json_error( __( 'Subject and message body are required.', 'appointment-hour-booking' ) );
+        }
+
+        $from_email = get_option( 'admin_email' );
+        $from_name  = get_bloginfo( 'name' );
+
+        if ( $form_id > 0 ) {
+            $this->setId( $form_id );
+            $configured_from = trim( $this->get_option( 'fp_from_email', '' ) );
+            if ( is_email( $configured_from ) ) {
+                $from_email = $configured_from;
+            }
+            $configured_name = trim( $this->get_option( 'fp_from_name', '' ) );
+            if ( ! empty( $configured_name ) ) {
+                $from_name = $configured_name;
+            }
+        }
+
+        $headers = array(
+            'Content-Type: text/plain; charset=UTF-8',
+            'From: "' . $from_name . '" <' . $from_email . '>',
+        );
+
+        $sent = wp_mail( $to_email, $subject, $reply_body, $headers );
+
+        if ( ! $sent ) {
+            wp_send_json_error( __( 'wp_mail() failed to send the email. Please check your SMTP settings.', 'appointment-hour-booking' ) );
+        }
+
+        // Append reply log to the booking record
+        if ( ! empty( $msg_row ) ) {
+            $updated_data = $msg_row->data . "\n--- Replied on " . current_time( 'Y-m-d H:i' ) . " ---\n" . $reply_body . "\n";
+            $wpdb->update(
+                $wpdb->prefix . 'cpappbk_messages',
+                array( 'data' => $updated_data ),
+                array( 'id' => $message_id ),
+                array( '%s' ),
+                array( '%d' )
+            );
+        }
+
+        wp_send_json_success( __( 'Reply sent successfully!', 'appointment-hour-booking' ) );
+    }
 
 } // end class
 
