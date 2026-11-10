@@ -1235,6 +1235,7 @@ public function render_form_admin( $atts ) {
        
        cpappb_loading_add_ons();     
 
+       add_action( 'wp_ajax_cpappb_toggle_ai_reply', array( $this, 'handle_toggle_ai_reply_ajax' ) );
        add_action( 'wp_ajax_cpappb_generate_ai_reply', array( $this, 'handle_generate_ai_reply_ajax' ) );
        add_action( 'wp_ajax_cpappb_send_reply', array( $this, 'handle_send_reply_ajax' ) );
             
@@ -3401,6 +3402,23 @@ private function countBookingsFor( $date, $slot, $service ) {
 
 
     /**
+     * AJAX Handler: Persist AI Reply Assistant Opt-In State (Off / On)
+     */
+    public function handle_toggle_ai_reply_ajax() {
+        check_ajax_referer( 'cpappb_reply_nonce', 'nonce' );
+
+        $cal_id = isset( $_POST['cal_id'] ) ? intval( $_POST['cal_id'] ) : 0;
+        if ( ! current_user_can( 'edit_pages' ) && ! $this->check_current_user_access( $cal_id ) ) {
+            wp_send_json_error( __( 'Unauthorized access.', 'appointment-hour-booking' ) );
+        }
+
+        $enabled = ( isset( $_POST['enabled'] ) && intval( $_POST['enabled'] ) === 1 ) ? '1' : '0';
+        update_option( 'cpappb_ai_reply_enabled', $enabled );
+
+        wp_send_json_success( array( 'enabled' => ( $enabled === '1' ) ) );
+    }
+
+    /**
      * AJAX Handler: Generate Reply with Free Keyless AI (Pollinations.ai)
      */
     public function handle_generate_ai_reply_ajax() {
@@ -3409,6 +3427,10 @@ private function countBookingsFor( $date, $slot, $service ) {
         $cal_id = isset( $_POST['cal_id'] ) ? intval( $_POST['cal_id'] ) : 0;
         if ( ! current_user_can( 'edit_pages' ) && ! $this->check_current_user_access( $cal_id ) ) {
             wp_send_json_error( __( 'Unauthorized access.', 'appointment-hour-booking' ) );
+        }
+
+        if ( get_option( 'cpappb_ai_reply_enabled', '0' ) !== '1' ) {
+            wp_send_json_error( __( 'AI Reply Assistant is disabled. Please turn it on first.', 'appointment-hour-booking' ) );
         }
 
         $original_message = isset( $_POST['original_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['original_message'] ) ) : '';

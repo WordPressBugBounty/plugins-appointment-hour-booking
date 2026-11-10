@@ -143,8 +143,10 @@ $events_query = apply_filters( 'cpappb_messages_query', $events_query );
 // Second Query: Items
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 $events = $wpdb->get_results( $events_query );
+
 $nonce = wp_create_nonce( 'cpappb_actions_booking' );
 $reply_nonce = wp_create_nonce( 'cpappb_reply_nonce' );
+$ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
 
 ?>
 <div class="wrap">
@@ -595,6 +597,72 @@ $reply_nonce = wp_create_nonce( 'cpappb_reply_nonce' );
     border-radius: 4px;
     margin-bottom: 16px;
 }
+.cpappb-ai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+.cpappb-ai-toggle-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d2327;
+    cursor: pointer;
+    user-select: none;
+}
+.cpappb-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+}
+.cpappb-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.cpappb-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #8c8f94;
+    transition: .2s;
+    border-radius: 20px;
+}
+.cpappb-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: .2s;
+    border-radius: 50%;
+}
+.cpappb-switch input:checked + .cpappb-slider {
+    background-color: #2271b1;
+}
+.cpappb-switch input:checked + .cpappb-slider:before {
+    transform: translateX(18px);
+}
+.cpappb-ai-notice {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #3c434a;
+}
+.cpappb-ai-controls {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #d0e3f5;
+}
 .cpappb-ai-row {
     display: flex;
     gap: 10px;
@@ -654,10 +722,27 @@ $reply_nonce = wp_create_nonce( 'cpappb_reply_nonce' );
         </div>
 
         <div class="cpappb-ai-box">
-            <label for="cpappb-ai-instructions" style="font-weight:600; color:#1d2327;">✨ <?php esc_html_e('AI Assistant Instructions (optional):','appointment-hour-booking'); ?></label>
-            <div class="cpappb-ai-row">
-                <input type="text" id="cpappb-ai-instructions" placeholder="<?php esc_attr_e('e.g., Confirm the booking for Tuesday at 10 AM and thank them','appointment-hour-booking'); ?>" />
-                <button type="button" class="button" id="cpappb-btn-ai" onclick="cp_generateAiReply();">✨ <?php esc_html_e('Generate with AI','appointment-hour-booking'); ?></button>
+            <div class="cpappb-ai-header">
+                <strong style="color:#1d2327;">✨ <?php esc_html_e('AI Reply Assistant','appointment-hour-booking'); ?></strong>
+                <label class="cpappb-ai-toggle-wrap" for="cpappb-ai-toggle">
+                    <span id="cpappb-ai-toggle-label"><?php echo $ai_reply_enabled ? esc_html__('On','appointment-hour-booking') : esc_html__('Off','appointment-hour-booking'); ?></span>
+                    <span class="cpappb-switch">
+                        <input type="checkbox" id="cpappb-ai-toggle" <?php checked( $ai_reply_enabled ); ?> onchange="cp_toggleAiAssistant(this);" />
+                        <span class="cpappb-slider"></span>
+                    </span>
+                </label>
+            </div>
+
+            <p class="cpappb-ai-notice">
+                <?php esc_html_e('Privacy Notice: When enabled, clicking "Generate with AI" sends your site name, the Original Booking Details shown above, and your instructions to the external AI service text.pollinations.ai to generate a draft reply.','appointment-hour-booking'); ?>
+            </p>
+
+            <div id="cpappb-ai-controls" class="cpappb-ai-controls" style="<?php echo $ai_reply_enabled ? '' : 'display:none;'; ?>">
+                <label for="cpappb-ai-instructions" style="font-weight:600; color:#1d2327; display:block;"><?php esc_html_e('AI Assistant Instructions (optional):','appointment-hour-booking'); ?></label>
+                <div class="cpappb-ai-row">
+                    <input type="text" id="cpappb-ai-instructions" placeholder="<?php esc_attr_e('e.g., Confirm the booking for Tuesday at 10 AM and thank them','appointment-hour-booking'); ?>" <?php disabled( ! $ai_reply_enabled ); ?> />
+                    <button type="button" class="button" id="cpappb-btn-ai" onclick="cp_generateAiReply();" <?php disabled( ! $ai_reply_enabled ); ?>>✨ <?php esc_html_e('Generate with AI','appointment-hour-booking'); ?></button>
+                </div>
             </div>
         </div>
 
@@ -689,11 +774,64 @@ function cp_openReplyModal(link) {
     document.getElementById('cpappb-reply-modal').style.display = 'block';
 }
 
+function cp_toggleAiAssistant(checkbox) {
+    var enabled = checkbox.checked;
+    var controls = document.getElementById('cpappb-ai-controls');
+    var label = document.getElementById('cpappb-ai-toggle-label');
+    var input = document.getElementById('cpappb-ai-instructions');
+    var btn = document.getElementById('cpappb-btn-ai');
+    var status = document.getElementById('cpappb-reply-status');
+
+    controls.style.display = enabled ? 'block' : 'none';
+    input.disabled = !enabled;
+    btn.disabled = !enabled;
+    label.innerText = enabled
+        ? '<?php echo esc_js(__('On','appointment-hour-booking')); ?>'
+        : '<?php echo esc_js(__('Off','appointment-hour-booking')); ?>';
+
+    $j.post(ajaxurl, {
+        action: 'cpappb_toggle_ai_reply',
+        nonce: '<?php echo esc_js($reply_nonce); ?>',
+        cal_id: '<?php echo intval($this->item); ?>',
+        enabled: enabled ? 1 : 0
+    }, function(response) {
+        if (!response || !response.success) {
+            checkbox.checked = !enabled;
+            controls.style.display = !enabled ? 'block' : 'none';
+            input.disabled = enabled;
+            btn.disabled = enabled;
+            label.innerText = !enabled
+                ? '<?php echo esc_js(__('On','appointment-hour-booking')); ?>'
+                : '<?php echo esc_js(__('Off','appointment-hour-booking')); ?>';
+            status.style.color = '#d63638';
+            status.innerText = (response && response.data) ? response.data : '<?php echo esc_js(__('Could not save setting.','appointment-hour-booking')); ?>';
+        }
+    }).fail(function() {
+        checkbox.checked = !enabled;
+        controls.style.display = !enabled ? 'block' : 'none';
+        input.disabled = enabled;
+        btn.disabled = enabled;
+        label.innerText = !enabled
+            ? '<?php echo esc_js(__('On','appointment-hour-booking')); ?>'
+            : '<?php echo esc_js(__('Off','appointment-hour-booking')); ?>';
+        status.style.color = '#d63638';
+        status.innerText = '<?php echo esc_js(__('Request failed while saving AI preference.','appointment-hour-booking')); ?>';
+    });
+}
+
 function cp_generateAiReply() {
+    var toggle = document.getElementById('cpappb-ai-toggle');
+    var status = document.getElementById('cpappb-reply-status');
+
+    if (!toggle || !toggle.checked) {
+        status.style.color = '#d63638';
+        status.innerText = '<?php echo esc_js(__('Please enable the AI Reply Assistant first.','appointment-hour-booking')); ?>';
+        return;
+    }
+
     var original = document.getElementById('cpappb-reply-original').value;
     var instructions = document.getElementById('cpappb-ai-instructions').value;
     var btn = document.getElementById('cpappb-btn-ai');
-    var status = document.getElementById('cpappb-reply-status');
 
     btn.disabled = true;
     btn.innerText = '<?php echo esc_js(__('Generating...','appointment-hour-booking')); ?>';

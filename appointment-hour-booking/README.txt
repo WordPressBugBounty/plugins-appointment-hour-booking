@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 5.3.0
 Tested up to: 7.1
-Stable tag: 1.6.04
+Stable tag: 1.6.05
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -897,7 +897,10 @@ Please note that the pro features aren't advertised as part of the free plugin i
 * New AI-assisted email reply feature in the bookings list (free, no API key required)
 * New email report content mode option (new/unread submissions or complete active booking list)
 
+= 1.6.05 =
+* AI-assistance improvements
+
 == Upgrade Notice ==
 
-= 1.6.04 =
-* New AI-assisted email reply feature (free, no API key required) and email report content mode option.
+= 1.6.05 =
+* AI-assistance improvements
