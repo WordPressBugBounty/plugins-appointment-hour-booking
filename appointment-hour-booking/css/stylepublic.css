@@ -48,11 +48,60 @@
 #fbuilder .right_aligned .section_breaks.fields label,
 #fbuilder .right_aligned .comment_area.fields label{width:100%;clear:both;}
 
-#fbuilder .cpefb_error{border1:1px solid red;}
-#fbuilder .top_aligned .fields label.cpefb_error,.left_aligned .fields label.cpefb_error,.right_aligned .fields label.cpefb_error{display:block;border:0px;color:#f00;float:none;}
+/* Validation Error Messages */
+#fbuilder input.cpefb_error,
+#fbuilder textarea.cpefb_error,
+#fbuilder select.cpefb_error {
+    border-color: #dc2626 !important;
+    background-color: #fffafb;
+}
 
-#fbuilder div.cpefb_error{background:#FDF9E5;border:1px solid #f00;opacity:0.9;margin-top:7px;position:relative;padding:0px 5px;z-index:1000;display:inline-block}
-#fbuilder div.cpefb_error:after{content:"";position:absolute;background:transparent url("../images/tooltop.gif") no-repeat scroll 10px center;color:red;font-weight:bold;height:8px;width:100%;top:-8px;left:0px;z-index:1000;}
+#fbuilder .top_aligned .fields label.cpefb_error,
+#fbuilder .left_aligned .fields label.cpefb_error,
+#fbuilder .right_aligned .fields label.cpefb_error,
+.top_aligned .fields label.cpefb_error,
+.left_aligned .fields label.cpefb_error,
+.right_aligned .fields label.cpefb_error {
+    display: block;
+    border: 0;
+    color: #dc2626;
+    float: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+#fbuilder div.cpefb_error,
+#fbuilder div.message.cpefb_error,
+div.cpefb_error,
+div.message.cpefb_error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #f87171;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    margin-top: 6px;
+    padding: 6px 10px;
+    position: relative;
+    z-index: 1000;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+}
+
+#fbuilder div.cpefb_error::after,
+div.cpefb_error::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    width: 10px;
+    height: 10px;
+    background: #fef2f2;
+    border-left: 1px solid #f87171;
+    border-top: 1px solid #f87171;
+    transform: rotate(45deg);
+}
 
 #fbuilder .ui-datepicker{ z-index:9999 !important;}
 #fbuilder span.uh{display:block;font-size:80%;clear:both;}

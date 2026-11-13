@@ -53,6 +53,7 @@ else if (isset($_GET['del']) && $_GET['del'] == 'all')
         $wpdb->query('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages`'); 
     else
         $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE formid=%d', $this->item)); 
+    do_action( 'cpappb_cache_clean', $this->item );
     $message = __('All items deleted','appointment-hour-booking');
 }
 else if (isset($_GET['lu']) && $_GET['lu'] != '')

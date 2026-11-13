@@ -215,14 +215,14 @@ echo $this->filter_list( array(   // phpcs:ignore WordPress.Security.EscapeOutpu
           userEditOwner:false,
           userDelOwner:false,
           showtooltipdwm:true,
-          userOwner:0 ,cellheight:62 , palette:0, paletteDefault:"F00",
+          userOwner:0, cellheight:60, hourswidth:64, palette:0, paletteDefault:"2563eb",
           <?php
                 $otherparams = get_option('cp_cpappb_schcalcontent_otherparams','');
                 if ($otherparams != '')
                     $otherparams = rtrim($otherparams,",").",";
                 echo str_replace('&quot;','"',esc_html($otherparams)); // phpcs:ignore WordPress.Security.EscapeOutput
           ?>
-          paletteFull:["FFF","FCC","FC9","FF9","FFC","9F9","9FF","CFF","CCF","FCF","CCC","F66","F96","FF6","FF3","6F9","3FF","6FF","99F","F9F","BBB","F00","F90","FC6","FF0","3F3","6CC","3CF","66C","C6C","999","C00","F60","FC3","FC0","3C0","0CC","36F","63F","C3C","666","900","C60","C93","990","090","399","33F","60C","939","333","600","930","963","660","060","366","009","339","636","000","300","630","633","330","030","033","006","309","303"]});
+          paletteFull:["94a3b8","f87171","fb923c","fbbf24","4ade80","2dd4bf","38bdf8","60a5fa","a78bfa","f472b6","64748b","ef4444","f97316","f59e0b","22c55e","14b8a6","06b6d4","3b82f6","8b5cf6","ec4899","475569","dc2626","ea580c","d97706","16a34a","0d9488","0891b2","2563eb","7c3aed","db2777","334155","b91c1c","c2410c","b45309","15803d","0f766e","0e7490","1d4ed8","6d28d9","be185d","1e293b","991b1b","9a3412","92400e","166534","115e59","155e75","1e40af","5b21b6","9d174d","0f172a","7f1d1d","7c2d12","78350f","14532d","134e4a","164e63","1e3a8a","4c1d95","831843","6366f1","4f46e5","10b981","059669","f43f5e","e11d48","0284c7","65a30d","c026d3","52525b"]});
             </script>
 
             <div id="multicalendar"><div id="cal<?php echo intval($this->item); ?>" class="multicalendar"></div></div>
@@ -262,15 +262,3 @@ echo $this->filter_list( array(   // phpcs:ignore WordPress.Security.EscapeOutpu
 
 
 </script>
-
-
-
-
-
-
-
-
-
-
-
-

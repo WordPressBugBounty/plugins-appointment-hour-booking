@@ -1385,7 +1385,7 @@ public function render_form_admin( $atts ) {
             $ret['events'][] = $ev;
         }
         $dataoutput = json_encode($ret);
-        do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
+        //do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
         echo $dataoutput; // phpcs:ignore WordPress.Security.EscapeOutput
         exit;
     }
@@ -1404,7 +1404,11 @@ public function render_form_admin( $atts ) {
         $current_user_access = current_user_can('manage_options');
         $saved_id = $this->item;
         $this->setID($calid);
-        $result = ($current_user_access || @in_array($current_user->ID, unserialize($this->get_option("cp_user_access",""))));
+        $access_list = unserialize($this->get_option("cp_user_access",""));
+        $result = (
+            $current_user_access ||
+            ($current_user->ID > 0 && is_array($access_list) && in_array($current_user->ID, $access_list))
+        );
         $this->setID($saved_id);
         return $result;
     }
@@ -1425,6 +1429,11 @@ public function render_form_admin( $atts ) {
 
             if ('mv' == $_REQUEST['cp_app_action'])
             {
+                if (!is_admin() || !$this->check_current_user_access($formid))
+                {
+                    echo 'Authentication required';
+                    exit;
+                }
                 $t_content_admin = get_option('cp_cpappb_schcalcontent_admin',CP_CPAPPB_SCHCALCONTENT_ADMIN);
                 $t_title_admin = get_option('cp_cpappb_schcaltitle_admin',CP_CPAPPB_SCHCALTITLE_ADMIN);
                 $t_content_public = get_option('cp_cpappb_schcalcontent_public',CP_CPAPPB_SCHCALCONTENT_PUBLIC);
@@ -1440,7 +1449,11 @@ public function render_form_admin( $atts ) {
             else
                 $dataquery = $wpdb->prepare("SELECT data,notifyto,posted_data FROM ".$wpdb->prefix."cpappbk_messages where formid=%d AND notifyto<>%s", $formid, $this->blocked_by_admin_indicator);
             
-            do_action( 'cpappb_cache_check', $formid, $dataquery );
+            $cache_key = 'public|slots|' . $field . '|' . $dataquery;
+            if ('get_slots' == $_REQUEST['cp_app_action'])
+            {
+                do_action( 'cpappb_cache_check', $formid, $cache_key );
+            }
             
             // Ignore the sniffer, the query is properly prepared, but it has to be passed to the cache action 
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
@@ -1490,7 +1503,7 @@ public function render_form_admin( $atts ) {
             }
             else {
                 $dataoutput = json_encode($tmp2);
-                do_action( 'cpappb_cache_store', $formid, $dataquery, $dataoutput );
+                do_action( 'cpappb_cache_store', $formid, $cache_key, $dataoutput );
                 echo $dataoutput; // phpcs:ignore WordPress.Security.EscapeOutput
                 //{type:"all",d:"",h1:8,m1:0,h2:17,m2:0}                
             }
@@ -2431,7 +2444,8 @@ private function countBookingsFor( $date, $slot, $service ) {
                                                                                                 ) );
                 }
             }
-        }                                                                           
+        }    
+        do_action( 'cpappb_cache_clean', 0 );
     }
 	
 
