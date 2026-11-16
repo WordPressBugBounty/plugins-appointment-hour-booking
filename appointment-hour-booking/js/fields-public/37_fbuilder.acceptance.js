@@ -25,7 +25,7 @@
 						dlg += '<div class="cff-dialog hide"><span class="cff-close-dlg"></span><div class="cff-dialog-content">'+me.message+'</div></div>'
 					}
 					return '<div class="fields '+$.fbuilder.htmlEncode(me.csslayout)+' cff-checkbox-field" id="field'+me.form_identifier+'-'+me.index+'"><div class="dfield">'+
-					'<div class="one_column"><label><input name="'+me.name+'" id="'+me.name+'" class="field required" value="'+$.fbuilder.htmlEncode(me.value)+'" vt="'+$.fbuilder.htmlEncode((/^\s*$/.test(me.value)) ? me.title : me.value)+'" type="checkbox" /> <span>'+
+					'<div class="one_column"><label><input name="'+$.fbuilder.htmlEncode(me.name)+'" id="'+$.fbuilder.htmlEncode(me.name)+'" class="field required" value="'+$.fbuilder.htmlEncode(me.value)+'" vt="'+$.fbuilder.htmlEncode((/^\s*$/.test(me.value)) ? me.title : me.value)+'" type="checkbox" /> <span>'+
 					$.fbuilder.htmlDecode( label )+''+((me.required)?'<span class="r">*</span>':'')+
 					'</span></label></div>'+
 					dlg+
@@ -49,7 +49,7 @@
 				},
 			val:function()
 				{
-					var e = $('[id="'+this.name+'"]:checked:not(.ignore)');
+					var e = $('[id="'+$.fbuilder.htmlEncode(this.name)+'"]:checked:not(.ignore)');
 					if( e.length )
 					{
 						var t = $.fbuilder.parseValStr( e[0].value );

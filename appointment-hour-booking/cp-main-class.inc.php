@@ -492,9 +492,10 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             echo '</div>';
             echo '<div class="cpapp_break"></div>';
         }
-        $nonce = wp_create_nonce( 'cpappb_actions_booking' );
+        $current_cal = isset( $_GET['cal'] ) ? intval( $_GET['cal'] ) : 0;
+        $nonce = wp_create_nonce( 'cpappb_actions_booking_' . $current_cal );
 ?>
-<?php if ( is_admin() && current_user_can('edit_pages') ) { ?>
+<?php if ( is_admin() && $this->check_current_user_access( $current_cal ) ) { ?>
 <script> 
  function cp_UpsItem(id,item)
  {
@@ -1412,6 +1413,27 @@ public function render_form_admin( $atts ) {
         $this->setID($saved_id);
         return $result;
     }
+    
+
+    function check_current_user_access_settings( $calid = '' )
+    {
+        $current_user = wp_get_current_user();
+        if ( current_user_can( 'manage_options' ) || current_user_can( 'edit_pages' ) ) {
+            return true;
+        }
+        $saved_id = $this->item;
+        $this->setId( $calid );
+        $access_list      = unserialize( $this->get_option( 'cp_user_access', '' ) );
+        $settings_allowed = ( $this->get_option( 'cp_user_access_settings', '' ) === 'true' );
+        $result = (
+            $current_user->ID > 0 &&
+            $settings_allowed &&
+            is_array( $access_list ) &&
+            in_array( $current_user->ID, $access_list )
+        );
+        $this->setId( $saved_id );
+        return $result;
+    }
 
 
     function data_management() {
@@ -1553,7 +1575,7 @@ public function render_form_admin( $atts ) {
 		
         if ($this->get_param($this->prefix.'_blockmultiple') == '1' && is_admin())
         {
-            $this->verify_nonce ($_POST["anonce"], 'cpappb_actions_admin');
+            $this->verify_nonce ($_POST["anonce"], 'cpappb_actions_admin_block_times');
             $this->block_multiple();
             return;
         }  		
@@ -1570,10 +1592,28 @@ public function render_form_admin( $atts ) {
             return;
         }
 
-        if ( $this->get_param($this->prefix.'_post_options') && is_admin() && $this->check_current_user_access(intval($this->get_param($this->prefix.'_id'))))
-        {
-            $this->save_options();
-            return;
+        if (
+            isset( $_SERVER['REQUEST_METHOD'] ) &&
+            'POST' === $_SERVER['REQUEST_METHOD'] &&
+            ! empty( $_POST[ $this->prefix . '_post_options' ] ) &&
+            is_admin()
+        ) {
+            $target_form_id = isset( $_POST[ $this->prefix . '_id' ] ) ? intval( $_POST[ $this->prefix . '_id' ] ) : 0;
+
+            // Reject if GET parameters attempt to specify a different form ID
+            if ( isset( $_GET[ $this->prefix . '_id' ] ) && intval( $_GET[ $this->prefix . '_id' ] ) !== $target_form_id ) {
+                wp_die( esc_html__( 'Invalid form target.', 'appointment-hour-booking' ), 400 );
+            }
+            if ( isset( $_GET['cal'] ) && $_GET['cal'] !== '' && intval( $_GET['cal'] ) !== $target_form_id ) {
+                wp_die( esc_html__( 'Invalid form target.', 'appointment-hour-booking' ), 400 );
+            }
+
+            if ( $target_form_id > 0 && $this->check_current_user_access_settings( $target_form_id ) ) {
+                $this->save_options();
+                return;
+            }
+
+            wp_die( esc_html__( 'Direct access not allowed.', 'appointment-hour-booking' ), 403 );
         }
 
         if (!isset($_SERVER['REQUEST_METHOD']))
@@ -2532,9 +2572,16 @@ private function countBookingsFor( $date, $slot, $service ) {
 
     function save_options() {
         global $wpdb;
-        $this->item = intval($_POST[$this->prefix."_id"]);
+        $this->item = isset( $_POST[ $this->prefix . '_id' ] ) ? intval( $_POST[ $this->prefix . '_id' ] ) : 0;
 
-        $this->verify_nonce (sanitize_text_field($_POST["anonce"]), 'cpappb_actions_admin');
+        if ( $this->item <= 0 || ! $this->check_current_user_access_settings( $this->item ) ) {
+            wp_die( esc_html__( 'Direct access not allowed.', 'appointment-hour-booking' ), 403 );
+        }
+
+        $this->verify_nonce(
+            isset( $_POST['anonce'] ) ? sanitize_text_field( wp_unslash( $_POST['anonce'] ) ) : '',
+            'cpappb_actions_admin_form_' . $this->item
+        );
 
         if (false == get_option('AHB_ONE_TIME_3UPDATE',false))
         {
@@ -2608,8 +2655,6 @@ private function countBookingsFor( $date, $slot, $service ) {
 					  'vs_text_nomore' => sanitize_text_field($_pdata['vs_text_nomore']),   
                       'vs_text_nmore' => sanitize_text_field($_pdata['vs_text_nmore']),
 
-                      'cp_user_access' => serialize($this->sanitize( ( isset($_pdata["cp_user_access"]) ? $_pdata["cp_user_access"] : array() ) )),
-                      'cp_user_access_settings' => sanitize_text_field($_pdata['cp_user_access_settings']),
                       'display_emails_endtime' => sanitize_text_field($_pdata['display_emails_endtime']),
                       'rep_enable' => sanitize_text_field($_pdata['rep_enable']),
                       'rep_days' => sanitize_text_field($_pdata['rep_days']),
@@ -2632,6 +2677,14 @@ private function countBookingsFor( $date, $slot, $service ) {
                       'cv_border' => sanitize_text_field(str_replace('#','',$_pdata['cv_border'])),
                       'cv_text_enter_valid_captcha' => sanitize_text_field($_pdata['cv_text_enter_valid_captcha'])
     	);
+        
+        if ( current_user_can( 'edit_pages' ) ) {
+            $raw_access = isset( $_pdata['cp_user_access'] ) && is_array( $_pdata['cp_user_access'] )
+                ? array_map( 'intval', $_pdata['cp_user_access'] )
+                : array();
+            $data['cp_user_access']          = serialize( $raw_access );
+            $data['cp_user_access_settings'] = sanitize_text_field( $_pdata['cp_user_access_settings'] ?? '' );
+        }
 
         $wpdb->update( $wpdb->prefix."cpappbk_forms", $data, array( 'id' => $this->item ));
 
@@ -3050,35 +3103,65 @@ private function countBookingsFor( $date, $slot, $service ) {
 
 
     public function admin_process_json( $str ) {
-        $form_data = json_decode($this->cleanJSON($str));
-        if (is_array($form_data))
-        {
-            $form_data[1][0]->title = $this->filter_allowed_tags( $form_data[1][0]->title );
-            $form_data[1][0]->description = $this->filter_allowed_tags( $form_data[1][0]->description );
-            
-            for ( $i=0; $i < count($form_data[0]); $i++ )
-            {
-                if ( isset( $form_data[0][$i]->title ) )
-                    $form_data[0][$i]->title = $this->filter_allowed_tags(($form_data[0][$i]->title));
-                $form_data[0][$i]->userhelpTooltip = $this->filter_allowed_tags(($form_data[0][$i]->userhelpTooltip));
-                $form_data[0][$i]->userhelp = $this->filter_allowed_tags(($form_data[0][$i]->userhelp));
-            
-                if ($form_data[0][$i]->ftype == 'fCommentArea')
-                    $form_data[0][$i]->userhelp = $this->filter_allowed_tags(($form_data[0][$i]->userhelp));
-                else if ($form_data[0][$i]->ftype == 'fradio' || $form_data[0][$i]->ftype == 'fcheck' || $form_data[0][$i]->ftype == 'fdropdown')
-                {
-                        for ($j=0; $j < count($form_data[0][$i]->choices); $j++)
-                            $form_data[0][$i]->choices[$j] = $this->filter_allowed_tags(($form_data[0][$i]->choices[$j]));
+        $form_data = json_decode( $this->cleanJSON( $str ) );
+        if ( is_array( $form_data ) && isset( $form_data[0] ) && is_array( $form_data[0] ) ) {
+            if ( isset( $form_data[1][0] ) && is_object( $form_data[1][0] ) ) {
+                $form_data[1][0]->title        = $this->filter_allowed_tags( $form_data[1][0]->title ?? '' );
+                $form_data[1][0]->description  = $this->filter_allowed_tags( $form_data[1][0]->description ?? '' );
+                if ( isset( $form_data[1][0]->formtemplate ) ) {
+                    $form_data[1][0]->formtemplate = preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[1][0]->formtemplate );
                 }
-                else if ($form_data[0][$i]->ftype == 'fapp')
-                {
-                    for ($j=0; $j < count($form_data[0][$i]->services); $j++)
-                        $form_data[0][$i]->services[$j]->name = $this->filter_allowed_tags(($form_data[0][$i]->services[$j]->name));
-                    if (isset($form_data[0][$i]->emptySelect))
-                        $form_data[0][$i]->emptySelect= $this->filter_allowed_tags(($form_data[0][$i]->emptySelect));
+                if ( isset( $form_data[1][0]->formlayout ) ) {
+                    $form_data[1][0]->formlayout = preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[1][0]->formlayout );
                 }
             }
-            $str = json_encode( $form_data );
+
+            for ( $i = 0; $i < count( $form_data[0] ); $i++ ) {
+                if ( ! is_object( $form_data[0][ $i ] ) ) {
+                    continue;
+                }
+
+                // Strictly enforce safe identifier format on field name and ftype
+                $clean_name = isset( $form_data[0][ $i ]->name )
+                    ? preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[0][ $i ]->name )
+                    : '';
+                $form_data[0][ $i ]->name = ( $clean_name !== '' ) ? $clean_name : 'fieldname' . $i;
+
+                if ( isset( $form_data[0][ $i ]->ftype ) ) {
+                    $form_data[0][ $i ]->ftype = preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[0][ $i ]->ftype );
+                }
+                if ( isset( $form_data[0][ $i ]->csslayout ) ) {
+                    $form_data[0][ $i ]->csslayout = preg_replace( '/[^a-zA-Z0-9_\-\s]/', '', (string) $form_data[0][ $i ]->csslayout );
+                }
+                if ( isset( $form_data[0][ $i ]->size ) ) {
+                    $form_data[0][ $i ]->size = preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[0][ $i ]->size );
+                }
+                if ( isset( $form_data[0][ $i ]->equalTo ) ) {
+                    $form_data[0][ $i ]->equalTo = preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[0][ $i ]->equalTo );
+                }
+
+                if ( isset( $form_data[0][ $i ]->title ) ) {
+                    $form_data[0][ $i ]->title = $this->filter_allowed_tags( $form_data[0][ $i ]->title );
+                }
+                $form_data[0][ $i ]->userhelpTooltip = $this->filter_allowed_tags( $form_data[0][ $i ]->userhelpTooltip ?? '' );
+                $form_data[0][ $i ]->userhelp        = $this->filter_allowed_tags( $form_data[0][ $i ]->userhelp ?? '' );
+
+                if ( $form_data[0][ $i ]->ftype == 'fCommentArea' ) {
+                    $form_data[0][ $i ]->userhelp = $this->filter_allowed_tags( $form_data[0][ $i ]->userhelp );
+                } else if ( in_array( $form_data[0][ $i ]->ftype, array( 'fradio', 'fcheck', 'fdropdown' ), true ) && isset( $form_data[0][ $i ]->choices ) && is_array( $form_data[0][ $i ]->choices ) ) {
+                    for ( $j = 0; $j < count( $form_data[0][ $i ]->choices ); $j++ ) {
+                        $form_data[0][ $i ]->choices[ $j ] = $this->filter_allowed_tags( $form_data[0][ $i ]->choices[ $j ] );
+                    }
+                } else if ( $form_data[0][ $i ]->ftype == 'fapp' && isset( $form_data[0][ $i ]->services ) && is_array( $form_data[0][ $i ]->services ) ) {
+                    for ( $j = 0; $j < count( $form_data[0][ $i ]->services ); $j++ ) {
+                        $form_data[0][ $i ]->services[ $j ]->name = $this->filter_allowed_tags( $form_data[0][ $i ]->services[ $j ]->name );
+                    }
+                    if ( isset( $form_data[0][ $i ]->emptySelect ) ) {
+                        $form_data[0][ $i ]->emptySelect = $this->filter_allowed_tags( $form_data[0][ $i ]->emptySelect );
+                    }
+                }
+            }
+            $str = wp_json_encode( $form_data );
         }
         return $str;
     }
@@ -3093,6 +3176,11 @@ private function countBookingsFor( $date, $slot, $service ) {
 
             for ($i=0; $i < count($form_data[0]); $i++)
             {
+                $clean_name = isset( $form_data[0][ $i ]->name )
+                    ? preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) $form_data[0][ $i ]->name )
+                    : '';
+                $form_data[0][ $i ]->name = ( $clean_name !== '' ) ? $clean_name : 'fieldname' . $i;
+                
                 if (property_exists($form_data[0][$i], 'title'))
                     $form_data[0][$i]->title = $this->filter_allowed_tags(__($form_data[0][$i]->title,'appointment-hour-booking'));
                 $form_data[0][$i]->userhelpTooltip = $this->filter_allowed_tags(__($form_data[0][$i]->userhelpTooltip,'appointment-hour-booking'));

@@ -2,16 +2,39 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$this->item = (isset($_GET["cal"]) ? intval($_GET["cal"]) : 0);
+$this->item = ( isset( $_GET['cal'] ) ? intval( $_GET['cal'] ) : 0 );
 
-$current_user = wp_get_current_user();
-$current_user_access = current_user_can('manage_options');
+$current_user        = wp_get_current_user();
+$current_user_access = current_user_can( 'manage_options' );
 
-if ( !is_admin() || (!$current_user_access && !@in_array($current_user->ID, unserialize($this->get_option("cp_user_access",serialize(array()))))))
-{
+if (
+    ! is_admin() ||
+    ( ! $current_user_access && ( $this->item <= 0 || ! $this->check_current_user_access( $this->item ) ) )
+) {
     echo 'Direct access not allowed.';
     exit;
 }
+
+$booking_nonce_action = 'cpappb_actions_booking_' . intval( $this->item );
+
+// Helper closure to verify booking belongs to the current form (or an authorized form if cal=0 for admins)
+$can_manage_booking = function( $booking_id ) use ( $wpdb, $current_user_access ) {
+    $booking_id = intval( $booking_id );
+    if ( $booking_id <= 0 ) {
+        return false;
+    }
+    $form_id = $wpdb->get_var(
+        $wpdb->prepare( "SELECT formid FROM `{$wpdb->prefix}cpappbk_messages` WHERE id = %d", $booking_id )
+    );
+    if ( null === $form_id ) {
+        return false;
+    }
+    $form_id = intval( $form_id );
+    if ( $this->item > 0 && $form_id !== $this->item ) {
+        return false;
+    }
+    return $current_user_access || $this->check_current_user_access( $form_id );
+};
 
 $current_page = intval( (empty($_GET["p"])?0:$_GET["p"]) );
 if (!$current_page) $current_page = 1;
@@ -19,77 +42,84 @@ $records_per_page = 50;
 
 $message = "";
 
-if (isset($_GET['statusmark']) && $_GET['statusmark'] != '')
-{
-    $this->verify_nonce ( sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    for ($i=0; $i<=$records_per_page; $i++)
-    if (isset($_GET['c'.$i]) && $_GET['c'.$i] != '')   
-    {
-        $this->update_status( intval($_GET['c'.$i]), sanitize_text_field($_GET['sbmi']) );        
+if ( isset( $_GET['statusmark'] ) && $_GET['statusmark'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    for ( $i = 0; $i <= $records_per_page; $i++ ) {
+        if ( isset( $_GET[ 'c' . $i ] ) && $_GET[ 'c' . $i ] != '' ) {
+            $target_id = intval( $_GET[ 'c' . $i ] );
+            if ( $can_manage_booking( $target_id ) ) {
+                $this->update_status( $target_id, sanitize_text_field( $_GET['sbmi'] ) );
+            }
+        }
     }
-    $message = __('Marked items status updated','appointment-hour-booking');
-}
-else if (isset($_GET['resend']) && $_GET['resend'] != '')
-{
-    $this->verify_nonce ( sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    $this->ready_to_go_reservation( intval($_GET['resend']), '', true);        
-    $message = __('Notification emails resent for the booking','appointment-hour-booking');
-}
-else if (isset($_GET['delmark']) && $_GET['delmark'] != '')
-{
-    $this->verify_nonce ( sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    for ($i=0; $i<=$records_per_page; $i++)
-    if (isset($_GET['c'.$i]) && $_GET['c'.$i] != '') {
-        do_action( 'cpappb_item_deleted', intval($_GET['c'.$i]) );
-        $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE id=%d', sanitize_text_field($_GET['c'.$i])) ); 
+    $message = __( 'Marked items status updated', 'appointment-hour-booking' );
+} else if ( isset( $_GET['resend'] ) && $_GET['resend'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    $resend_id = intval( $_GET['resend'] );
+    if ( $can_manage_booking( $resend_id ) ) {
+        $this->ready_to_go_reservation( $resend_id, '', true );
+        $message = __( 'Notification emails resent for the booking', 'appointment-hour-booking' );
+    }
+} else if ( isset( $_GET['delmark'] ) && $_GET['delmark'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    for ( $i = 0; $i <= $records_per_page; $i++ ) {
+        if ( isset( $_GET[ 'c' . $i ] ) && $_GET[ 'c' . $i ] != '' ) {
+            $del_id = intval( $_GET[ 'c' . $i ] );
+            if ( $can_manage_booking( $del_id ) ) {
+                do_action( 'cpappb_item_deleted', $del_id );
+                $wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $wpdb->prefix . 'cpappbk_messages` WHERE id=%d', $del_id ) );
+            }
+        }
     }
     do_action( 'cpappb_cache_clean', $this->item );
-    $message = __('Marked items deleted','appointment-hour-booking');
-}
-else if (isset($_GET['del']) && $_GET['del'] == 'all')
-{
-    $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    if ($this->item == '' || $this->item == '0')
-        $wpdb->query('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages`'); 
-    else
-        $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE formid=%d', $this->item)); 
+    $message = __( 'Marked items deleted', 'appointment-hour-booking' );
+} else if ( isset( $_GET['del'] ) && $_GET['del'] == 'all' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    if ( $this->item == '' || $this->item == '0' ) {
+        if ( $current_user_access ) {
+            $wpdb->query( 'DELETE FROM `' . $wpdb->prefix . 'cpappbk_messages`' );
+        }
+    } else if ( $this->check_current_user_access( $this->item ) ) {
+        $wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $wpdb->prefix . 'cpappbk_messages` WHERE formid=%d', $this->item ) );
+    }
     do_action( 'cpappb_cache_clean', $this->item );
-    $message = __('All items deleted','appointment-hour-booking');
-}
-else if (isset($_GET['lu']) && $_GET['lu'] != '')
-{
-    $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    $myrows = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", sanitize_text_field($_GET['lu'])) ); 
-    $params = unserialize($myrows[0]->posted_data);
-    $params["paid"] = sanitize_text_field($_GET["status"]);
-    $params["payment_type"] = __('Manually updated','appointment-hour-booking');
-    $wpdb->query( $wpdb->prepare('UPDATE `'.$wpdb->prefix.'cpappbk_messages` SET posted_data=%s WHERE id=%d', serialize($params), sanitize_text_field($_GET['lu'])) ); 
-    $message = __('Item updated','appointment-hour-booking');
-}
-else if (isset($_GET['ld']) && $_GET['ld'] != '')
-{
-    $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');
-    do_action( 'cpappb_item_deleted', intval($_GET['ld']) );
-    $wpdb->query( $wpdb->prepare('DELETE FROM `'.$wpdb->prefix.'cpappbk_messages` WHERE id=%d', sanitize_text_field($_GET['ld'])) ); 
-    $message = __('Item deleted','appointment-hour-booking');
-}
-else if (isset($_GET['ud']) && $_GET['ud'] != '')
-{
-    $this->verify_nonce (sanitize_text_field($_GET["anonce"]), 'cpappb_actions_booking');      
-    if (isset($_GET["udidx"]))
-        $this->update_status(sanitize_text_field($_GET['ud']), sanitize_text_field($_GET['status']), intval($_GET["udidx"]));
-    else  
-        $this->update_status(sanitize_text_field($_GET['ud']), sanitize_text_field($_GET['status']));
-    
-    if ( !empty( $_GET["or"] ) && $_GET["or"] == 'shlist')
-    {
-      ?><script type="text/javascript">
-       document.location = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&schedule=1&cal=<?php echo intval($_GET["cal"]); ?>#sb<?php echo intval($_GET["ud"]).'_'.intval($_GET["udidx"]); ?>';
-       </script>
-      <?php
-      exit;
-    }        
-    $message = __('Status updated','appointment-hour-booking');
+    $message = __( 'All items deleted', 'appointment-hour-booking' );
+} else if ( isset( $_GET['lu'] ) && $_GET['lu'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    $lu_id = intval( $_GET['lu'] );
+    if ( $can_manage_booking( $lu_id ) ) {
+        $myrows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . $wpdb->prefix . "cpappbk_messages WHERE id=%d", $lu_id ) );
+        $params = unserialize( $myrows[0]->posted_data );
+        $params['paid'] = sanitize_text_field( $_GET['status'] );
+        $params['payment_type'] = __( 'Manually updated', 'appointment-hour-booking' );
+        $wpdb->query( $wpdb->prepare( 'UPDATE `' . $wpdb->prefix . 'cpappbk_messages` SET posted_data=%s WHERE id=%d', serialize( $params ), $lu_id ) );
+        $message = __( 'Item updated', 'appointment-hour-booking' );
+    }
+} else if ( isset( $_GET['ld'] ) && $_GET['ld'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    $ld_id = intval( $_GET['ld'] );
+    if ( $can_manage_booking( $ld_id ) ) {
+        do_action( 'cpappb_item_deleted', $ld_id );
+        $wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $wpdb->prefix . 'cpappbk_messages` WHERE id=%d', $ld_id ) );
+        $message = __( 'Item deleted', 'appointment-hour-booking' );
+    }
+} else if ( isset( $_GET['ud'] ) && $_GET['ud'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    $ud_id = intval( $_GET['ud'] );
+    if ( $can_manage_booking( $ud_id ) ) {
+        if ( isset( $_GET['udidx'] ) ) {
+            $this->update_status( $ud_id, sanitize_text_field( $_GET['status'] ), intval( $_GET['udidx'] ) );
+        } else {
+            $this->update_status( $ud_id, sanitize_text_field( $_GET['status'] ) );
+        }
+        if ( ! empty( $_GET['or'] ) && $_GET['or'] == 'shlist' ) {
+            ?><script type="text/javascript">
+            document.location = 'admin.php?page=<?php echo esc_js( $this->menu_parameter ); ?>&schedule=1&cal=<?php echo intval( $_GET['cal'] ); ?>#sb<?php echo intval( $_GET['ud'] ) . '_' . intval( $_GET['udidx'] ); ?>';
+            </script><?php
+            exit;
+        }
+        $message = __( 'Status updated', 'appointment-hour-booking' );
+    }
 }
 
 if ($this->item != 0)
@@ -145,7 +175,7 @@ $events_query = apply_filters( 'cpappb_messages_query', $events_query );
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 $events = $wpdb->get_results( $events_query );
 
-$nonce = wp_create_nonce( 'cpappb_actions_booking' );
+$nonce = wp_create_nonce( $booking_nonce_action );
 $reply_nonce = wp_create_nonce( 'cpappb_reply_nonce' );
 $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
 

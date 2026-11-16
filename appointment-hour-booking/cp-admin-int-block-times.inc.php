@@ -50,7 +50,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform
 
 
 $selected = array();
-if (!empty($_POST["selectedcalendar"]) && isset( $_POST['selectedcalendar'] ) && is_array( $_POST['selectedcalendar'] ) && wp_verify_nonce( sanitize_text_field($_POST["anonce"]), 'cpappb_actions_admin'))
+if ( ! empty( $_POST['selectedcalendar'] ) && is_array( $_POST['selectedcalendar'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['anonce'] ) ), 'cpappb_actions_admin_block_times' ) )
 {
     $sanitized_array = array_map( 'sanitize_text_field', $_POST['selectedcalendar'] );    
     foreach ($sanitized_array as $item)
@@ -60,7 +60,7 @@ else
     $selected = array($this->item);
 
 
-$nonce = wp_create_nonce( 'cpappb_actions_admin' );
+$nonce = wp_create_nonce( 'cpappb_actions_admin_block_times' );
 
 
 ?>

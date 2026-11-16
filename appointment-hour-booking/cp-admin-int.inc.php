@@ -2,16 +2,15 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$current_user = wp_get_current_user();
-$current_user_access = current_user_can('edit_pages');
+$this->item = isset( $_GET['cal'] ) ? intval( $_GET['cal'] ) : 0;
 
-if ( !is_admin() || (!$current_user_access && !@in_array($current_user->ID, unserialize($this->get_option("cp_user_access","")))))
-{
+$current_user = wp_get_current_user();
+$current_user_access = current_user_can( 'edit_pages' );
+
+if ( ! is_admin() || ! $this->check_current_user_access_settings( $this->item ) ) {
     echo 'Direct access not allowed.';
     exit;
 }
-
-$this->item = intval($_GET["cal"]);
 
 $this->option_buffered_item = false;
 $this->option_buffered_id = -1;
@@ -22,7 +21,7 @@ define('CP_APPBOOK_DEFAULT_fp_destination_emails', CP_APPBOOK_DEFAULT_fp_from_em
 if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_options'] ) )
     echo "<div id='setting-error-settings_updated' class='updated'> <h2>Settings saved.</h2></div>";
 
-$nonce = wp_create_nonce( 'cpappb_actions_admin' );
+$nonce = wp_create_nonce( 'cpappb_actions_admin_form_' . intval( $this->item ) );
 
 ?>
 <style>
@@ -513,6 +512,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
          <em>* <?php esc_html_e('Note: To enable a payment method enable first the related addon.','appointment-hour-booking'); ?></em>
       </div>
       <hr />
+      <?php if ( $current_user_access ) : ?>
       <h3 class='hndle' style="padding-top:5px;padding-bottom:5px;"><span><?php esc_html_e('Users with access to the messages list','appointment-hour-booking'); ?></span></h3>
       <div class="inside">
          <table class="form-table">
@@ -544,6 +544,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
            </tr>            
          </table>
       </div>
+      <?php endif; ?>
       <hr>
 		<div class="ahb-buttons-container">
 			<input type="button" value="<?php esc_html_e('Next Step - Notification Emails >','appointment-hour-booking'); ?>" class="button" style="float:right;margin-right:10px" onclick="ahbGoToStep(3);" />
