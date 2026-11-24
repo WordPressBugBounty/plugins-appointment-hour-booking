@@ -764,7 +764,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             try { if (form.cp_appbooking_pform_status.value == '1') return false; } catch (e) {}
             $dexQuery = jQuery.noConflict();
             try { form.cp_ref_page.value = document.location; } catch (e) {}
-            $dexQuery = jQuery.noConflict();<?php if (!is_admin() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) { ?>
+            $dexQuery = jQuery.noConflict();<?php if (!$this->is_authorized_admin_booking() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) { ?>
             var result = '';
             try {
             if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>) {
@@ -1259,7 +1259,15 @@ public function render_form_admin( $atts ) {
         {
             $this->verify_nonce ( sanitize_text_field($_POST["anonce"]), 'cpappb_actions_pwizard');
             $shortcode = '[CP_APP_HOUR_BOOKING  id="'.$this->item .'"]';
-            $this->postURL = $this->publish_on($this->sanitize( (isset($_POST["whereto"]) ? $_POST["whereto"] : '') ), $this->sanitize( (isset($_POST["publishpage"]) ? $_POST["publishpage"] : '') ), $this->sanitize( (isset($_POST["publishpost"]) ? $_POST["publishpost"] : '') ), $shortcode, $this->sanitize( (isset($_POST["posttitle"]) ? $_POST["posttitle"] : '' ) )); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $publishstatus = ( isset( $_POST['publishstatus'] ) && 'publish' === sanitize_text_field( wp_unslash( $_POST['publishstatus'] ) ) ) ? 'publish' : 'draft';
+            $this->postURL = $this->publish_on(
+                $this->sanitize( (isset($_POST["whereto"]) ? $_POST["whereto"] : '') ),
+                $this->sanitize( (isset($_POST["publishpage"]) ? $_POST["publishpage"] : '') ),
+                $this->sanitize( (isset($_POST["publishpost"]) ? $_POST["publishpost"] : '') ),
+                $shortcode,
+                $this->sanitize( (isset($_POST["posttitle"]) ? $_POST["posttitle"] : '' ) ),
+                $publishstatus
+            ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             return;
         }
 
@@ -1270,16 +1278,21 @@ public function render_form_admin( $atts ) {
     }
 
 
-    private function publish_on( $whereto, $publishpage = '', $publishpost = '', $content = '', $posttitle = 'Booking Form' ) {
+    private function publish_on( $whereto, $publishpage = '', $publishpost = '', $content = '', $posttitle = 'Booking Form', $publishstatus = 'draft' ) {
         global $wpdb;
         $id = '';
         if ($whereto == '0' || $whereto =='1') // new page
         {
+            $post_status  = ( 'publish' === $publishstatus ) ? 'publish' : 'draft';
+            $post_content = ( 'publish' === $post_status )
+                ? $content
+                : 'This is a <b>preview</b> page, remember to publish it if needed. You can edit the full calendar and form settings into the admin settings page.<br /><br /> ' . $content;
+
             $my_post = array(
               'post_title'    => $posttitle,
-              'post_type' => ($whereto == '0'?'page':'post'),
-              'post_content'  => 'This is a <b>preview</b> page, remember to publish it if needed. You can edit the full calendar and form settings into the admin settings page.<br /><br /> '.$content,
-              'post_status'   => 'draft'
+              'post_type'     => ($whereto == '0' ? 'page' : 'post'),
+              'post_content'  => $post_content,
+              'post_status'   => $post_status
             );
 
             // Insert the post into the database
@@ -1436,6 +1449,21 @@ public function render_form_admin( $atts ) {
     }
 
 
+    public function is_authorized_admin_booking( $form_id = null )
+    {
+        if ( ! is_admin() || wp_doing_ajax() || ! is_user_logged_in() ) {
+            return false;
+        }
+
+        $target_id = ( null !== $form_id ) ? intval( $form_id ) : intval( $this->item );
+        if ( $target_id <= 0 ) {
+            return false;
+        }
+
+        return $this->check_current_user_access( $target_id );
+    }
+
+
     function data_management() {
         global $wpdb;
             
@@ -1496,11 +1524,15 @@ public function render_form_admin( $atts ) {
                             (($_REQUEST['cp_app_action'] != 'mv') || !strpos($excluded_multiview, ','.$data["apps"][$k]["field"].','))
                            )
                         {
-                            $slot = $data["apps"][$k]["slot"];
+                            $allow_full_day = ( isset( $data["apps"][$k]["duration"] ) && intval( $data["apps"][$k]["duration"] ) === 1440 );
+                            $parsed_slot    = $this->parse_and_normalize_slot( isset( $data["apps"][$k]["slot"] ) ? $data["apps"][$k]["slot"] : '', $allow_full_day );
+                            if ( false === $parsed_slot ) {
+                                continue;
+                            }
                             $quantity = intval(@$data["apps"][$k]["quant"]);
                             if (!$quantity) $quantity = 1;
 
-                            $availitem = array("d"=>$data["apps"][$k]["date"] ,"h1"=>intval(substr($slot,0,2)),"m1"=>intval(substr($slot,3,2)),"h2"=>intval(substr($slot,6,2)),"m2"=>intval(substr($slot,9,2)),"serviceindex"=>intval(@$data["apps"][$k]["serviceindex"]),"quantity"=>$quantity);
+                            $availitem = array("d"=>$data["apps"][$k]["date"] ,"h1"=>$parsed_slot["h1"],"m1"=>$parsed_slot["m1"],"h2"=>$parsed_slot["h2"],"m2"=>$parsed_slot["m2"],"serviceindex"=>intval(@$data["apps"][$k]["serviceindex"]),"quantity"=>$quantity);
 
                             if (isset($data["apps"][$k]["sid"]) && $data["apps"][$k]["sid"] != '')
                                 $availitem["sid"] = intval(@$data["apps"][$k]["sid"]);
@@ -1573,12 +1605,21 @@ public function render_form_admin( $atts ) {
             exit;
         }
 		
-        if ($this->get_param($this->prefix.'_blockmultiple') == '1' && is_admin())
-        {
-            $this->verify_nonce ($_POST["anonce"], 'cpappb_actions_admin_block_times');
+        if (
+            isset( $_SERVER['REQUEST_METHOD'] ) &&
+            'POST' === $_SERVER['REQUEST_METHOD'] &&
+            ! empty( $_POST[ $this->prefix . '_blockmultiple' ] ) &&
+            is_admin() &&
+            ! wp_doing_ajax() &&
+            is_user_logged_in()
+        ) {
+            $this->verify_nonce(
+                isset( $_POST['anonce'] ) ? sanitize_text_field( wp_unslash( $_POST['anonce'] ) ) : '',
+                'cpappb_actions_admin_block_times'
+            );
             $this->block_multiple();
             return;
-        }  		
+        }
 
         if ($this->get_param($this->prefix.'_csv1') && is_admin() && $this->check_current_user_access(intval($this->get_param("cal"))))
         {
@@ -1631,14 +1672,40 @@ public function render_form_admin( $atts ) {
 
         if ($this->get_param($this->prefix.'_id')) $this->item = intval($this->get_param($this->prefix.'_id'));
 
+        $is_post_submission = ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform_process'] ) );
+        $is_admin_booking   = false;
+
+        if ( $is_post_submission )
+        {
+            if ( $this->item <= 0 ) {
+                wp_die( esc_html__( 'Invalid booking form.', 'appointment-hour-booking' ), 400 );
+            }
+
+            if ( wp_doing_ajax() ) {
+                wp_die( esc_html__( 'Direct access not allowed.', 'appointment-hour-booking' ), 403 );
+            }
+
+            if ( is_admin() ) {
+                if ( ! $this->is_authorized_admin_booking( $this->item ) ) {
+                    wp_die( esc_html__( 'Direct access not allowed.', 'appointment-hour-booking' ), 403 );
+                }
+                $admin_nonce = isset( $_POST['anonce_admin'] ) ? sanitize_text_field( wp_unslash( $_POST['anonce_admin'] ) ) : '';
+                if ( ! wp_verify_nonce( $admin_nonce, 'cpappb_actions_admin_booking_' . intval( $this->item ) ) ) {
+                    wp_die( esc_html__( 'Security check failed.', 'appointment-hour-booking' ), 403 );
+                }
+                $is_admin_booking = true;
+            }
+        }
+
         @session_start();
+        $sequence = '';
         if (isset($_GET["ps"])) $sequence = sanitize_text_field($_GET["ps"]); else if (isset($_POST["cp_pform_psequence"])) $sequence = sanitize_text_field($_POST["cp_pform_psequence"]);
         $captcha_tr = '';
         if (!empty($_COOKIE['rand_code'.$sequence])) $captcha_tr = get_transient( "ahb-captcha-".sanitize_key($_COOKIE['rand_code'.$sequence]));
         if (
                !apply_filters( 'cpappb_valid_submission', true) ||
                (
-                   (!is_admin() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) &&
+                   (!$is_admin_booking && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) &&
                    ( (!isset($_SESSION['rand_code'.$sequence]) ||
                       strtolower($this->get_param('hdcaptcha_'.$this->prefix.'_post')) != strtolower(sanitize_text_field($_SESSION['rand_code'.$sequence])) ||
                      ($_SESSION['rand_code'.$sequence] == ''))
@@ -1655,7 +1722,7 @@ public function render_form_admin( $atts ) {
         }
 
     	// if this isn't the real post (it was the captcha verification) then echo ok and exit
-        if ( 'POST' != $_SERVER['REQUEST_METHOD'] || ! isset( $_POST[$this->prefix.'_pform_process'] ) )
+        if ( ! $is_post_submission )
     	{
     	    echo 'ok';
             exit;
@@ -1665,7 +1732,7 @@ public function render_form_admin( $atts ) {
         foreach ($_POST as $item => $value)
             $posted_items[sanitize_key($item)] = $this->sanitize( is_array($value) ? $value : stripcslashes($value) );
 
-        if (isset($_GET["blocktimes"]) && is_admin() && current_user_can('edit_posts'))
+        if (isset($_GET["blocktimes"]) && $is_admin_booking && current_user_can('edit_posts'))
             define('CPAPPHOURBK_BLOCK_TIMES_PROCESS', true);
 
         // get form info
@@ -1674,7 +1741,12 @@ public function render_form_admin( $atts ) {
         $form_data = json_decode($this->cleanJSON($this->get_option('form_structure', CP_APPBOOK_DEFAULT_form_structure)));
         $fields = array();
 
-        $apps = $this->extract_appointments($form_data[0], $posted_items, $sequence);
+        $validation_error = '';
+        $apps = $this->extract_appointments($form_data[0], $posted_items, $sequence, $is_admin_booking, $validation_error);
+        if ( '' !== $validation_error )
+        {
+            wp_die( esc_html( $validation_error ), esc_html__( 'Invalid Booking Request', 'appointment-hour-booking' ), array( 'response' => 400 ) );
+        }
 
         $honeypotcheck = sanitize_key(get_option('cp_cpappb_honeypot',''));
         if ($honeypotcheck != '' && (isset($_POST[$honeypotcheck]) && $_POST[$honeypotcheck] != ''))
@@ -1759,8 +1831,8 @@ public function render_form_admin( $atts ) {
 
         $buffer_A = (defined('CPAPPHOURBK_BLOCK_TIMES_PROCESS')?__('BLOCKED BY ADMIN','appointment-hour-booking')."\n\n":'') . $buffer;
 
-        if ($this->booking_form_nonce || is_admin())
-            $this->verify_nonce ($posted_items["anonce"], 'cpappb_actions_bookingform');
+        if ($this->booking_form_nonce)
+            $this->verify_nonce (isset($posted_items["anonce"]) ? $posted_items["anonce"] : '', 'cpappb_actions_bookingform');
 
         $_SESSION['rand_code'.$sequence] = '';
         if (!empty($_COOKIE['rand_code'.$sequence])) set_transient( "ahb-captcha-".sanitize_key($_COOKIE['rand_code'.$sequence]) , '' , 1800 );
@@ -1831,7 +1903,7 @@ public function render_form_admin( $atts ) {
         $this->ready_to_go_reservation( $item_number, "" );
         $_SESSION[ 'cp_cff_form_data' ] = $item_number;
 
-        if (is_admin())
+        if ($is_admin_booking)
             return;
 
         /**
@@ -1859,108 +1931,149 @@ public function render_form_admin( $atts ) {
         global $wpdb;
 
         // If there are no appointments in the cart, it's valid
-        if (!isset($params["apps"]) || !is_array($params["apps"]) || empty($params["apps"])) {
+        if ( ! isset( $params["apps"] ) || ! is_array( $params["apps"] ) || empty( $params["apps"] ) ) {
             return true;
         }
 
-        // 1. Group submitted appointments to handle duplicates within the same cart
+        // 1. Parse and group submitted appointments using normalized HH:MM/HH:MM slots
         $requested_slots = array();
-        foreach ($params["apps"] as $current_app) {
-            if (!isset($current_app["date"]) || !isset($current_app["slot"]) || !isset($current_app["service"])) {
+        $requested_dates = array();
+
+        foreach ( $params["apps"] as $current_app ) {
+            if ( ! isset( $current_app["date"], $current_app["slot"], $current_app["service"] ) ) {
                 continue;
             }
-            
-            // Create a unique key for the specific date, time, and service
-            $key = $current_app["date"] . '|' . $current_app["slot"] . '|' . $current_app["service"];
-            $quant = isset($current_app["quant"]) ? intval($current_app["quant"]) : 1;
-            
-            if (!isset($requested_slots[$key])) {
-                $requested_slots[$key] = array(
-                    'date' => $current_app["date"],
-                    'field' => isset($current_app["field"]) ? $current_app["field"] : '',
-                    'serviceindex' => isset($current_app["serviceindex"]) ? intval($current_app["serviceindex"]) : -1,
-                    'requested_quant' => 0
+
+            $allow_full_day = ( isset( $current_app["duration"] ) && intval( $current_app["duration"] ) === 1440 );
+            $parsed         = $this->parse_and_normalize_slot( $current_app["slot"], $allow_full_day );
+            if ( false === $parsed ) {
+                return false;
+            }
+
+            $date  = $current_app["date"];
+            $key   = $date . '|' . $parsed['slot'] . '|' . $current_app["service"];
+            $quant = isset( $current_app["quant"] ) ? max( 1, intval( $current_app["quant"] ) ) : 1;
+
+            $requested_dates[ $date ] = true;
+
+            if ( ! isset( $requested_slots[ $key ] ) ) {
+                $requested_slots[ $key ] = array(
+                    'date'            => $date,
+                    'slot'            => $parsed['slot'],
+                    'start_min'       => $parsed['start_min'],
+                    'end_min'         => $parsed['end_min'],
+                    'service'         => $current_app["service"],
+                    'field'           => isset( $current_app["field"] ) ? $current_app["field"] : '',
+                    'serviceindex'    => isset( $current_app["serviceindex"] ) ? intval( $current_app["serviceindex"] ) : -1,
+                    'requested_quant' => 0,
                 );
             }
-            $requested_slots[$key]['requested_quant'] += $quant;
+            $requested_slots[ $key ]['requested_quant'] += $quant;
         }
 
-        if (empty($requested_slots)) {
+        if ( empty( $requested_slots ) ) {
             return true;
         }
 
         // 2. Fetch recent bookings exactly ONCE to prevent N+1 queries
         $latestitems = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT id, posted_data FROM ".$wpdb->prefix."cpappbk_messages WHERE formid=%d ORDER BY ID DESC LIMIT 2000",
+                "SELECT id, posted_data FROM " . $wpdb->prefix . "cpappbk_messages WHERE formid=%d ORDER BY ID DESC LIMIT 2000",
                 $this->item
             )
         );
 
-        // 3. Tally existing bookings for ONLY the requested slots in memory
+        // 3. Tally overlapping existing bookings (normalized) and admin blocks in memory
         $already_booked = array();
-        foreach ($latestitems as $item) {
+        $admin_blocked  = array();
+
+        foreach ( $latestitems as $item ) {
             // If verifying post-insert, skip the row we just inserted so we don't double-count it
-            if ($is_double_check && $item->id == $is_double_check) {
-                continue; 
+            if ( $is_double_check && intval( $item->id ) === intval( $is_double_check ) ) {
+                continue;
             }
-            
-            $latestdata = unserialize($item->posted_data);
-            if (!isset($latestdata["apps"]) || !is_array($latestdata["apps"])) continue;
+
+            $latestdata = unserialize( $item->posted_data );
+            if ( ! isset( $latestdata["apps"] ) || ! is_array( $latestdata["apps"] ) ) {
+                continue;
+            }
 
             // Check if the overall submission is locked (e.g., pending payment checkout)
-            $has_lock = isset($latestdata["lock"]);
+            $has_lock = isset( $latestdata["lock"] );
 
-            // Check every stored appointment
-            foreach ($latestdata["apps"] as $app) {
-                $status = isset($app["cancelled"]) ? $app["cancelled"] : '';
-                
-                // Only count the slot if it has a valid occupied status or is actively locked
+            foreach ( $latestdata["apps"] as $app ) {
+                $status      = isset( $app["cancelled"] ) ? $app["cancelled"] : '';
                 $is_occupied = $has_lock || $status === '' || $status === 'Pending' || $status === 'Attended';
-                
-                if (!$is_occupied) continue;
-                if (!isset($app["date"]) || !isset($app["slot"]) || !isset($app["service"])) continue;
-                
-                $key = $app["date"] . '|' . $app["slot"] . '|' . $app["service"];
-                
-                // If it matches a slot the user wants, add it to our memory map
-                if (isset($requested_slots[$key])) {
-                    if (!isset($already_booked[$key])) {
-                        $already_booked[$key] = 0;
+
+                if ( ! $is_occupied || ! isset( $app["date"], $app["slot"] ) || ! isset( $requested_dates[ $app["date"] ] ) ) {
+                    continue;
+                }
+
+                $allow_full_day = ( isset( $app["duration"] ) && intval( $app["duration"] ) === 1440 );
+                $existing       = $this->parse_and_normalize_slot( $app["slot"], $allow_full_day );
+                if ( false === $existing ) {
+                    continue;
+                }
+
+                $is_all_services_block = ( isset( $app["serviceindex"] ) && intval( $app["serviceindex"] ) === -1 );
+                $existing_quant        = isset( $app["quant"] ) ? max( 1, intval( $app["quant"] ) ) : 1;
+
+                foreach ( $requested_slots as $req_key => $req ) {
+                    if ( $app["date"] !== $req['date'] ) {
+                        continue;
                     }
-                    $quant = isset($app["quant"]) ? intval($app["quant"]) : 1;
-                    $already_booked[$key] += $quant;
+                    if ( ! ( $existing['start_min'] < $req['end_min'] && $existing['end_min'] > $req['start_min'] ) ) {
+                        continue;
+                    }
+
+                    if ( $is_all_services_block ) {
+                        $admin_blocked[ $req_key ] = true;
+                        continue;
+                    }
+
+                    if ( isset( $app["service"] ) && $app["service"] === $req['service'] ) {
+                        if ( ! isset( $already_booked[ $req_key ] ) ) {
+                            $already_booked[ $req_key ] = 0;
+                        }
+                        $already_booked[ $req_key ] += $existing_quant;
+                    }
                 }
             }
         }
 
         // 4. Get form configuration for capacities
-        $form_data = json_decode($this->cleanJSON($this->get_option('form_structure', CP_APPBOOK_DEFAULT_form_structure)));
+        $form_data = json_decode( $this->cleanJSON( $this->get_option( 'form_structure', CP_APPBOOK_DEFAULT_form_structure ) ) );
 
-        // 5. Verify every requested slot against its capacity
-        foreach ($requested_slots as $key => $slot_data) {
-            $capacity = 0; 
-            
-            if (is_array($form_data) && isset($form_data[0])) {
-                foreach ($form_data[0] as $field) {
-                    if (isset($field->name) && $field->name === $slot_data['field'] && isset($field->services[$slot_data['serviceindex']])) {
-                        $capacity = intval($field->services[$slot_data['serviceindex']]->capacity ?? 1);
+        // 5. Verify every requested slot against admin blocks and its capacity
+        foreach ( $requested_slots as $key => $slot_data ) {
+            if ( ! empty( $admin_blocked[ $key ] ) ) {
+                if ( $is_double_check ) {
+                    $wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->prefix . "cpappbk_messages WHERE id=%d", $is_double_check ) );
+                }
+                return false;
+            }
+
+            $capacity = 0;
+
+            if ( is_array( $form_data ) && isset( $form_data[0] ) ) {
+                foreach ( $form_data[0] as $field ) {
+                    if ( isset( $field->name ) && $field->name === $slot_data['field'] && isset( $field->services[ $slot_data['serviceindex'] ] ) ) {
+                        $capacity = intval( $field->services[ $slot_data['serviceindex'] ]->capacity ?? 1 );
                         break;
                     }
                 }
             }
-            // Fallback if capacity isn't found (identical to original logic)
-            if ($capacity == 0) $capacity = 1;
+            if ( $capacity <= 0 ) {
+                $capacity = 1;
+            }
 
-            $current_booked = isset($already_booked[$key]) ? $already_booked[$key] : 0;
-            
-            // Fail if the capacity limit is exceeded
-            if (($current_booked + $slot_data['requested_quant']) > $capacity) {
-                // If this is a post-insertion check, delete the invalid row just like the original code did
-                if ($is_double_check) {
-                    $wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."cpappbk_messages WHERE id=%d", $is_double_check));
+            $current_booked = isset( $already_booked[ $key ] ) ? $already_booked[ $key ] : 0;
+
+            if ( ( $current_booked + $slot_data['requested_quant'] ) > $capacity ) {
+                if ( $is_double_check ) {
+                    $wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->prefix . "cpappbk_messages WHERE id=%d", $is_double_check ) );
                 }
-                return false; 
+                return false;
             }
         }
 
@@ -1968,9 +2081,13 @@ public function render_form_admin( $atts ) {
     }
 
 
-private function countBookingsFor( $date, $slot, $service ) {
+    private function countBookingsFor( $date, $slot, $service ) {
         global $wpdb;
         $count = 0;
+
+        $target_parsed = $this->parse_and_normalize_slot( $slot, true );
+        $target_slot   = ( false !== $target_parsed ) ? $target_parsed['slot'] : trim( (string) $slot );
+
         // verification for the latest 1000 submissions
         $like_date = '%' . $wpdb->esc_like( $date ) . '%';
 
@@ -1980,21 +2097,27 @@ private function countBookingsFor( $date, $slot, $service ) {
                 $this->item,
                 $like_date
             )
-        );                         
-                         
-        foreach ($latestitems as $item)
-        {
-            $latestdata = unserialize($item->posted_data);
-            if (!isset($latestdata["apps"]) || !is_array($latestdata["apps"])) continue;
-            
-            foreach ($latestdata["apps"] as $app) {
-                if ($app["date"] == $date &&
-                    $app["slot"] == $slot &&
+        );
+
+        foreach ( $latestitems as $item ) {
+            $latestdata = unserialize( $item->posted_data );
+            if ( ! isset( $latestdata["apps"] ) || ! is_array( $latestdata["apps"] ) ) {
+                continue;
+            }
+
+            foreach ( $latestdata["apps"] as $app ) {
+                $allow_full_day = ( isset( $app["duration"] ) && intval( $app["duration"] ) === 1440 );
+                $app_parsed     = isset( $app["slot"] ) ? $this->parse_and_normalize_slot( $app["slot"], $allow_full_day ) : false;
+                $app_slot       = ( false !== $app_parsed ) ? $app_parsed['slot'] : ( isset( $app["slot"] ) ? $app["slot"] : '' );
+
+                if ( isset( $app["date"], $app["service"] ) &&
+                    $app["date"] == $date &&
+                    $app_slot == $target_slot &&
                     $app["service"] == $service &&
-                    ($app["cancelled"] == '' || $app["cancelled"] == 'Pending' || $app["cancelled"] == 'Attended')
-                   ) {
-                   $quant = isset($app["quant"]) ? intval($app["quant"]) : 1;
-                   $count += $quant;
+                    ( ! isset( $app["cancelled"] ) || $app["cancelled"] == '' || $app["cancelled"] == 'Pending' || $app["cancelled"] == 'Attended' )
+                ) {
+                    $quant  = isset( $app["quant"] ) ? max( 1, intval( $app["quant"] ) ) : 1;
+                    $count += $quant;
                 }
             }
         }
@@ -2072,62 +2195,397 @@ private function countBookingsFor( $date, $slot, $service ) {
     }
 
 
-    public function extract_appointments( $form, $data, $sequence ) {
-        $apps = array();
-        $subid = 0;
-        if (is_admin() || defined('CPAPPHOURBK_BLOCK_TIMES_PROCESS'))
-		{
-            if (is_admin() && isset($_POST["statusbox"]))
-                $status = sanitize_text_field($_POST["statusbox"]);
-            else
-			    $status = $this->get_option('defaultpaidstatus', '');
-		}
-        else
-            $status = $this->get_option('defaultstatus', '');
-        if (defined('CPAPPHOURBK_BLOCK_TIMES_PROCESS')) $status = '';
-        foreach($form as $field)
-            if ($field->ftype == 'fapp' && @$data[$field->name.$sequence] != '')
-            {
-                $apps_text = explode(';',$data[$field->name.$sequence]);
-                $fieldtotalcost = 0;
-                $fieldpostedcost = floatval(@$data["tcost".$field->name.$sequence]);
-                foreach($apps_text as $app_item_text)
-                {
-                    $item_split = explode(' ',$app_item_text);  
-                    if (!isset($item_split[2])) {
-                            continue; 
-                    }                    
-                    $item_split[2] = intval($item_split[2]);
-                    if (!isset($field->services[ $item_split[2] ])) {
-                        continue;
-                    }
-                    $service_capacity = max(1, intval($field->services[ $item_split[2] ]->capacity ?? 1));
-                    $quant = min(intval($item_split[3] ?? 1), $service_capacity);
-                    if ($quant <= 0) {
-                        $quant = 1;
-                    }
-                    $subid++;
-                    $fieldtotalcost += (floatval($field->services[ $item_split[2] ]->price) * $quant);
-                    $sdate = strtotime($item_split[0]);
-                    if ($sdate > 0)
-                        $apps[] = array (
-                                         'id' => $subid,
-                                         'cancelled' => $status,
-                                         'serviceindex' => $item_split[2],
-                                         'service' => $field->services[ $item_split[2] ]->name,
-                                         'duration' => $field->services[ $item_split[2] ]->duration,
-                                         'price' => floatval($field->services[ $item_split[2] ]->price) * $quant,
-                                         'date' =>  gmdate("Y-m-d", $sdate),
-                                         'slot' => sanitize_text_field($item_split[1]),
-                                         'military' => (!empty($field->militaryTime) ? $field->militaryTime : 0),
-                                         'field' => $field->name,
-                                         'quant' => $quant,
-                                         'sid' => (isset($field->services[ $item_split[2] ]->idx)?$field->services[ $item_split[2] ]->idx:'')  // service ID
-                                         );
-                }
-                //if ($fieldtotalcost < $fieldpostedcost)      // this is to support javascript price calculations
-                //    $apps[count($apps)-1]["price"] = $fieldpostedcost;
+    private function parse_and_normalize_slot( $raw_slot, $allow_full_day = false ) {
+        $raw_slot = trim( (string) $raw_slot );
+        if ( ! preg_match( '/^(\d{1,2}):(\d{2})\/(\d{1,2}):(\d{2})$/', $raw_slot, $m ) ) {
+            return false;
+        }
+
+        $h1 = intval( $m[1] );
+        $m1 = intval( $m[2] );
+        $h2 = intval( $m[3] );
+        $m2 = intval( $m[4] );
+
+        if ( $h1 < 0 || $h1 > 23 || $m1 < 0 || $m1 > 59 ) {
+            return false;
+        }
+        if ( $h2 < 0 || $h2 > 24 || $m2 < 0 || $m2 > 59 || ( 24 === $h2 && $m2 > 0 ) ) {
+            return false;
+        }
+
+        $start_min = ( $h1 * 60 ) + $m1;
+        $end_min   = ( $h2 * 60 ) + $m2;
+
+        if ( $end_min === $start_min ) {
+            if ( ! $allow_full_day ) {
+                return false;
             }
+            $end_min = $start_min + 1440;
+        } elseif ( $end_min < $start_min ) {
+            return false;
+        }
+
+        return array(
+            'h1'        => $h1,
+            'm1'        => $m1,
+            'h2'        => $h2,
+            'm2'        => $m2,
+            'start_min' => $start_min,
+            'end_min'   => $end_min,
+            'slot'      => sprintf( '%02d:%02d/%02d:%02d', $h1, $m1, $h2, $m2 ),
+        );
+    }
+
+
+    private function parse_datepicker_date_string( $date_str, $date_format ) {
+        $date_str = trim( (string) $date_str );
+        if ( '' === $date_str ) {
+            return false;
+        }
+
+        if ( preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $date_str, $m ) ) {
+            return checkdate( intval( $m[2] ), intval( $m[3] ), intval( $m[1] ) ) ? $date_str : false;
+        }
+
+        $php_format = str_replace(
+            array( 'dd', 'mm', 'yy', 'd', 'm', 'y' ),
+            array( 'd', 'm', 'Y', 'j', 'n', 'y' ),
+            (string) $date_format
+        );
+        $dt = DateTime::createFromFormat( '!' . $php_format, $date_str, new DateTimeZone( 'UTC' ) );
+        if ( $dt && $dt->format( $php_format ) === $date_str ) {
+            return $dt->format( 'Y-m-d' );
+        }
+
+        return false;
+    }
+
+
+    private function parse_datepicker_bound( $spec, $date_format, $now_ts ) {
+        $spec = trim( (string) $spec );
+        if ( '' === $spec ) {
+            return null;
+        }
+
+        $today_ts = strtotime( gmdate( 'Y-m-d', $now_ts ) . ' 00:00:00 UTC' );
+
+        if ( preg_match( '/^[+-]?\d+$/', $spec ) ) {
+            $days = intval( $spec );
+            return array(
+                'type' => 'date',
+                'date' => gmdate( 'Y-m-d', $today_ts + ( $days * 86400 ) ),
+            );
+        }
+
+        if ( preg_match( '/^([+-]?\d+)\s*h$/i', $spec, $m ) ) {
+            return array(
+                'type' => 'timestamp',
+                'ts'   => $now_ts + ( intval( $m[1] ) * 3600 ),
+            );
+        }
+
+        if ( preg_match_all( '/([+-]?\d+)\s*([dwmy])/i', $spec, $matches, PREG_SET_ORDER ) ) {
+            $cleaned = trim( preg_replace( '/([+-]?\d+)\s*([dwmy])/i', '', $spec ) );
+            if ( '' === $cleaned ) {
+                $dt = new DateTime( '@' . $today_ts );
+                $dt->setTimezone( new DateTimeZone( 'UTC' ) );
+                $unit_map = array(
+                    'd' => 'days',
+                    'w' => 'weeks',
+                    'm' => 'months',
+                    'y' => 'years',
+                );
+                foreach ( $matches as $part ) {
+                    $val  = intval( $part[1] );
+                    $unit = $unit_map[ strtolower( $part[2] ) ];
+                    $dt->modify( ( $val >= 0 ? '+' : '' ) . $val . ' ' . $unit );
+                }
+                return array(
+                    'type' => 'date',
+                    'date' => $dt->format( 'Y-m-d' ),
+                );
+            }
+        }
+
+        $fixed = $this->parse_datepicker_date_string( $spec, $date_format );
+        if ( false !== $fixed ) {
+            return array(
+                'type' => 'date',
+                'date' => $fixed,
+            );
+        }
+
+        return null;
+    }
+
+
+    private function is_date_in_invalid_dates( $date, $invalid_dates_str, $date_format ) {
+        $invalid_dates_str = trim( (string) $invalid_dates_str );
+        if ( '' === $invalid_dates_str ) {
+            return false;
+        }
+
+        $entries = explode( ',', $invalid_dates_str );
+        foreach ( $entries as $entry ) {
+            $entry = trim( $entry );
+            if ( '' === $entry ) {
+                continue;
+            }
+            if ( strpos( $entry, '-' ) !== false && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $entry ) ) {
+                $parts = explode( '-', $entry, 2 );
+                $d1    = $this->parse_datepicker_date_string( $parts[0], $date_format );
+                $d2    = $this->parse_datepicker_date_string( $parts[1], $date_format );
+                if ( $d1 && $d2 && $date >= $d1 && $date <= $d2 ) {
+                    return true;
+                }
+            } else {
+                $d = $this->parse_datepicker_date_string( $entry, $date_format );
+                if ( $d && $date === $d ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    private function validate_appointment_against_field( $field, $service_index, $date, $parsed_slot ) {
+        if ( ! isset( $field->services[ $service_index ] ) ) {
+            return false;
+        }
+
+        $service  = $field->services[ $service_index ];
+        $duration = isset( $service->duration ) ? intval( $service->duration ) : 0;
+        if ( $duration <= 0 ) {
+            return false;
+        }
+
+        // 1. Verify exact service duration
+        if ( ( $parsed_slot['end_min'] - $parsed_slot['start_min'] ) !== $duration ) {
+            return false;
+        }
+
+        // 2. Verify minDate / maxDate in WordPress local timezone
+        $now_ts        = current_time( 'timestamp' );
+        $date_format   = ! empty( $field->dateFormat ) ? $field->dateFormat : $this->get_option( 'date_format', 'mm/dd/yy' );
+        $slot_start_ts = strtotime( $date . ' ' . sprintf( '%02d:%02d:00', $parsed_slot['h1'], $parsed_slot['m1'] ) . ' UTC' );
+
+        $min_bound = $this->parse_datepicker_bound( isset( $field->minDate ) ? $field->minDate : '', $date_format, $now_ts );
+        if ( is_array( $min_bound ) ) {
+            if ( 'date' === $min_bound['type'] && $date < $min_bound['date'] ) {
+                return false;
+            }
+            if ( 'timestamp' === $min_bound['type'] && $slot_start_ts < $min_bound['ts'] ) {
+                return false;
+            }
+        }
+
+        $max_bound = $this->parse_datepicker_bound( isset( $field->maxDate ) ? $field->maxDate : '', $date_format, $now_ts );
+        if ( is_array( $max_bound ) ) {
+            if ( 'date' === $max_bound['type'] && $date > $max_bound['date'] ) {
+                return false;
+            }
+            if ( 'timestamp' === $max_bound['type'] && $slot_start_ts > $max_bound['ts'] ) {
+                return false;
+            }
+        }
+
+        // 3. Verify invalidDates
+        if ( ! empty( $field->invalidDates ) && $this->is_date_in_invalid_dates( $date, $field->invalidDates, $date_format ) ) {
+            return false;
+        }
+
+        // 4. Resolve open hours rules (special date > weekday > all)
+        $dow      = intval( gmdate( 'w', strtotime( $date . ' 00:00:00 UTC' ) ) );
+        $oh_index = isset( $service->ohindex ) ? intval( $service->ohindex ) : 0;
+        $oh_rules = array();
+
+        if ( isset( $field->allOH[ $oh_index ]->openhours ) && is_array( $field->allOH[ $oh_index ]->openhours ) ) {
+            $oh_rules = $field->allOH[ $oh_index ]->openhours;
+        } elseif ( isset( $field->openhours[0]->openhours ) && is_array( $field->openhours[0]->openhours ) ) {
+            $oh_rules = $field->openhours[0]->openhours;
+        }
+
+        $special_rules = array();
+        $weekday_rules = array();
+        $all_rules     = array();
+
+        foreach ( $oh_rules as $rule ) {
+            $type = isset( $rule->type ) ? (string) $rule->type : '';
+            if ( 'special' === $type && isset( $rule->d ) && $rule->d === $date ) {
+                $special_rules[] = $rule;
+            } elseif ( $type === 'd' . $dow ) {
+                $weekday_rules[] = $rule;
+            } elseif ( 'all' === $type ) {
+                $all_rules[] = $rule;
+            }
+        }
+
+        if ( ! empty( $special_rules ) ) {
+            $active_rules = $special_rules;
+        } else {
+            if ( isset( $field->working_dates ) && is_array( $field->working_dates ) && empty( $field->working_dates[ $dow ] ) ) {
+                return false;
+            }
+            $active_rules = ! empty( $weekday_rules ) ? $weekday_rules : $all_rules;
+        }
+
+        if ( empty( $active_rules ) ) {
+            return false;
+        }
+
+        // 5. Check slot falls inside an open window and aligns to the configured slot step
+        $pb = isset( $service->pb ) ? max( 0, intval( $service->pb ) ) : 0;
+        $pa = isset( $service->pa ) ? max( 0, intval( $service->pa ) ) : 0;
+
+        if ( ! empty( $service->bSlotsCheckbox ) && ! empty( $service->bSlots ) && intval( $service->bSlots ) > 0 ) {
+            $step = intval( $service->bSlots );
+        } elseif ( ! empty( $field->bSlotsCheckbox ) && ! empty( $field->bSlots ) && intval( $field->bSlots ) > 0 ) {
+            $step = intval( $field->bSlots );
+        } else {
+            $step = $duration + $pb + $pa;
+        }
+
+        foreach ( $active_rules as $rule ) {
+            $oh_start = ( intval( $rule->h1 ?? 0 ) * 60 ) + intval( $rule->m1 ?? 0 );
+            $oh_end   = ( intval( $rule->h2 ?? 0 ) * 60 ) + intval( $rule->m2 ?? 0 );
+
+            if ( 0 === $oh_end && ( $oh_start > 0 || 1440 === $duration ) ) {
+                $oh_end = 1440;
+            }
+
+            if ( $oh_end <= $oh_start ) {
+                continue;
+            }
+
+            if ( $parsed_slot['start_min'] >= $oh_start && $parsed_slot['end_min'] <= $oh_end ) {
+                $aligned_padded = ( $parsed_slot['start_min'] >= ( $oh_start + $pb ) &&
+                                    ( $parsed_slot['end_min'] + $pa ) <= $oh_end &&
+                                    $step > 0 &&
+                                    ( ( $parsed_slot['start_min'] - ( $oh_start + $pb ) ) % $step ) === 0 );
+                $aligned_raw    = ( $pb > 0 &&
+                                    $step > 0 &&
+                                    ( ( $parsed_slot['start_min'] - $oh_start ) % $step ) === 0 );
+
+                if ( $aligned_padded || $aligned_raw ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    public function extract_appointments( $form, $data, $sequence, $is_admin_booking = false, &$validation_error = '' ) {
+        $apps  = array();
+        $subid = 0;
+
+        if ( $is_admin_booking || defined( 'CPAPPHOURBK_BLOCK_TIMES_PROCESS' ) ) {
+            $allowed_statuses = array_merge( array( '' ), $this->paid_statuses );
+            if ( $is_admin_booking && isset( $_POST["statusbox"] ) ) {
+                $requested_status = sanitize_text_field( wp_unslash( $_POST["statusbox"] ) );
+                $status           = in_array( $requested_status, $allowed_statuses, true )
+                    ? $requested_status
+                    : $this->get_option( 'defaultpaidstatus', '' );
+            } else {
+                $status = $this->get_option( 'defaultpaidstatus', '' );
+            }
+        } else {
+            $status = $this->get_option( 'defaultstatus', '' );
+        }
+
+        if ( defined( 'CPAPPHOURBK_BLOCK_TIMES_PROCESS' ) ) {
+            $status = '';
+        }
+
+        foreach ( $form as $field ) {
+            if ( 'fapp' !== $field->ftype ) {
+                continue;
+            }
+
+            $raw_field_value = isset( $data[ $field->name . $sequence ] ) ? trim( (string) $data[ $field->name . $sequence ] ) : '';
+            if ( '' === $raw_field_value ) {
+                if ( ! $is_admin_booking && ! empty( $field->required ) ) {
+                    $validation_error = __( 'Please select a valid appointment date and time slot.', 'appointment-hour-booking' );
+                    return array();
+                }
+                continue;
+            }
+
+            $apps_text   = array_filter( array_map( 'trim', explode( ';', $raw_field_value ) ), 'strlen' );
+            $field_count = 0;
+            $max_apps    = isset( $field->maxNumberOfApp ) ? intval( $field->maxNumberOfApp ) : 0;
+
+            foreach ( $apps_text as $app_item_text ) {
+                $item_split = preg_split( '/\s+/', $app_item_text );
+                if ( count( $item_split ) < 3 ) {
+                    $validation_error = __( 'Invalid appointment format.', 'appointment-hour-booking' );
+                    return array();
+                }
+
+                $raw_date      = $item_split[0];
+                $raw_slot      = $item_split[1];
+                $service_index = intval( $item_split[2] );
+
+                if ( ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $raw_date, $dm ) ||
+                     ! checkdate( intval( $dm[2] ), intval( $dm[3] ), intval( $dm[1] ) ) ) {
+                    $validation_error = __( 'Invalid appointment date.', 'appointment-hour-booking' );
+                    return array();
+                }
+                $normalized_date = sprintf( '%04d-%02d-%02d', intval( $dm[1] ), intval( $dm[2] ), intval( $dm[3] ) );
+
+                if ( ! isset( $field->services[ $service_index ] ) ) {
+                    $validation_error = __( 'Invalid appointment service.', 'appointment-hour-booking' );
+                    return array();
+                }
+
+                $service        = $field->services[ $service_index ];
+                $allow_full_day = ( isset( $service->duration ) && intval( $service->duration ) === 1440 );
+                $parsed_slot    = $this->parse_and_normalize_slot( $raw_slot, $allow_full_day );
+                if ( false === $parsed_slot ) {
+                    $validation_error = __( 'Invalid appointment time slot.', 'appointment-hour-booking' );
+                    return array();
+                }
+
+                if ( ! $is_admin_booking && ! defined( 'CPAPPHOURBK_BLOCK_TIMES_PROCESS' ) ) {
+                    if ( ! $this->validate_appointment_against_field( $field, $service_index, $normalized_date, $parsed_slot ) ) {
+                        $validation_error = __( 'Selected date or time slot is not available.', 'appointment-hour-booking' );
+                        return array();
+                    }
+                }
+
+                $service_capacity = max( 1, intval( $service->capacity ?? 1 ) );
+                $quant            = min( intval( $item_split[3] ?? 1 ), $service_capacity );
+                if ( $quant <= 0 ) {
+                    $quant = 1;
+                }
+
+                $field_count++;
+                if ( ! $is_admin_booking && $max_apps > 0 && $field_count > $max_apps ) {
+                    $validation_error = __( 'Maximum number of appointments exceeded.', 'appointment-hour-booking' );
+                    return array();
+                }
+
+                $subid++;
+                $apps[] = array(
+                    'id'           => $subid,
+                    'cancelled'    => $status,
+                    'serviceindex' => $service_index,
+                    'service'      => $service->name,
+                    'duration'     => $service->duration,
+                    'price'        => floatval( $service->price ) * $quant,
+                    'date'         => $normalized_date,
+                    'slot'         => $parsed_slot['slot'],
+                    'military'     => ( ! empty( $field->militaryTime ) ? $field->militaryTime : 0 ),
+                    'field'        => $field->name,
+                    'quant'        => $quant,
+                    'sid'          => ( isset( $service->idx ) ? $service->idx : '' ),  // service ID
+                );
+            }
+        }
+
         return $apps;
     }
 
@@ -2291,8 +2749,8 @@ private function countBookingsFor( $date, $slot, $service ) {
         $subject = $this->replace_tags($subject, $params);
 
 
-        // if is_admin and not required emails end function here
-        if (is_admin() && !isset($_POST["sendemails_admin"]) && !$resendonly)
+        // if authorized admin booking and not required emails end function here
+        if ($this->is_authorized_admin_booking($this->item) && !isset($_POST["sendemails_admin"]) && !$resendonly)
             return;
 
         foreach ($to as $item)
@@ -2418,76 +2876,118 @@ private function countBookingsFor( $date, $slot, $service ) {
     function block_multiple()
     {
         global $wpdb;
-        $rawfromfield = sanitize_text_field($_POST["bdate"]);
-        if ($rawfromfield == '')
+        if ( ! is_admin() || wp_doing_ajax() || ! is_user_logged_in() ) {
             return;
-        $rawfromfield = explode(",",$rawfromfield);
-       
-	    $calendars = array();
-	   	if (is_array($_POST["selectedcalendar"]))
-		    foreach ($_POST["selectedcalendar"] as $item)
-                $calendars[] = intval($item);
-        
-        $current_user = wp_get_current_user();
-        
-        foreach ($rawfromfield as $rawfrom)
-        {
-            $rawfrom = trim($rawfrom);
-            
-            foreach ($calendars as $calendar)
-            {
-                if ($calendar)
-                    $this->setId($calendar);
-                else
-                {
-                    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix."cpappbk_forms" ); 
-                    $this->setId($myrows[0]->id);
-                }
-                
-                if ( current_user_can('manage_options') || @in_array($current_user->ID, unserialize($this->get_option("cp_user_access",""))) )
-                {
-                
-                    if ($this->get_option('date_format', 'mm/dd/yy') == 'dd/mm/yy')
-                        $rawfrom = str_replace('/','.',$rawfrom);
-                    $from = gmdate("Y-m-d H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])));
-                    $to = gmdate("Y-m-d H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"])));
-                    $duration = ceil((strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"])) -  strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])))  / 60);
-                            
-                    
-                    $apps = array();
-                    $apps[] = array ( 'id' => 1,
-                                      'cancelled' => '',
-                                      'serviceindex' => -1,
-                                      'service' => __('[all services]','appointment-hour-booking'),
-                                      'duration' => $duration,
-                                      'price' => 0, //$field->services[ $item_split[2] ]->price,
-                                      'date' => gmdate("Y-m-d", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"]))),
-                                      'slot' => gmdate("H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h1"]). ":".sanitize_text_field($_POST["m1"])))."/". gmdate("H:i", strtotime($rawfrom. " ".sanitize_text_field($_POST["h2"]). ":".sanitize_text_field($_POST["m2"]))),
-                                      'military' => 0,
-                                      'field' => '',
-                                      'quant' => 0
-                                    );    
-                                    
-                     $apptext = __('BLOCKED BY ADMIN','appointment-hour-booking').  "\n\n" . $this->get_appointments_text ($apps);                        
-                     
-                     //echo '<pre>'; print_r($apptext);exit;
-                     $params = array();
-                     $params["apps"] = $apps;
-                     $current_user = wp_get_current_user();
-                     $rows_affected = $wpdb->insert( $wpdb->prefix."cpappbk_messages", array( 'formid' => $calendar,
-                                                                                                 'time' => current_time('mysql'),
-                                                                                                 'ipaddr' => (get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP)?$_SERVER['REMOTE_ADDR']:''),
-                                                                                                 'notifyto' => $this->blocked_by_admin_indicator,
-                                                                                                 'posted_data' => serialize($params),
-                                                                                                 'data' => $apptext,
-                                                                                                 'whoadded' => "".$current_user->ID
-                                                                                                ) );
-                }
+        }
+
+        $rawfromfield = isset( $_POST['bdate'] ) ? sanitize_text_field( wp_unslash( $_POST['bdate'] ) ) : '';
+        if ( '' === $rawfromfield ) {
+            return;
+        }
+        $rawfromfield = explode( ',', $rawfromfield );
+
+        $h1 = isset( $_POST['h1'] ) ? intval( $_POST['h1'] ) : -1;
+        $m1 = isset( $_POST['m1'] ) ? intval( $_POST['m1'] ) : -1;
+        $h2 = isset( $_POST['h2'] ) ? intval( $_POST['h2'] ) : -1;
+        $m2 = isset( $_POST['m2'] ) ? intval( $_POST['m2'] ) : -1;
+
+        $start_min = ( $h1 * 60 ) + $m1;
+        $end_min   = ( $h2 * 60 ) + $m2;
+        if (
+            $h1 < 0 || $h1 > 23 || $m1 < 0 || $m1 > 59 ||
+            $h2 < 0 || $h2 > 24 || $m2 < 0 || $m2 > 59 || ( 24 === $h2 && $m2 > 0 ) ||
+            $end_min <= $start_min
+        ) {
+            return;
+        }
+
+        $duration        = $end_min - $start_min;
+        $normalized_slot = sprintf( '%02d:%02d/%02d:%02d', $h1, $m1, $h2, $m2 );
+
+        $calendars = array();
+        if ( isset( $_POST['selectedcalendar'] ) && is_array( $_POST['selectedcalendar'] ) ) {
+            foreach ( $_POST['selectedcalendar'] as $item ) {
+                $calendars[] = intval( $item );
             }
-        }    
+        }
+        if ( empty( $calendars ) ) {
+            return;
+        }
+
+        $current_user = wp_get_current_user();
+
+        foreach ( $rawfromfield as $rawfrom ) {
+            $rawfrom = trim( $rawfrom );
+            if ( '' === $rawfrom ) {
+                continue;
+            }
+
+            foreach ( $calendars as $calendar ) {
+                if ( $calendar > 0 ) {
+                    $this->setId( $calendar );
+                } else {
+                    $myrows = $wpdb->get_results( "SELECT id FROM " . $wpdb->prefix . "cpappbk_forms ORDER BY id ASC LIMIT 1" );
+                    if ( empty( $myrows ) ) {
+                        continue;
+                    }
+                    $this->setId( intval( $myrows[0]->id ) );
+                }
+
+                $target_form_id = $this->getId();
+                if ( ! $this->check_current_user_access( $target_form_id ) ) {
+                    continue;
+                }
+
+                $date_format = $this->get_option( 'date_format', 'mm/dd/yy' );
+                $parsed_date = $this->parse_datepicker_date_string( $rawfrom, $date_format );
+                if ( false === $parsed_date ) {
+                    $fallback_raw = ( 'dd/mm/yy' === $date_format ) ? str_replace( '/', '.', $rawfrom ) : $rawfrom;
+                    $ts           = strtotime( $fallback_raw );
+                    if ( false === $ts || $ts <= 0 ) {
+                        continue;
+                    }
+                    $parsed_date = gmdate( 'Y-m-d', $ts );
+                }
+
+                $apps   = array();
+                $apps[] = array(
+                    'id'           => 1,
+                    'cancelled'    => '',
+                    'serviceindex' => -1,
+                    'service'      => __( '[all services]', 'appointment-hour-booking' ),
+                    'duration'     => $duration,
+                    'price'        => 0,
+                    'date'         => $parsed_date,
+                    'slot'         => $normalized_slot,
+                    'military'     => 0,
+                    'field'        => '',
+                    'quant'        => 0,
+                );
+
+                $apptext = __( 'BLOCKED BY ADMIN', 'appointment-hour-booking' ) . "\n\n" . $this->get_appointments_text( $apps );
+                $params         = array();
+                $params['apps'] = $apps;
+                $ipaddr         = ( get_option( 'cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP ) && isset( $_SERVER['REMOTE_ADDR'] ) )
+                    ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+                    : '';
+
+                $wpdb->insert(
+                    $wpdb->prefix . 'cpappbk_messages',
+                    array(
+                        'formid'      => $target_form_id,
+                        'time'        => current_time( 'mysql' ),
+                        'ipaddr'      => $ipaddr,
+                        'notifyto'    => $this->blocked_by_admin_indicator,
+                        'posted_data' => serialize( $params ),
+                        'data'        => $apptext,
+                        'whoadded'    => '' . $current_user->ID,
+                    )
+                );
+            }
+        }
         do_action( 'cpappb_cache_clean', 0 );
     }
-	
+
 
     function save_edition() {
         global $wpdb;

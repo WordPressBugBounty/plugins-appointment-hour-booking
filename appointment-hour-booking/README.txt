@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 5.3.0
 Tested up to: 7.1
-Stable tag: 1.6.07
+Stable tag: 1.6.08
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -906,7 +906,12 @@ Please note that the pro features aren't advertised as part of the free plugin i
 = 1.6.07 =
 * Improved permission checks, request validation, and input sanitization across form settings and booking management actions.
 
+= 1.6.08 =
+* Hardened booking form and time-blocking submissions with stricter server-side validation for dates, time slots, schedule availability, and administrative permissions. Thanks to kta1kri for responsible disclosure.   
+* Fixed bug in Publish Wizard 
+
 == Upgrade Notice ==
 
-= 1.6.07 =
-* Improved permission checks, request validation, and input sanitization across form settings and booking management actions.
+= 1.6.08 =
+* Hardened booking form and time-blocking submissions with stricter server-side validation for dates, time slots, schedule availability, and administrative permissions. Thanks to kta1kri for responsible disclosure.   
+* Fixed bug in Publish Wizard 

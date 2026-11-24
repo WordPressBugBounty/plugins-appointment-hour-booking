@@ -2,17 +2,12 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$this->item = intval($_GET["cal"]);
+$this->item = isset( $_GET['cal'] ) ? intval( $_GET['cal'] ) : 0;
 
 $current_user        = wp_get_current_user();
 $current_user_access = current_user_can( 'manage_options' );
 
-$access_option = $this->get_option( 'cp_user_access', '' );
-$allowed_users = maybe_unserialize( $access_option );
-
-$has_custom_access = is_array( $allowed_users ) && in_array( $current_user->ID, $allowed_users );
-
-if ( ! is_admin() || ( ! $current_user_access && ! $has_custom_access ) ) {
+if ( ! $this->is_authorized_admin_booking( $this->item ) ) {
     wp_die( 
         esc_html__( 'Direct access not allowed.', 'appointment-hour-booking' ), 
         '', 
@@ -34,7 +29,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform
     echo ' <a href="?page='.esc_attr($this->menu_parameter).'&cal='.intval($this->item).'&list=1">';
     esc_html_e('bookings list','appointment-hour-booking');
     echo '</a>. </strong></p></div>';
-} else if ($this->get_param($this->prefix.'_blockmultiple') == '1' && is_admin() )
+} else if ( 'POST' === $_SERVER['REQUEST_METHOD'] && ! empty( $_POST[ $this->prefix . '_blockmultiple' ] ) && $this->is_authorized_admin_booking( $this->item ) )
 {
     $opensecond = true;
     echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>';
@@ -50,9 +45,14 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_pform
 
 
 $selected = array();
-if ( ! empty( $_POST['selectedcalendar'] ) && is_array( $_POST['selectedcalendar'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['anonce'] ) ), 'cpappb_actions_admin_block_times' ) )
+if (
+    ! empty( $_POST['selectedcalendar'] ) &&
+    is_array( $_POST['selectedcalendar'] ) &&
+    ! empty( $_POST['anonce'] ) &&
+    wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['anonce'] ) ), 'cpappb_actions_admin_block_times' )
+)
 {
-    $sanitized_array = array_map( 'sanitize_text_field', $_POST['selectedcalendar'] );    
+    $sanitized_array = array_map( 'sanitize_text_field', wp_unslash( $_POST['selectedcalendar'] ) );    
     foreach ($sanitized_array as $item)
         $selected[] = intval($item);    
 }
@@ -227,8 +227,18 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin_block_times' );
            alert('<?php echo esc_js(__('Please select at least one date in the calendar','appointment-hour-booking')); ?>');
            return false;
        }
-       else
-           return true;
+       var f = document.forms['cp_appbooking_pform_2'];
+       if (f && f.h1 && f.m1 && f.h2 && f.m2)
+       {
+           var startMin = (parseInt(f.h1.value, 10) * 60) + parseInt(f.m1.value, 10);
+           var endMin   = (parseInt(f.h2.value, 10) * 60) + parseInt(f.m2.value, 10);
+           if (isNaN(startMin) || isNaN(endMin) || endMin <= startMin)
+           {
+               alert('<?php echo esc_js(__('End time must be after start time.','appointment-hour-booking')); ?>');
+               return false;
+           }
+       }
+       return true;
    }
  
 	jQuery(function(){
