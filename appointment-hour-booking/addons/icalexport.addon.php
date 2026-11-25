@@ -33,32 +33,38 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
             $cp_appb_plugin->add_field_verify ($wpdb->prefix.$this->form_table, 'ical_organizeremail');
 
 			// Insertion in database
-			if(
-				isset( $_POST[ 'CPAPPB_icalexport_id' ] ) && isset( $_POST["anonce"] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["anonce"])), 'cpappb_actions_admin')
-			)
-			{
-			    $wpdb->delete( $wpdb->prefix.$this->form_table, array( 'formid' => $form_id ), array( '%d' ) );
-				$wpdb->insert(
-								$wpdb->prefix.$this->form_table,
-								array(
-									'formid' => $form_id,
+            if (
+                isset( $_POST['CPAPPB_icalexport_id'], $_POST['anonce'] ) &&
+                $cp_appb_plugin->check_current_user_access_settings( $form_id )
+            ) {
+                $anonce = sanitize_text_field( wp_unslash( $_POST['anonce'] ) );
+                if (
+                    wp_verify_nonce( $anonce, 'cpappb_actions_admin_form_' . intval( $form_id ) ) ||
+                    wp_verify_nonce( $anonce, 'cpappb_actions_admin' )
+                ) {
+                    $wpdb->delete( $wpdb->prefix.$this->form_table, array( 'formid' => $form_id ), array( '%d' ) );
+                    $wpdb->insert(
+                                    $wpdb->prefix.$this->form_table,
+                                    array(
+                                        'formid' => $form_id,
 
-									'observe_day_light'	 => sanitize_text_field(stripslashes_deep($_POST["observe_day_light"])),
-									'ical_daylight_zone'	 => sanitize_text_field(stripslashes_deep($_POST["ical_daylight_zone"])),
-									'cal_time_zone_modify'	 => sanitize_text_field(stripslashes_deep($_POST["cal_time_zone_modify"])),
-                                    'attachical'	 => sanitize_text_field(stripslashes_deep($_POST["attachical"])),
-                                    'base_summary'	 => stripslashes_deep($cp_appb_plugin->sanitize($_POST["base_summary"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                                    'base_description'	 => stripslashes_deep($cp_appb_plugin->sanitize($_POST["base_description"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                                    'cal_tzid'	 => sanitize_text_field(stripslashes_deep($_POST["cal_tzid"])),
-                                    'ical_uselocal'	 => sanitize_text_field(stripslashes_deep($_POST["ical_uselocal"])),
-                                    'ical_organizer'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizer"])),
-                                    'ical_organizername'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizername"])),
-                                    'ical_organizeremail'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizeremail"]))
+                                        'observe_day_light'	 => sanitize_text_field(stripslashes_deep($_POST["observe_day_light"])),
+                                        'ical_daylight_zone'	 => sanitize_text_field(stripslashes_deep($_POST["ical_daylight_zone"])),
+                                        'cal_time_zone_modify'	 => sanitize_text_field(stripslashes_deep($_POST["cal_time_zone_modify"])),
+                                        'attachical'	 => sanitize_text_field(stripslashes_deep($_POST["attachical"])),
+                                        'base_summary'	 => stripslashes_deep($cp_appb_plugin->sanitize($_POST["base_summary"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                                        'base_description'	 => stripslashes_deep($cp_appb_plugin->sanitize($_POST["base_description"])), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                                        'cal_tzid'	 => sanitize_text_field(stripslashes_deep($_POST["cal_tzid"])),
+                                        'ical_uselocal'	 => sanitize_text_field(stripslashes_deep($_POST["ical_uselocal"])),
+                                        'ical_organizer'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizer"])),
+                                        'ical_organizername'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizername"])),
+                                        'ical_organizeremail'	 => sanitize_text_field(stripslashes_deep($_POST["ical_organizeremail"]))
 
-								),
-								array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
-							);
-			}
+                                    ),
+                                    array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+                                );
+                }
+            }
 
 			$rows = $wpdb->get_results(
 						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_icalexport WHERE formid=%d", $form_id )  
@@ -171,8 +177,7 @@ if( !class_exists( 'CPAPPB_iCalExport' ) )
                           <option value="1" <?php if ($row["attachical"] == '1') echo ' selected'; ?>>Yes - for all emails (excluding cancelled and rejected items)</option>
                           <option value="2" <?php if ($row["attachical"] == '2') echo ' selected'; ?>>Yes - for approved items only</option>
                          </select>
-                         <br />
-                         <em>* Important note: The folder "/wp-content/uploads/" must exist and have enough permissions to generate the iCal file to be attached.</em>
+                         <br />                         
                     </td>
                     </tr>
                     <tr valign="top">
@@ -234,18 +239,18 @@ ahb_icalexp_checkorg();
 
         private $form_table = 'cpappbk_icalexport';
         private $_inserted = false;
+        private $temp_files = array();
 
         /************************ CONSTRUCT *****************************/
 
         function __construct()
         {
-			$this->description = $this->tr_apply("The add-on adds support for exporting iCal files.", 'appointment-hour-booking' );
-            // Check if the plugin is active
-			if( !$this->addon_is_active() ) return;
+            $this->description = $this->tr_apply("The add-on adds support for exporting iCal files.", 'appointment-hour-booking' );
+            if( !$this->addon_is_active() ) return;
 
-			add_action( 'init', array( &$this, 'pp_iCalExport_update_status' ), 10, 1 );
-
+            add_action( 'init', array( &$this, 'pp_iCalExport_update_status' ), 10, 1 );
             add_filter( 'cpappb_email_attachments', array( &$this, 'attach_ical_file' ), 10, 3 );
+            add_action( 'shutdown', array( &$this, 'cleanup_temp_files' ) );
 
             $this->update_database();
 
@@ -255,8 +260,17 @@ ahb_icalexp_checkorg();
                 $passcode = wp_generate_uuid4();
                 update_option( 'CPAHB_PASSCODE', $passcode);
             }
+        }
 
-        } // End __construct
+        public function cleanup_temp_files()
+        {
+            foreach ( $this->temp_files as $file_path ) {
+                if ( file_exists( $file_path ) ) {
+                    wp_delete_file( $file_path );
+                }
+            }
+            $this->temp_files = array();
+        }
 
 
         		/**
@@ -364,7 +378,7 @@ ahb_icalexp_checkorg();
                             $datetime = $app["date"]." ".trim($time[0]);
                             $duration = "+".$app["duration"]." minutes";
                             $submissiontime = strtotime($item->time);
-                            if ($icalSettings[0]->observe_day_light)
+                            if ( isset($icalSettings[0]->observe_day_light) && $icalSettings[0]->observe_day_light === 'true' )
                             {
                                 $full_date = gmdate("Ymd",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify));
                                 $year = substr($full_date,0,4);
@@ -377,7 +391,7 @@ ahb_icalexp_checkorg();
                                 {
                                     $dst_start = strtotime('first Sunday GMT', strtotime("1 April $year GMT")); // First Sunday April
                                     $dst_stop = strtotime('last Sunday GMT', strtotime("1 October $year GMT")); // Last Sunday September
-                                } if (strtoupper($icalSettings[0]->ical_daylight_zone) == 'EUROPE')
+                                } else if (strtoupper($icalSettings[0]->ical_daylight_zone) == 'EUROPE')
                                 {
                                     $dst_start = strtotime('last Sunday GMT', strtotime("1 April $year GMT")); // Last Sunday March
                                     $dst_stop = strtotime('last Sunday GMT', strtotime("1 November $year GMT")); // Last Sunday October
@@ -444,7 +458,7 @@ ahb_icalexp_checkorg();
 						$wpdb->prepare( "SELECT * FROM ".$wpdb->prefix."cpappbk_icalexport WHERE formid=%d", $form_id ) 
 					);
 
-            if ($icalSettings[0]->attachical != '1' && $icalSettings[0]->attachical != '2')
+            if ( empty( $icalSettings ) || ( $icalSettings[0]->attachical != '1' && $icalSettings[0]->attachical != '2' ) )
                 return $attachments;
 
             $data = $params;
@@ -463,7 +477,7 @@ ahb_icalexp_checkorg();
                     $datetime = $app["date"]." ".trim($time[0]);
                     $duration = "+".$app["duration"]." minutes";
                     $submissiontime = time();
-                    if ($icalSettings[0]->observe_day_light)
+                    if ( isset($icalSettings[0]->observe_day_light) && $icalSettings[0]->observe_day_light === 'true' )
                     {
                         $full_date = gmdate("Ymd",strtotime($datetime.$icalSettings[0]->cal_time_zone_modify));
                         $year = substr($full_date,0,4);
@@ -533,14 +547,17 @@ ahb_icalexp_checkorg();
                     $buffer .= 'END:VCALENDAR';
 
                     if ( empty( $wp_filesystem ) ) {
-                        require_once( ABSPATH . '/wp-admin/includes/file.php' );
+                        require_once ABSPATH . 'wp-admin/includes/file.php';
                         WP_Filesystem();
                     }
-                    $filename1 = sanitize_file_name( 'Appointment' . '_' . $params["itemnumber"] . '_' . $ct . '.ics' );
-                    $upload_dir_info = wp_upload_dir();
-                    $file_path = $upload_dir_info['basedir'] . '/' . $filename1;
-                    if ( $wp_filesystem->put_contents( $file_path, $buffer, FS_CHMOD_FILE ) ) {    
-                        $attachments[] = $file_path;
+
+                    $tmp_dir   = trailingslashit( get_temp_dir() );
+                    $filename1 = sanitize_file_name( 'Appointment_' . intval( $params["itemnumber"] ) . '_' . $ct . '.ics' );
+                    $file_path = $tmp_dir . wp_unique_filename( $tmp_dir, $filename1 );
+
+                    if ( ! empty( $wp_filesystem ) && $wp_filesystem->put_contents( $file_path, $buffer, FS_CHMOD_FILE ) ) {
+                        $this->temp_files[] = $file_path;
+                        $attachments[]      = $file_path;
                     }
 
                 }

@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 5.3.0
 Tested up to: 7.1
-Stable tag: 1.6.09
+Stable tag: 1.6.11
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -914,7 +914,13 @@ Please note that the pro features aren't advertised as part of the free plugin i
 = 1.6.09 =
 * Added GDPR & Privacy Controls tab: IP anonymization/suppression, automated data retention cleanup, cookie-less CAPTCHA mode, AI reply PII redaction, WordPress Data Export/Erasure & Privacy Guide integration, and one-click booking anonymization.
 
+= 1.6.10 =
+Better validation messages
+
+= 1.6.11 =
+iCal Export bug fix
+
 == Upgrade Notice ==
 
-= 1.6.09 =
-Added GDPR & Privacy Controls, cookie-less CAPTCHA mode, WordPress Personal Data Export/Erasure integration, automated retention cleanup, and one-click booking anonymization.
+= 1.6.11 =
+iCal Export bug fix

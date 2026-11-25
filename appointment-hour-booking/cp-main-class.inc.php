@@ -538,6 +538,19 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
         $this->insert_public_item();
         $buffered_contents = ob_get_contents();
         ob_end_clean();
+        
+        if ( isset( $_GET['ahb_err'] ) ) {
+            $err_form = isset( $_GET['ahb_form'] ) ? intval( $_GET['ahb_form'] ) : 0;
+            if ( 0 === $err_form || $err_form === intval( $this->item ) ) {
+                $err_msg = $this->get_booking_error_message( sanitize_key( wp_unslash( $_GET['ahb_err'] ) ) );
+                if ( '' !== $err_msg ) {
+                    $notice_html = '<div class="ahb-booking-error" role="alert" style="margin:0 0 16px;padding:12px 16px;border:1px solid #d63638;border-left-width:4px;background:#fcf0f1;color:#1d2327;">'
+                        . esc_html( $err_msg )
+                        . '</div>';
+                    $buffered_contents = $notice_html . $buffered_contents;
+                }
+            }
+        }
 
 	    /**
 	     * Filters applied after generate the form,
@@ -1787,10 +1800,18 @@ public function render_form_admin( $atts ) {
         $fields = array();
 
         $validation_error = '';
-        $apps = $this->extract_appointments($form_data[0], $posted_items, $sequence, $is_admin_booking, $validation_error);
-        if ( '' !== $validation_error )
-        {
-            wp_die( esc_html( $validation_error ), esc_html__( 'Invalid Booking Request', 'appointment-hour-booking' ), array( 'response' => 400 ) );
+        $apps = $this->extract_appointments( $form_data[0], $posted_items, $sequence, $is_admin_booking, $validation_error );
+        if ( '' !== $validation_error ) {
+            $error_code = 'slot_unavailable';
+            if ( false !== stripos( $validation_error, 'Maximum number' ) ) {
+                $error_code = 'max_apps';
+            } elseif ( false !== stripos( $validation_error, 'Please select' ) ) {
+                $error_code = 'slot_required';
+            } elseif ( false !== stripos( $validation_error, 'Invalid' ) ) {
+                $error_code = 'invalid_request';
+            }
+
+            $this->redirect_with_booking_error( $error_code, $validation_error, $posted_items, $sequence );
         }
 
         $honeypotcheck = sanitize_key(get_option('cp_cpappb_honeypot',''));
@@ -1917,10 +1938,13 @@ public function render_form_admin( $atts ) {
         if (defined('CPAPPHOURBK_BLOCK_TIMES_PROCESS'))
             $sanitized_email = $this->blocked_by_admin_indicator;
 
-        if (!$this->performAdvancedDoubleBookingVerification($params, $sequence))
-        {
-            $this->endSubmission();
-            return; // in the case it shouldn't break the whole process
+        if ( ! $this->performAdvancedDoubleBookingVerification( $params, $sequence ) ) {
+            $this->redirect_with_booking_error(
+                'slot_taken',
+                __( 'Selected time is no longer available. Please select another time.', 'appointment-hour-booking' ),
+                $posted_items,
+                $sequence
+            );
         }
 
         $rows_affected = $wpdb->insert( $wpdb->prefix."cpappbk_messages", array( 'formid' => $this->item,
@@ -2464,6 +2488,8 @@ public function render_form_admin( $atts ) {
             $oh_rules = $field->allOH[ $oh_index ]->openhours;
         } elseif ( isset( $field->openhours[0]->openhours ) && is_array( $field->openhours[0]->openhours ) ) {
             $oh_rules = $field->openhours[0]->openhours;
+        } elseif ( isset( $field->openhours ) && is_array( $field->openhours ) ) {
+            $oh_rules = $field->openhours;
         }
 
         $special_rules = array();
@@ -2494,18 +2520,35 @@ public function render_form_admin( $atts ) {
             return false;
         }
 
-        // 5. Check slot falls inside an open window and aligns to the configured slot step
+        // 5. Resolve slot step:
+        // bSlotsCheckbox === true means "use service duration as step";
+        // bSlotsCheckbox === false means "use custom bSlots interval".
         $pb = isset( $service->pb ) ? max( 0, intval( $service->pb ) ) : 0;
         $pa = isset( $service->pa ) ? max( 0, intval( $service->pa ) ) : 0;
 
-        if ( ! empty( $service->bSlotsCheckbox ) && ! empty( $service->bSlots ) && intval( $service->bSlots ) > 0 ) {
-            $step = intval( $service->bSlots );
-        } elseif ( ! empty( $field->bSlotsCheckbox ) && ! empty( $field->bSlots ) && intval( $field->bSlots ) > 0 ) {
-            $step = intval( $field->bSlots );
+        $use_duration_step = true;
+        $custom_step       = 0;
+
+        if ( isset( $service->bSlotsCheckbox ) ) {
+            $use_duration_step = filter_var( $service->bSlotsCheckbox, FILTER_VALIDATE_BOOLEAN );
+            if ( ! empty( $service->bSlots ) && intval( $service->bSlots ) > 0 ) {
+                $custom_step = intval( $service->bSlots );
+            }
+        } elseif ( isset( $field->bSlotsCheckbox ) ) {
+            $use_duration_step = filter_var( $field->bSlotsCheckbox, FILTER_VALIDATE_BOOLEAN );
+            if ( ! empty( $field->bSlots ) && intval( $field->bSlots ) > 0 ) {
+                $custom_step = intval( $field->bSlots );
+            }
+        }
+
+        if ( ! $use_duration_step && $custom_step > 0 ) {
+            $step = $custom_step;
         } else {
             $step = $duration + $pb + $pa;
         }
 
+        // 6. Build and sort open windows for the day (handles multiple/unordered ranges per weekday)
+        $windows = array();
         foreach ( $active_rules as $rule ) {
             $oh_start = ( intval( $rule->h1 ?? 0 ) * 60 ) + intval( $rule->m1 ?? 0 );
             $oh_end   = ( intval( $rule->h2 ?? 0 ) * 60 ) + intval( $rule->m2 ?? 0 );
@@ -2517,6 +2560,52 @@ public function render_form_admin( $atts ) {
             if ( $oh_end <= $oh_start ) {
                 continue;
             }
+
+            $windows[] = array(
+                'start' => $oh_start,
+                'end'   => $oh_end,
+            );
+        }
+
+        if ( empty( $windows ) ) {
+            return false;
+        }
+
+        usort(
+            $windows,
+            function ( $a, $b ) {
+                if ( $a['start'] === $b['start'] ) {
+                    return $a['end'] - $b['end'];
+                }
+                return $a['start'] - $b['start'];
+            }
+        );
+
+        // Also include merged adjacent/overlapping windows for the same day
+        $candidate_windows = $windows;
+        $merged_windows    = array();
+        foreach ( $windows as $win ) {
+            if ( empty( $merged_windows ) ) {
+                $merged_windows[] = $win;
+            } else {
+                $last_idx = count( $merged_windows ) - 1;
+                if ( $win['start'] <= $merged_windows[ $last_idx ]['end'] ) {
+                    if ( $win['end'] > $merged_windows[ $last_idx ]['end'] ) {
+                        $merged_windows[ $last_idx ]['end'] = $win['end'];
+                    }
+                } else {
+                    $merged_windows[] = $win;
+                }
+            }
+        }
+        foreach ( $merged_windows as $mwin ) {
+            $candidate_windows[] = $mwin;
+        }
+
+        // 7. Check slot falls inside an open window and aligns to the configured slot step
+        foreach ( $candidate_windows as $win ) {
+            $oh_start = $win['start'];
+            $oh_end   = $win['end'];
 
             if ( $parsed_slot['start_min'] >= $oh_start && $parsed_slot['end_min'] <= $oh_end ) {
                 $aligned_padded = ( $parsed_slot['start_min'] >= ( $oh_start + $pb ) &&
@@ -2535,7 +2624,53 @@ public function render_form_admin( $atts ) {
 
         return false;
     }
+    
+    private function redirect_with_booking_error( $error_code, $fallback_message, $posted_items = array(), $sequence = '' ) {
+        $raw_ref = '';
+        if ( '' !== $sequence && ! empty( $posted_items[ 'refpage' . $sequence ] ) ) {
+            $raw_ref = $posted_items[ 'refpage' . $sequence ];
+        } elseif ( wp_get_referer() ) {
+            $raw_ref = wp_get_referer();
+        }
 
+        // Only allow redirects back to the same site (prevents open redirects)
+        $safe_url = wp_validate_redirect( esc_url_raw( $raw_ref ), '' );
+
+        if ( '' !== $safe_url ) {
+            $safe_url = remove_query_arg( array( 'ahb_err', 'ahb_form' ), $safe_url );
+            $safe_url = add_query_arg(
+                array(
+                    'ahb_err'  => sanitize_key( $error_code ),
+                    'ahb_form' => intval( $this->item ),
+                ),
+                $safe_url
+            );
+            wp_safe_redirect( $safe_url );
+            exit;
+        }
+
+        // Fallback for direct/non-browser POSTs without a valid local referer
+        wp_die(
+            esc_html( $fallback_message ),
+            esc_html__( 'Invalid Booking Request', 'appointment-hour-booking' ),
+            array(
+                'response'  => 400,
+                'back_link' => true,
+            )
+        );
+    }
+
+    private function get_booking_error_message( $error_code ) {
+        $messages = array(
+            'slot_unavailable' => __( 'Selected date or time slot is not available. Please select a different slot.', 'appointment-hour-booking' ),
+            'slot_taken'       => __( 'Selected time is no longer available. Please select another time.', 'appointment-hour-booking' ),
+            'slot_required'    => __( 'Please select a valid appointment date and time slot.', 'appointment-hour-booking' ),
+            'max_apps'         => __( 'Maximum number of appointments exceeded.', 'appointment-hour-booking' ),
+            'invalid_request'  => __( 'Invalid booking selection. Please select your date and time slot again.', 'appointment-hour-booking' ),
+        );
+
+        return isset( $messages[ $error_code ] ) ? $messages[ $error_code ] : '';
+    }   
 
     public function extract_appointments( $form, $data, $sequence, $is_admin_booking = false, &$validation_error = '' ) {
         $apps  = array();
@@ -2759,6 +2894,11 @@ public function render_form_admin( $atts ) {
             $message = str_replace('%INFO%',$buffer,$message);
         $subject = $this->get_option('fp_subject', CP_APPBOOK_DEFAULT_fp_subject);
 
+
+        // if authorized admin booking and not required emails end function here
+        if ($this->is_authorized_admin_booking($this->item) && !isset($_POST["sendemails_admin"]) && !$resendonly)
+            return;
+        
         /**
 		 *	Attach or modify attached files,
 		 *  Example for adding ical or PDF attachments
@@ -2810,10 +2950,6 @@ public function render_form_admin( $atts ) {
         $message = $this->replace_tags($message, $params);
         $subject = $this->replace_tags($subject, $params);
 
-
-        // if authorized admin booking and not required emails end function here
-        if ($this->is_authorized_admin_booking($this->item) && !isset($_POST["sendemails_admin"]) && !$resendonly)
-            return;
 
         foreach ($to as $item)
             if (trim($item) != '')
@@ -2883,9 +3019,15 @@ public function render_form_admin( $atts ) {
             if ( $is_html_cu ) { remove_filter( 'wp_mail_content_type', $html_filter ); }            
         }
         
-        foreach ($attachments as $item)
-            if (substr($item,0,strlen(WP_CONTENT_DIR . '/uploads/')) == WP_CONTENT_DIR . '/uploads/' && pathinfo($item, PATHINFO_EXTENSION) == 'ics')
-                wp_delete_file($item);
+        $tmp_dir = trailingslashit( wp_normalize_path( get_temp_dir() ) );
+
+        foreach ( $attachments as $item ) {
+            if ( is_string( $item ) &&
+                 strtolower( pathinfo( $item, PATHINFO_EXTENSION ) ) === 'ics' &&
+                 strpos( wp_normalize_path( $item ), $tmp_dir ) === 0 ) {
+                wp_delete_file( $item );
+            }
+        }
 
     }
 
