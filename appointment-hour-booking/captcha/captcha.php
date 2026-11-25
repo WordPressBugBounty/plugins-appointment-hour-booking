@@ -48,7 +48,23 @@ function appointment_hour_booking_get_captcha() {
     $random_text_color= true;                                
                                                   
 
-    if (function_exists('session_start')) @session_start();
+    $ahb_is_admin_preview   = ( ! empty( $_GET['preview'] ) && is_user_logged_in() );
+    $ahb_cookieless_captcha = ( class_exists( 'CP_AppBooking_GDPR' ) && CP_AppBooking_GDPR::get_setting( 'captcha_cookieless', '1' ) === '1' );
+    $ctoken                 = isset( $_GET['ctoken'] ) ? sanitize_text_field( wp_unslash( $_GET['ctoken'] ) ) : '';
+    $use_cookieless         = ( $ahb_cookieless_captcha && isset( $_GET['ctoken'] ) );
+
+    if ( ! $ahb_is_admin_preview ) {
+        if ( $use_cookieless ) {
+            if ( ! preg_match( '/^[a-f0-9]{16,32}$/', $ctoken ) ) {
+                status_header( 400 );
+                exit;
+            }
+        } else {
+            if ( function_exists( 'session_start' ) && session_status() === PHP_SESSION_NONE ) {
+                @session_start();
+            }
+        }
+    }
 
     function cpcff_make_seed() {
         list($usec, $sec) = explode(' ', microtime());
@@ -62,13 +78,19 @@ function appointment_hour_booking_get_captcha() {
     for ($i = 0; $i < $letter_count; $i++) {
          $str .= chr(wp_rand(97, 122))." ";
     }
-    $_SESSION['rand_code'.sanitize_key($_GET["ps"])] = str_replace(" ", "", $str);
+    $clean_code = strtolower( str_replace( " ", "", $str ) );
 
-    $uidt = uniqid();
+    if ( ! $ahb_is_admin_preview ) {
+        if ( $use_cookieless ) {
+            set_transient( 'ahb_cap_' . $ctoken, wp_hash( $clean_code ), 1800 );
+        } else {
+            $_SESSION['rand_code'.sanitize_key($_GET["ps"])] = $clean_code;
 
-    set_transient( "ahb-captcha-".$uidt , str_replace(" ", "", $str) , 1800 );
-
-    setCookie('rand_code'.sanitize_key($_GET["ps"]), $uidt, time()+36000,"/");
+            $uidt = uniqid();
+            set_transient( "ahb-captcha-".$uidt, $clean_code, 1800 );
+            setCookie('rand_code'.sanitize_key($_GET["ps"]), $uidt, time()+36000, "/");
+        }
+    }
 
     if ( ! function_exists( 'imagecreatetruecolor' ) ) {
         header( 'Content-type: image/png' );

@@ -3,7 +3,7 @@
 Plugin Name: Appointment Hour Booking
 Plugin URI: https://apphourbooking.dwbooster.com
 Description: Appointment Hour Booking is a plugin for creating booking forms for appointments with a start time and a defined duration.
-Version: 1.6.08
+Version: 1.6.09
 Author: CodePeople
 Author URI: https://apphourbooking.dwbooster.com
 License: GPLv2
@@ -120,9 +120,15 @@ function cpappb_loading_add_ons()
 
 include_once dirname( __FILE__ ) . '/classes/cp-base-class.inc.php';
 include_once dirname( __FILE__ ) . '/cp-main-class.inc.php';
+include_once dirname( __FILE__ ) . '/classes/cp-gdpr.inc.php';
 
 
-$cp_appb_plugin = new CP_AppBookingPlugin;
+$cp_appb_plugin       = new CP_AppBookingPlugin;
+$cp_appb_gdpr         = new CP_AppBooking_GDPR( $cp_appb_plugin );
+$cp_appb_plugin->gdpr = $cp_appb_gdpr;
+
+add_action( 'init', array( $cp_appb_gdpr, 'init' ), 5 );
+register_deactivation_hook( __FILE__, array( 'CP_AppBooking_GDPR', 'deactivate' ) );
 
 register_activation_hook(__FILE__, array($cp_appb_plugin,'install') );
 add_action( 'media_buttons', array($cp_appb_plugin, 'insert_button'), 11);

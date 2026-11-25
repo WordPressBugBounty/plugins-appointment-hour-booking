@@ -15,6 +15,7 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
     private $include_user_data_csv = false;
     private $booking_form_nonce = false;
     public $CP_CFPP_global_templates;
+    public $gdpr = null;
     protected $postURL;
 
     protected $paid_statuses = array('Pending','Cancelled','Cancelled by customer','Rejected','Attended');
@@ -764,20 +765,39 @@ class CP_AppBookingPlugin extends CP_APPBOOK_BaseClass {
             try { if (form.cp_appbooking_pform_status.value == '1') return false; } catch (e) {}
             $dexQuery = jQuery.noConflict();
             try { form.cp_ref_page.value = document.location; } catch (e) {}
-            $dexQuery = jQuery.noConflict();<?php if (!$this->is_authorized_admin_booking() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) { ?>
+            $dexQuery = jQuery.noConflict();<?php if (!$this->is_authorized_admin_booking() && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != false && function_exists('imagecreatetruecolor')) { ?>
             var result = '';
             try {
-            if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>) {
-            if (form.hdcaptcha_cp_appbooking_post.value == '') { setTimeout( "cp_appbooking_cerror"+counterid+"()", 100); return false; }
-            var result = $dexQuery.ajax({ type: "GET", url: "<?php echo esc_html($this->get_site_url()); ?>?ps="+counterid+"&cp_appbooking_pform_process=2&cp_appbooking_id=<?php echo intval($this->item); ?>&inAdmin=1&ps="+counterid+"&hdcaptcha_cp_appbooking_post="+form.hdcaptcha_cp_appbooking_post.value, async: false }).responseText;
-            }
-            } catch (e) {result='';console.log('AHB: Captcha not detected.');}
+                if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?>) {
+                    var $captchaInput = $dexQuery("#" + form.id + " input[name='hdcaptcha_cp_appbooking_post']:visible");
+                    var captchaVal = $captchaInput.length ? $captchaInput.val() : (form.hdcaptcha_cp_appbooking_post ? form.hdcaptcha_cp_appbooking_post.value : '');
+                    if (captchaVal == '') { setTimeout( "cp_appbooking_cerror"+counterid+"()", 100); return false; }
+                    var ctokenParam = "";
+                    var ctokenEl = document.getElementById("cpappb_ctoken" + counterid);
+                    if (ctokenEl && ctokenEl.value) {
+                        ctokenParam = "&cpappb_ctoken=" + encodeURIComponent(ctokenEl.value);
+                    }
+                    result = $dexQuery.ajax({
+                        type: "GET",
+                        url: "<?php echo esc_js( esc_url_raw( $this->fixurl( $this->get_site_url(), 'cp_appbooking_pform_process=2&cp_appbooking_id=' . intval($this->item) . '&inAdmin=1' ) ) ); ?>&ps=" + encodeURIComponent(counterid) + "&hdcaptcha_cp_appbooking_post=" + encodeURIComponent(captchaVal) + ctokenParam,
+                        async: false
+                    }).responseText;
+                }
+            } catch (e) { result = ''; console.log('AHB: Captcha not detected.'); }
             if (!apphboverbooking_handler<?php echo esc_html($this->print_counter-1); ?> && result.indexOf("captchafailed") != -1) {
-                $dexQuery("#captchaimg"+counterid).attr('src', $dexQuery("#captchaimg"+counterid).attr('src')+'&'+Math.floor((Math.random() * 99999) + 1));
+                if (typeof window["ahbRefreshCaptcha" + counterid] === "function") {
+                    window["ahbRefreshCaptcha" + counterid]();
+                } else {
+                    $dexQuery("img[id='captchaimg" + counterid + "'], img.ahb-captcha-img" + counterid).each(function(){
+                        var s = $dexQuery(this).attr('src') || '';
+                        $dexQuery(this).attr('src', s.replace(/&t=\d+$/, '') + '&t=' + Date.now());
+                    });
+                }
                 setTimeout( "cp_appbooking_cerror"+counterid+"()", 100);
                 return false;
             } else <?php } ?>
             {
+                $dexQuery("#" + form.id).find("[id='hdcaptcha_error" + counterid + "']").hide();
                 var cpefb_error = 0; 
                 $dexQuery("#"+form.id).find(".cpefb_error").each(function(index){
                 if ($dexQuery(this).css("display")!="none")
@@ -1697,26 +1717,51 @@ public function render_form_admin( $atts ) {
             }
         }
 
-        @session_start();
         $sequence = '';
-        if (isset($_GET["ps"])) $sequence = sanitize_text_field($_GET["ps"]); else if (isset($_POST["cp_pform_psequence"])) $sequence = sanitize_text_field($_POST["cp_pform_psequence"]);
-        $captcha_tr = '';
-        if (!empty($_COOKIE['rand_code'.$sequence])) $captcha_tr = get_transient( "ahb-captcha-".sanitize_key($_COOKIE['rand_code'.$sequence]));
-        if (
-               !apply_filters( 'cpappb_valid_submission', true) ||
-               (
-                   (!$is_admin_booking && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && function_exists('imagecreatetruecolor')) &&
-                   ( (!isset($_SESSION['rand_code'.$sequence]) ||
-                      strtolower($this->get_param('hdcaptcha_'.$this->prefix.'_post')) != strtolower(sanitize_text_field($_SESSION['rand_code'.$sequence])) ||
-                     ($_SESSION['rand_code'.$sequence] == ''))
-                   )
-                   &&
-                   ( (strtolower($this->get_param('hdcaptcha_'.$this->prefix.'_post')) != $captcha_tr) ||
-                     ($captcha_tr == '')
-                   )
-               )
-           )
-        {
+        if ( isset( $_GET['ps'] ) ) {
+            $sequence = sanitize_key( $_GET['ps'] );
+        } elseif ( isset( $_POST['cp_pform_psequence'] ) ) {
+            $sequence = sanitize_key( $_POST['cp_pform_psequence'] );
+        }
+
+        $captcha_enabled    = ( ! $is_admin_booking && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != 'false' && $this->get_option('cv_enable_captcha', CP_APPBOOK_DEFAULT_cv_enable_captcha) != false && function_exists('imagecreatetruecolor') );
+        $cookieless_captcha = ( class_exists( 'CP_AppBooking_GDPR' ) && CP_AppBooking_GDPR::get_setting( 'captcha_cookieless', '1' ) === '1' );
+        $use_cookieless     = ( $cookieless_captcha && isset( $_REQUEST['cpappb_ctoken'] ) );
+
+        $captcha_valid = true;
+        if ( $captcha_enabled ) {
+            $submitted_code = strtolower( trim( (string) $this->get_param( 'hdcaptcha_' . $this->prefix . '_post' ) ) );
+
+            if ( $use_cookieless ) {
+                $ctoken        = isset( $_REQUEST['cpappb_ctoken'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['cpappb_ctoken'] ) ) : '';
+                $captcha_valid = false;
+
+                if ( $submitted_code !== '' && preg_match( '/^[a-f0-9]{16,32}$/', $ctoken ) ) {
+                    $stored_hash = get_transient( 'ahb_cap_' . $ctoken );
+                    if ( is_string( $stored_hash ) && $stored_hash !== '' && hash_equals( $stored_hash, wp_hash( $submitted_code ) ) ) {
+                        $captcha_valid = true;
+                    } else {
+                        // Invalidate token immediately on failed guess to block brute-force attempts
+                        delete_transient( 'ahb_cap_' . $ctoken );
+                    }
+                }
+            } else {
+                if ( function_exists( 'session_start' ) && session_status() === PHP_SESSION_NONE ) {
+                    @session_start();
+                }
+                $session_code     = isset( $_SESSION['rand_code' . $sequence] ) ? strtolower( sanitize_text_field( (string) $_SESSION['rand_code' . $sequence] ) ) : '';
+                $cookie_val       = isset( $_COOKIE['rand_code' . $sequence] ) ? sanitize_text_field( wp_unslash( $_COOKIE['rand_code' . $sequence] ) ) : '';
+                $transient_code   = ( $cookie_val !== '' ) ? strtolower( (string) get_transient( 'ahb-captcha-' . sanitize_key( $cookie_val ) ) ) : '';
+
+                $session_match    = ( $session_code !== '' && $submitted_code === $session_code );
+                $transient_match  = ( $transient_code !== '' && $submitted_code === $transient_code );
+                $md5_cookie_match = ( $cookie_val !== '' && md5( $submitted_code ) === $cookie_val );
+
+                $captcha_valid = ( $session_match || $transient_match || $md5_cookie_match );
+            }
+        }
+
+        if ( ! apply_filters( 'cpappb_valid_submission', true ) || ! $captcha_valid ) {
             echo 'captchafailed';
             exit;
         }
@@ -1834,8 +1879,20 @@ public function render_form_admin( $atts ) {
         if ($this->booking_form_nonce)
             $this->verify_nonce (isset($posted_items["anonce"]) ? $posted_items["anonce"] : '', 'cpappb_actions_bookingform');
 
-        $_SESSION['rand_code'.$sequence] = '';
-        if (!empty($_COOKIE['rand_code'.$sequence])) set_transient( "ahb-captcha-".sanitize_key($_COOKIE['rand_code'.$sequence]) , '' , 1800 );
+        if ( $use_cookieless ) {
+            $ctoken = isset( $_POST['cpappb_ctoken'] ) ? sanitize_text_field( wp_unslash( $_POST['cpappb_ctoken'] ) ) : '';
+            if ( preg_match( '/^[a-f0-9]{16,32}$/', $ctoken ) ) {
+                delete_transient( 'ahb_cap_' . $ctoken );
+            }
+        } else {
+            if ( isset( $_SESSION['rand_code' . $sequence] ) ) {
+                $_SESSION['rand_code' . $sequence] = '';
+            }
+            if ( ! empty( $_COOKIE['rand_code' . $sequence] ) ) {
+                delete_transient( 'ahb-captcha-' . sanitize_key( wp_unslash( $_COOKIE['rand_code' . $sequence] ) ) );
+                setCookie( 'rand_code' . $sequence, '', time() - 3600, "/" );
+            }
+        }
         
 	    /**
 	     * Action called before insert the data into database.
@@ -1868,7 +1925,9 @@ public function render_form_admin( $atts ) {
 
         $rows_affected = $wpdb->insert( $wpdb->prefix."cpappbk_messages", array( 'formid' => $this->item,
                                                                                     'time' => current_time('mysql'),
-                                                                                    'ipaddr' => ( get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP)? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '' ),
+                                                                                    'ipaddr' => ( class_exists( 'CP_AppBooking_GDPR' )
+                                                                                        ? CP_AppBooking_GDPR::get_processed_ip()
+                                                                                        : ( get_option('cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '' ) ),
                                                                                     'notifyto' => $sanitized_email,
                                                                                     'posted_data' => serialize($params),
                                                                                     'data' =>$buffer_A,
@@ -2669,8 +2728,11 @@ public function render_form_admin( $atts ) {
             $buffer .="ADDITIONAL INFORMATION\n"
                   ."*********************************\n";
 
-            $basic_data = "IP: ".$myrows[0]->ipaddr."\n"
-              ."Server Time:  ".gmdate("Y-m-d H:i:s", current_time('timestamp'))."\n";
+            $basic_data = '';
+            if ( ! empty( $myrows[0]->ipaddr ) ) {
+                $basic_data .= "IP: " . $myrows[0]->ipaddr . "\n";
+            }
+            $basic_data .= "Server Time: " . gmdate("Y-m-d H:i:s", current_time('timestamp')) . "\n";
 
 		    /**
 		     *	Includes additional information to the email's message,
@@ -2967,9 +3029,11 @@ public function render_form_admin( $atts ) {
                 $apptext = __( 'BLOCKED BY ADMIN', 'appointment-hour-booking' ) . "\n\n" . $this->get_appointments_text( $apps );
                 $params         = array();
                 $params['apps'] = $apps;
-                $ipaddr         = ( get_option( 'cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP ) && isset( $_SERVER['REMOTE_ADDR'] ) )
-                    ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
-                    : '';
+                $ipaddr         = class_exists( 'CP_AppBooking_GDPR' )
+                    ? CP_AppBooking_GDPR::get_processed_ip()
+                    : ( ( get_option( 'cp_cpappb_storeip', CP_APPBOOK_DEFAULT_track_IP ) && isset( $_SERVER['REMOTE_ADDR'] ) )
+                        ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+                        : '' );
 
                 $wpdb->insert(
                     $wpdb->prefix . 'cpappbk_messages',
@@ -3020,7 +3084,18 @@ public function render_form_admin( $atts ) {
             if ($honeypot == 'Yes')
                 $honeypot = 'cpapphb'.substr(sanitize_key(md5(wp_generate_uuid4())),0,5);
             update_option( 'cp_cpappb_honeypot', $honeypot);
-            update_option( 'cp_cpappb_storeip', sanitize_text_field($posted_items["cp_cpappb_storeip"]));
+            $legacy_storeip = sanitize_text_field($posted_items["cp_cpappb_storeip"]);
+            update_option( 'cp_cpappb_storeip', $legacy_storeip );
+            $gdpr_saved = get_option( 'cp_cpappb_gdpr_settings', array() );
+            if ( is_array( $gdpr_saved ) && ! empty( $gdpr_saved ) ) {
+                if ( $legacy_storeip === '' ) {
+                    $gdpr_saved['ip_mode'] = 'none';
+                    update_option( 'cp_cpappb_gdpr_settings', $gdpr_saved );
+                } elseif ( isset( $gdpr_saved['ip_mode'] ) && $gdpr_saved['ip_mode'] === 'none' ) {
+                    $gdpr_saved['ip_mode'] = 'anonymize';
+                    update_option( 'cp_cpappb_gdpr_settings', $gdpr_saved );
+                }
+            }
 			update_option( 'cp_cpappb_admin_language', sanitize_text_field($_POST["cp_cpappb_admin_language"]));
         }
         else if (current_user_can('manage_options') && isset($_POST["gotab"]) && $_POST["gotab"] == 'schedulecalarea')
@@ -3056,6 +3131,51 @@ public function render_form_admin( $atts ) {
 	                    }
 	                }
                 }
+            }
+        }
+        else if ( isset( $_POST["gotab"] ) && $_POST["gotab"] == 'gdprarea' )
+        {
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_die( esc_html__( 'You do not have permission to change privacy settings.', 'appointment-hour-booking' ) );
+            }
+
+            // Handle one-click utility actions
+            if ( ! empty( $_POST['ahb_gdpr_action'] ) && $this->gdpr ) {
+                $util_action = sanitize_text_field( wp_unslash( $_POST['ahb_gdpr_action'] ) );
+                if ( $util_action === 'purge_ips_anonymize' ) {
+                    $this->gdpr->purge_existing_ips( 'anonymize' );
+                } elseif ( $util_action === 'purge_ips_clear' ) {
+                    $this->gdpr->purge_existing_ips( 'none' );
+                } elseif ( $util_action === 'run_retention_now' ) {
+                    $this->gdpr->run_retention_cleanup();
+                }
+                return;
+            }
+
+            $allowed_ip_modes = array( 'full', 'anonymize', 'none' );
+            $allowed_actions  = array( 'anonymize', 'delete' );
+            $allowed_ai_modes = array( 'redact', 'block', 'allow' );
+
+            $ip_mode          = isset( $_POST['gdpr_ip_mode'] ) && in_array( $_POST['gdpr_ip_mode'], $allowed_ip_modes, true ) ? sanitize_text_field( wp_unslash( $_POST['gdpr_ip_mode'] ) ) : 'anonymize';
+            $retention_action = isset( $_POST['gdpr_retention_action'] ) && in_array( $_POST['gdpr_retention_action'], $allowed_actions, true ) ? sanitize_text_field( wp_unslash( $_POST['gdpr_retention_action'] ) ) : 'anonymize';
+            $erasure_action   = isset( $_POST['gdpr_erasure_action'] ) && in_array( $_POST['gdpr_erasure_action'], $allowed_actions, true ) ? sanitize_text_field( wp_unslash( $_POST['gdpr_erasure_action'] ) ) : 'anonymize';
+            $ai_gdpr_mode     = isset( $_POST['gdpr_ai_mode'] ) && in_array( $_POST['gdpr_ai_mode'], $allowed_ai_modes, true ) ? sanitize_text_field( wp_unslash( $_POST['gdpr_ai_mode'] ) ) : 'redact';
+
+            $gdpr_settings = array(
+                'ip_mode'            => $ip_mode,
+                'retention_days'     => max( 0, intval( isset( $_POST['gdpr_retention_days'] ) ? $_POST['gdpr_retention_days'] : 0 ) ),
+                'retention_action'   => $retention_action,
+                'erasure_action'     => $erasure_action,
+                'delete_uploads'     => ! empty( $_POST['gdpr_delete_uploads'] ) ? '1' : '0',
+                'ai_gdpr_mode'       => $ai_gdpr_mode,
+                'captcha_cookieless' => ! empty( $_POST['gdpr_captcha_cookieless'] ) ? '1' : '0',
+            );
+
+            update_option( 'cp_cpappb_gdpr_settings', $gdpr_settings );
+            update_option( 'cp_cpappb_storeip', ( $ip_mode === 'none' ? '' : 'Yes' ) );
+
+            if ( $this->gdpr ) {
+                $this->gdpr->sync_cron_schedule();
             }
         }
         else if (!empty($posted_items['editionarea']))
@@ -4035,6 +4155,13 @@ public function render_form_admin( $atts ) {
             wp_send_json_error( __( 'AI Reply Assistant is disabled. Please turn it on first.', 'appointment-hour-booking' ) );
         }
 
+        if ( class_exists( 'CP_AppBooking_GDPR' ) ) {
+            $ai_gdpr_mode = CP_AppBooking_GDPR::get_setting( 'ai_gdpr_mode', 'redact' );
+            if ( $ai_gdpr_mode === 'block' ) {
+                wp_send_json_error( __( 'External AI transmission is disabled in GDPR & Privacy Settings.', 'appointment-hour-booking' ) );
+            }
+        }
+
         $original_message = isset( $_POST['original_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['original_message'] ) ) : '';
         $instructions     = isset( $_POST['instructions'] ) && trim( $_POST['instructions'] ) !== ''
             ? sanitize_text_field( wp_unslash( $_POST['instructions'] ) )
@@ -4050,7 +4177,11 @@ public function render_form_admin( $atts ) {
                        . "Follow the same language used by the customer unless instructed otherwise. "
                        . "Output ONLY the email body text without a 'Subject:' line.";
 
-        $user_prompt = "Customer Booking Submission:\n{$original_message}\n\nAdmin Instructions for Reply:\n{$instructions}";
+        $prompt_message = $original_message;
+        if ( class_exists( 'CP_AppBooking_GDPR' ) && CP_AppBooking_GDPR::get_setting( 'ai_gdpr_mode', 'redact' ) === 'redact' ) {
+            $prompt_message = CP_AppBooking_GDPR::sanitize_for_ai( $original_message );
+        }
+        $user_prompt = "Customer Booking Submission:\n{$prompt_message}\n\nAdmin Instructions for Reply:\n{$instructions}";
 
         $url = 'https://text.pollinations.ai/' . rawurlencode( $system_prompt . "\n\n" . $user_prompt );
 

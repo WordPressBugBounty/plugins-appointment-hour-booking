@@ -103,6 +103,15 @@ if ( isset( $_GET['statusmark'] ) && $_GET['statusmark'] != '' ) {
         $wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $wpdb->prefix . 'cpappbk_messages` WHERE id=%d', $ld_id ) );
         $message = __( 'Item deleted', 'appointment-hour-booking' );
     }
+} else if ( isset( $_GET['an'] ) && $_GET['an'] != '' ) {
+    $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
+    $an_id = intval( $_GET['an'] );
+    if ( $can_manage_booking( $an_id ) ) {
+        if ( isset( $this->gdpr ) && method_exists( $this->gdpr, 'anonymize_booking_by_id' ) ) {
+            $this->gdpr->anonymize_booking_by_id( $an_id );
+        }
+        $message = __( 'Booking personal data anonymized', 'appointment-hour-booking' );
+    }
 } else if ( isset( $_GET['ud'] ) && $_GET['ud'] != '' ) {
     $this->verify_nonce( sanitize_text_field( $_GET['anonce'] ), $booking_nonce_action );
     $ud_id = intval( $_GET['ud'] );
@@ -260,6 +269,17 @@ $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
         }
      } 
      
+     function cp_anonymizeMessageItem(id, element) {
+        if (confirm('<?php echo esc_js(__('Anonymize all personal data (name, email, phone, IP, and uploaded files) for this booking while keeping the appointment slot intact? This cannot be undone.', 'appointment-hour-booking')); ?>')) {
+            var url = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&an=' + id + '&r=' + Math.random();
+            var $link = jQuery(element);
+            $link.text('<?php echo esc_js(__('Anonymizing...', 'appointment-hour-booking')); ?>').css({'pointer-events': 'none', 'opacity': '0.5'});
+            jQuery.get(url, function() {
+                location.reload();
+            });
+        }
+     }
+
      function cp_deleteMessageItem(id, element) {
         if (confirm('<?php echo esc_js(__('Are you sure that you want to delete this item?','appointment-hour-booking')); ?>')) {
             var url = 'admin.php?page=<?php echo esc_js($this->menu_parameter); ?>&anonce=<?php echo esc_js($nonce); ?>&cal=<?php echo intval($_GET["cal"]); ?>&list=1&ld='+id+'&r='+Math.random();
@@ -446,15 +466,16 @@ $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
 
                           $raw_data = $events[$i]->data;
                           $display_email = sanitize_email($events[$i]->notifyto);
-                          if (empty($display_email) && preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $raw_data, $matches)) {
+                          if (empty($display_email) && $events[$i]->notifyto != $this->blocked_by_admin_indicator && preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $raw_data, $matches)) {
                               $display_email = sanitize_email($matches[0]);
                           }
+                          $is_anonymized = ( is_array( $posted_data ) && ! empty( $posted_data['gdpr_anonymized'] ) );
                  ?>
                   <tr class="<?php if ( $cancelled && $cancelled == count( $posted_data["apps"] ) && $status != 'Attended') { echo 'cpappb_cancelled'; } ?>" valign="top">
                     <th scope="row" class="check-column"><input type="checkbox" name="c<?php echo intval($i); ?>" value="<?php echo intval($events[$i]->id); ?>" /></th>
                     <td><?php echo intval($events[$i]->id); ?></td>
                     <td><?php echo esc_html($this->format_date(substr($events[$i]->time,0,16)).gmdate(" H:i",strtotime($events[$i]->time))); ?></td>
-                    <td><a href="mailto:<?php echo esc_attr(sanitize_email($events[$i]->notifyto)); ?>"><?php echo esc_html(sanitize_email($events[$i]->notifyto)); ?></a></td>
+                    <td><?php if ( $is_anonymized ) : ?><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#f0f0f1;border:1px solid #dcdcde;color:#50575e;font-size:11.5px;font-weight:600;" title="<?php echo esc_attr( $posted_data['gdpr_anonymized'] ); ?>">🔒 <?php esc_html_e('Anonymized', 'appointment-hour-booking'); ?></span><?php else : ?><a href="mailto:<?php echo esc_attr(sanitize_email($events[$i]->notifyto)); ?>"><?php echo esc_html(sanitize_email($events[$i]->notifyto)); ?></a><?php endif; ?></td>
                     <td class="ahbmessage">
                       <div class="ahbmessagemw">
                         <?php
@@ -502,13 +523,20 @@ $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
                           <?php $this->render_status_box('sb'.intval($events[$i]->id), $status); ?>
                       </div>
                       <div class="row-actions visible">
+                          <?php if ( ! $is_anonymized && $events[$i]->notifyto != $this->blocked_by_admin_indicator ) { ?>
                           <span class="reply"><a href="javascript:void(0);"
                               data-id="<?php echo intval($events[$i]->id); ?>"
                               data-email="<?php echo esc_attr($display_email); ?>"
                               data-message="<?php echo esc_attr(trim($raw_data)); ?>"
                               onclick="cp_openReplyModal(this);"><?php esc_html_e('Reply','appointment-hour-booking'); ?></a> | </span>
+                          <?php } ?>
                           <span class="edit"><a href="javascript:void(0);" onclick="cp_updateMessageItem(<?php echo intval($events[$i]->id); ?>,<?php echo ($is_paid ? '0' : '1'); ?>, this);"><?php esc_html_e('Toggle Payment','appointment-hour-booking'); ?></a> | </span>
+                          <?php if ( ! $is_anonymized ) { ?>
                           <span class="inline"><a href="javascript:void(0);" onclick="cp_resendMessageItem(<?php echo intval($events[$i]->id); ?>, this);"><?php esc_html_e('Resend Email','appointment-hour-booking'); ?></a> | </span>
+                          <?php if ( $events[$i]->notifyto != $this->blocked_by_admin_indicator ) { ?>
+                          <span class="anonymize"><a href="javascript:void(0);" onclick="cp_anonymizeMessageItem(<?php echo intval($events[$i]->id); ?>, this);"><?php esc_html_e('Anonymize','appointment-hour-booking'); ?></a> | </span>
+                          <?php } ?>
+                          <?php } ?>
                           <span class="trash"><a href="javascript:void(0);" onclick="cp_deleteMessageItem(<?php echo intval($events[$i]->id); ?>, this);" class="submitdelete"><?php esc_html_e('Delete','appointment-hour-booking'); ?></a></span>
                       </div>                      
                     </td>
@@ -752,6 +780,10 @@ $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
             <textarea id="cpappb-reply-original" rows="4" style="background:#f6f7f7;" readonly></textarea>
         </div>
 
+        <?php
+        $ai_gdpr_mode = class_exists( 'CP_AppBooking_GDPR' ) ? CP_AppBooking_GDPR::get_setting( 'ai_gdpr_mode', 'redact' ) : 'redact';
+        if ( $ai_gdpr_mode !== 'block' ) :
+        ?>
         <div class="cpappb-ai-box">
             <div class="cpappb-ai-header">
                 <strong style="color:#1d2327;">✨ <?php esc_html_e('AI Reply Assistant','appointment-hour-booking'); ?></strong>
@@ -765,7 +797,11 @@ $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
             </div>
 
             <p class="cpappb-ai-notice">
-                <?php esc_html_e('Privacy Notice: When enabled, clicking "Generate with AI" sends your site name, the Original Booking Details shown above, and your instructions to the external AI service text.pollinations.ai to generate a draft reply.','appointment-hour-booking'); ?>
+                <?php if ( $ai_gdpr_mode === 'redact' ) : ?>
+                    <?php esc_html_e('Privacy Notice: When enabled, clicking "Generate with AI" sends your site name, the Original Booking Details (with email addresses, phone numbers, and IPs automatically redacted), and your instructions to text.pollinations.ai to generate a draft reply.','appointment-hour-booking'); ?>
+                <?php else : ?>
+                    <?php esc_html_e('Privacy Notice: When enabled, clicking "Generate with AI" sends your site name, the Original Booking Details shown above, and your instructions to the external AI service text.pollinations.ai to generate a draft reply.','appointment-hour-booking'); ?>
+                <?php endif; ?>
             </p>
 
             <div id="cpappb-ai-controls" class="cpappb-ai-controls" style="<?php echo $ai_reply_enabled ? '' : 'display:none;'; ?>">
@@ -776,6 +812,7 @@ $ai_reply_enabled = ( get_option( 'cpappb_ai_reply_enabled', '0' ) === '1' );
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="cpappb-modal-field">
             <label for="cpappb-reply-subject"><?php esc_html_e('Subject:','appointment-hour-booking'); ?></label>

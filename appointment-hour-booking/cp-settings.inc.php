@@ -32,10 +32,25 @@ if ( !empty($_POST["nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash(
             $message = 'Custom CSS updated.';
         else if ($gotab == 'js')
             $message = 'Custom javascript updated.';
+        else if ($gotab == 'gdprarea') {
+            $gdpr_action = isset($_POST["ahb_gdpr_action"]) ? sanitize_text_field(wp_unslash($_POST["ahb_gdpr_action"])) : '';
+            if ($gdpr_action === 'purge_ips_anonymize')
+                $message = __('All stored IP addresses have been anonymized.', 'appointment-hour-booking');
+            else if ($gdpr_action === 'purge_ips_clear')
+                $message = __('All stored IP addresses have been cleared.', 'appointment-hour-booking');
+            else if ($gdpr_action === 'run_retention_now')
+                $message = __('Data retention cleanup completed.', 'appointment-hour-booking');
+            else
+                $message = __('GDPR & Privacy settings updated.', 'appointment-hour-booking');
+        }
     }
     else
         if (isset($_GET["gotab"]))
             $gotab = sanitize_text_field(wp_unslash($_GET["gotab"]));
+}
+else if (isset($_GET["gotab"]))
+{
+    $gotab = sanitize_text_field(wp_unslash($_GET["gotab"]));
 }
 
 $nonce = wp_create_nonce( 'cpappb_actions_admin' );
@@ -46,6 +61,11 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin' );
 	.ahb-tab label{font-weight:600;}
 	.tab-active{display:block;}
 	.ahb-code-editor-container{border:1px solid #DDDDDD;margin-bottom:20px;}
+	.ahb-gdpr-card{background:#fff;border:1px solid #dcdcde;border-radius:6px;padding:18px 22px;margin-top:16px;max-width:1040px;}
+	.ahb-gdpr-card-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-bottom:1px solid #e5e7eb;padding-bottom:12px;margin-bottom:14px;}
+	.ahb-gdpr-card-header h2{margin:0;padding:0;}
+	.ahb-gdpr-links{display:flex;gap:8px;flex-wrap:wrap;}
+	.ahb-gdpr-utilities{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;}
 
 .ahb-csssample { margin-top: 15px; margin-left:20px;  margin-right:20px;}
 .ahb-csssampleheader {
@@ -136,6 +156,9 @@ jQuery(function(){
     <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'schedulecalarea') echo ' nav-tab-active'; ?>"  data-tab="6"><?php esc_html_e('Schedule Calendar Contents','appointment-hour-booking'); ?></a>
     <?php } ?>
     <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'miscsettings') echo ' nav-tab-active'; ?>"  data-tab="7"><?php esc_html_e('Misc Settings','appointment-hour-booking'); ?></a>
+    <?php if ($is_admin) { ?>
+    <a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'gdprarea') echo ' nav-tab-active'; ?>"  data-tab="8">🔒 <?php esc_html_e('GDPR & Privacy','appointment-hour-booking'); ?></a>
+    <?php } ?>
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'css') echo ' nav-tab-active'; ?>"  data-tab="3"><?php esc_html_e('Edit Styles','appointment-hour-booking'); ?></a>
     <?php if ($is_admin) { ?>
 	<a href="javascript:void(0);" class="nav-tab<?php if ($gotab == 'js') echo ' nav-tab-active'; ?>"  data-tab="4"><?php esc_html_e('Edit Scripts','appointment-hour-booking'); ?></a>
@@ -475,6 +498,7 @@ jQuery(function(){
                             <option value="Yes"  <?php if (get_option('cp_cpappb_storeip',CP_APPBOOK_DEFAULT_track_IP) != '') echo 'selected'; ?>  ><?php esc_html_e('Yes','appointment-hour-booking'); ?></option>
 	    				</select>
                         <br />
+                        <em><?php esc_html_e('For IP anonymization and full privacy controls, see the "GDPR & Privacy" tab.', 'appointment-hour-booking'); ?></em>
 	    			</td>
 	    		</tr>
                 <tr valign="top">
@@ -611,5 +635,157 @@ jQuery(function(){
 	     </div>
 	     <input type="submit" value="<?php esc_html_e('Save Scripts','appointment-hour-booking'); ?>" class="button button-primary" />
      </form>
+</div>
+<?php } ?>
+
+<?php if ($is_admin) { ?>
+<!-- TAB 8: GDPR & PRIVACY CONTROLS -->
+<div class="ahb-tab<?php if ($gotab == 'gdprarea') echo ' tab-active'; ?>" data-tab="8">
+    <?php
+    $gdpr_ip_mode            = CP_AppBooking_GDPR::get_setting('ip_mode', 'anonymize');
+    $gdpr_retention_days     = intval(CP_AppBooking_GDPR::get_setting('retention_days', 0));
+    $gdpr_retention_action   = CP_AppBooking_GDPR::get_setting('retention_action', 'anonymize');
+    $gdpr_erasure_action     = CP_AppBooking_GDPR::get_setting('erasure_action', 'anonymize');
+    $gdpr_delete_uploads     = CP_AppBooking_GDPR::get_setting('delete_uploads', '1');
+    $gdpr_ai_mode            = CP_AppBooking_GDPR::get_setting('ai_gdpr_mode', 'redact');
+    $gdpr_captcha_cookieless = CP_AppBooking_GDPR::get_setting('captcha_cookieless', '1');
+    ?>
+    <div class="ahb-gdpr-card">
+        <div class="ahb-gdpr-card-header">
+            <div>
+                <h2>🔒 <?php esc_html_e('GDPR & Privacy Controls', 'appointment-hour-booking'); ?></h2>
+                <p style="margin:4px 0 0;color:#646970;"><?php esc_html_e('Manage IP anonymization, automated data retention, WordPress personal data export/erasure, cookie-less CAPTCHA, and external AI privacy.', 'appointment-hour-booking'); ?></p>
+            </div>
+            <div class="ahb-gdpr-links">
+                <a href="<?php echo esc_url(admin_url('export-personal-data.php')); ?>" class="button"><?php esc_html_e('WP Data Export', 'appointment-hour-booking'); ?></a>
+                <a href="<?php echo esc_url(admin_url('erase-personal-data.php')); ?>" class="button"><?php esc_html_e('WP Data Erasure', 'appointment-hour-booking'); ?></a>
+                <a href="<?php echo esc_url(admin_url('options-privacy.php')); ?>" class="button"><?php esc_html_e('WP Privacy Guide', 'appointment-hour-booking'); ?></a>
+            </div>
+        </div>
+
+        <form method="post" action="" name="cpformconf_gdpr">
+            <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
+            <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
+            <input name="gotab" type="hidden" value="gdprarea" />
+
+            <table class="form-table">
+                <tbody>
+                    <tr valign="top">
+                        <th scope="row"><label for="gdpr_ip_mode"><?php esc_html_e('Visitor IP Address Storage', 'appointment-hour-booking'); ?></label></th>
+                        <td>
+                            <select id="gdpr_ip_mode" name="gdpr_ip_mode">
+                                <option value="anonymize" <?php selected($gdpr_ip_mode, 'anonymize'); ?>><?php esc_html_e('Anonymize IP (Recommended — masks last octet / IPv6 suffix)', 'appointment-hour-booking'); ?></option>
+                                <option value="none" <?php selected($gdpr_ip_mode, 'none'); ?>><?php esc_html_e('Do Not Store IP Addresses', 'appointment-hour-booking'); ?></option>
+                                <option value="full" <?php selected($gdpr_ip_mode, 'full'); ?>><?php esc_html_e('Store Full IP Address (Legacy)', 'appointment-hour-booking'); ?></option>
+                            </select>
+                            <p class="description"><?php esc_html_e('Uses WordPress wp_privacy_anonymize_ip() before saving bookings or sending admin notifications.', 'appointment-hour-booking'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><label for="gdpr_ai_mode"><?php esc_html_e('AI Reply Assistant Privacy (Pollinations.ai)', 'appointment-hour-booking'); ?></label></th>
+                        <td>
+                            <select id="gdpr_ai_mode" name="gdpr_ai_mode">
+                                <option value="redact" <?php selected($gdpr_ai_mode, 'redact'); ?>><?php esc_html_e('Redact emails, phones & IPs before sending (Recommended)', 'appointment-hour-booking'); ?></option>
+                                <option value="block" <?php selected($gdpr_ai_mode, 'block'); ?>><?php esc_html_e('Block external AI transmission completely', 'appointment-hour-booking'); ?></option>
+                                <option value="allow" <?php selected($gdpr_ai_mode, 'allow'); ?>><?php esc_html_e('Send full booking message without redaction', 'appointment-hour-booking'); ?></option>
+                            </select>
+                            <p class="description"><?php esc_html_e('Prevents customer PII from being transmitted in third-party AI API requests.', 'appointment-hour-booking'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><label for="gdpr_retention_days"><?php esc_html_e('Auto-Cleanup After (Days)', 'appointment-hour-booking'); ?></label></th>
+                        <td>
+                            <input type="number" min="0" id="gdpr_retention_days" name="gdpr_retention_days" value="<?php echo esc_attr($gdpr_retention_days); ?>" class="small-text" />
+                            <p class="description"><?php esc_html_e('Set to 0 to disable. Runs daily via WP-Cron. Bookings with upcoming future appointment dates are never purged early.', 'appointment-hour-booking'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><label for="gdpr_retention_action"><?php esc_html_e('Retention Cleanup Action', 'appointment-hour-booking'); ?></label></th>
+                        <td>
+                            <select id="gdpr_retention_action" name="gdpr_retention_action">
+                                <option value="anonymize" <?php selected($gdpr_retention_action, 'anonymize'); ?>><?php esc_html_e('Anonymize PII (Keep slot & stats)', 'appointment-hour-booking'); ?></option>
+                                <option value="delete" <?php selected($gdpr_retention_action, 'delete'); ?>><?php esc_html_e('Permanently Delete Records', 'appointment-hour-booking'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><label for="gdpr_erasure_action"><?php esc_html_e('WP Personal Data Eraser Behavior', 'appointment-hour-booking'); ?></label></th>
+                        <td>
+                            <select id="gdpr_erasure_action" name="gdpr_erasure_action">
+                                <option value="anonymize" <?php selected($gdpr_erasure_action, 'anonymize'); ?>><?php esc_html_e('Anonymize PII (Preserve slot availability)', 'appointment-hour-booking'); ?></option>
+                                <option value="delete" <?php selected($gdpr_erasure_action, 'delete'); ?>><?php esc_html_e('Permanently Delete Booking Rows', 'appointment-hour-booking'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><?php esc_html_e('Uploaded Files Cleanup', 'appointment-hour-booking'); ?></th>
+                        <td>
+                            <label style="font-weight:normal;">
+                                <input type="checkbox" name="gdpr_delete_uploads" value="1" <?php checked($gdpr_delete_uploads, '1'); ?> />
+                                <?php esc_html_e('Also delete customer-uploaded files from wp-content/uploads when erasing, anonymizing, or deleting bookings', 'appointment-hour-booking'); ?>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><?php esc_html_e('Cookie-less CAPTCHA Mode', 'appointment-hour-booking'); ?></th>
+                        <td>
+                            <label style="font-weight:normal;">
+                                <input type="checkbox" name="gdpr_captcha_cookieless" value="1" <?php checked($gdpr_captcha_cookieless, '1'); ?> />
+                                <?php esc_html_e('Enable Cookie-less CAPTCHA Mode (Transient-based)', 'appointment-hour-booking'); ?>
+                            </label>
+                            <p class="description"><?php esc_html_e('Validates CAPTCHA submissions using short-lived hashed WordPress transients and per-load client tokens—no PHPSESSID or rand_code cookies are set, and full-page caching stays intact.', 'appointment-hour-booking'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row"><?php esc_html_e('GDPR Consent Checkboxes', 'appointment-hour-booking'); ?></th>
+                        <td>
+                            <p class="description" style="margin-top:0;"><?php esc_html_e('Add optional or required acceptance/GDPR checkboxes directly inside each booking form using the Form Builder. Their submitted values are automatically included in WordPress Personal Data Exports and erased/anonymized upon GDPR erasure requests.', 'appointment-hour-booking'); ?></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="submit">
+                <input type="submit" value="<?php esc_attr_e('Save Privacy Settings', 'appointment-hour-booking'); ?>" class="button button-primary" />
+            </p>
+        </form>
+    </div>
+
+    <div class="ahb-gdpr-card">
+        <h3 style="margin-top:0;"><?php esc_html_e('Privacy Maintenance Utilities', 'appointment-hour-booking'); ?></h3>
+        <p style="color:#646970;"><?php esc_html_e('Apply privacy rules retroactively to existing bookings in the database.', 'appointment-hour-booking'); ?></p>
+        <div class="ahb-gdpr-utilities">
+            <form method="post" action="" onsubmit="return confirm('<?php echo esc_js(__('Anonymize all stored IP addresses in existing bookings?', 'appointment-hour-booking')); ?>');">
+                <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
+                <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
+                <input name="gotab" type="hidden" value="gdprarea" />
+                <input name="ahb_gdpr_action" type="hidden" value="purge_ips_anonymize" />
+                <button type="submit" class="button"><?php esc_html_e('Anonymize All Stored IPs', 'appointment-hour-booking'); ?></button>
+            </form>
+
+            <form method="post" action="" onsubmit="return confirm('<?php echo esc_js(__('Permanently clear all IP addresses from existing bookings?', 'appointment-hour-booking')); ?>');">
+                <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
+                <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
+                <input name="gotab" type="hidden" value="gdprarea" />
+                <input name="ahb_gdpr_action" type="hidden" value="purge_ips_clear" />
+                <button type="submit" class="button"><?php esc_html_e('Clear All Stored IPs', 'appointment-hour-booking'); ?></button>
+            </form>
+
+            <form method="post" action="" onsubmit="return confirm('<?php echo esc_js(__('Run the configured retention cleanup right now?', 'appointment-hour-booking')); ?>');">
+                <input name="nonce" type="hidden" value="<?php echo esc_attr($nonce); ?>" />
+                <input name="<?php echo esc_attr($cpid); ?>_post_edition" type="hidden" value="1" />
+                <input name="gotab" type="hidden" value="gdprarea" />
+                <input name="ahb_gdpr_action" type="hidden" value="run_retention_now" />
+                <button type="submit" class="button"><?php esc_html_e('Run Retention Cleanup Now', 'appointment-hour-booking'); ?></button>
+            </form>
+        </div>
+    </div>
 </div>
 <?php } ?>

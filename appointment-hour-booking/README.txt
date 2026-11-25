@@ -4,7 +4,7 @@ Donate link: https://apphourbooking.dwbooster.com/download
 Tags: appointment booking,calendar,booking,appointment,schedule
 Requires at least: 5.3.0
 Tested up to: 7.1
-Stable tag: 1.6.08
+Stable tag: 1.6.09
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,7 +31,8 @@ Main Features:
 * Automatic price calculation
 * Customizable **email notifications** for administrators and users
 * **Reply to bookings with AI assistance** directly from the bookings list (free, no API key required)
-* Form **validation** and **built-in** anti-spam **captcha** protection
+* **Built-in GDPR & Privacy Controls**: Visitor IP anonymization/suppression, cookie-less CAPTCHA mode, WordPress Personal Data Export/Erasure & Privacy Policy Guide integration, automated data retention cleanup, one-click per-booking anonymization, and automatic PII redaction for AI replies
+* Form **validation** and **built-in** anti-spam **captcha** protection (with cookie-less transient mode for full-page caching)
 * Manual and automatic **CSV reports** (configurable for new/unread submissions or complete active booking lists)
 * iCal add-on with iCal export link and iCal file attached to emails
 * Calendar available in 53+ languages
@@ -79,7 +80,7 @@ https://apphourbooking.dwbooster.com
 
 = Q: How does the "Reply with AI" feature work in the bookings list? =
 
-A: In the "Booking Orders" list, each booking includes a "Reply" action link. Clicking it opens a modal where you can write a direct email reply to the customer or click "Generate with AI" to automatically draft a polite, context-aware response based on the customer's booking details and your optional instructions. This feature is completely free and requires no API key.
+A: In the "Booking Orders" list, each booking includes a "Reply" action link. Clicking it opens a modal where you can write a direct email reply to the customer or click "Generate with AI" to automatically draft a polite, context-aware response based on the customer's booking details and your optional instructions. This feature is completely free and requires no API key. For privacy, email addresses, phone numbers, and IP addresses are automatically redacted before sending to the AI service (or AI transmission can be disabled completely in **General Settings >> GDPR & Privacy**).
 
 = Q: Where can I publish an appointment booking form? =
 
@@ -185,7 +186,7 @@ A: Yes, for this purpose you can use the plugin [CP Referrer and Conversions Tra
 
 = Q: Are the forms GDPR compliant? =
 
-A: In all plugin versions, you can turn off IP tracking to avoid saving that user information. Full GDPR-compliant forms can be built using the commercial versions of the plugin.
+A: Yes. Under **General Settings >> GDPR & Privacy**, you can anonymize or disable visitor IP storage, enable cookie-less CAPTCHA verification (no `PHPSESSID` or tracking cookies), configure automated data retention cleanup (anonymize or delete old completed bookings while protecting upcoming appointments), redact or block PII in AI replies, and apply retroactive IP anonymization/clearing. The plugin also integrates natively with WordPress **Export Personal Data**, **Erase Personal Data**, and the **Privacy Policy Guide**, and includes a one-click **Anonymize** action in the **Booking Orders** list plus optional acceptance/GDPR checkboxes in the form builder.
 
 == Other Notes ==
 
@@ -910,8 +911,10 @@ Please note that the pro features aren't advertised as part of the free plugin i
 * Hardened booking form and time-blocking submissions with stricter server-side validation for dates, time slots, schedule availability, and administrative permissions. Thanks to kta1kri for responsible disclosure.   
 * Fixed bug in Publish Wizard 
 
+= 1.6.09 =
+* Added GDPR & Privacy Controls tab: IP anonymization/suppression, automated data retention cleanup, cookie-less CAPTCHA mode, AI reply PII redaction, WordPress Data Export/Erasure & Privacy Guide integration, and one-click booking anonymization.
+
 == Upgrade Notice ==
 
-= 1.6.08 =
-* Hardened booking form and time-blocking submissions with stricter server-side validation for dates, time slots, schedule availability, and administrative permissions. Thanks to kta1kri for responsible disclosure.   
-* Fixed bug in Publish Wizard 
+= 1.6.09 =
+Added GDPR & Privacy Controls, cookie-less CAPTCHA mode, WordPress Personal Data Export/Erasure integration, automated retention cleanup, and one-click booking anonymization.

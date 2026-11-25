@@ -170,7 +170,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin_form_' . intval( $this->item ) )
                    qs += "&font="+f.cv_font.options[f.cv_font.selectedIndex].value;
                    qs += "&r="+(randcaptcha++);
                    
-                   document.getElementById("captchaimg").src= "<?php echo esc_js($this->get_site_url(true).'?'.$this->prefix.'_captcha=captcha&inAdmin=1'); ?>"+qs;
+                   document.getElementById("captchaimg").src = "<?php echo esc_js( esc_url_raw( $this->fixurl( $this->get_site_url(true), $this->prefix.'_captcha=captcha&inAdmin=1&preview=1' ) ) ); ?>" + qs;
                } catch (e) {}
             }
             
@@ -732,7 +732,7 @@ $nonce = wp_create_nonce( 'cpappb_actions_admin_form_' . intval( $this->item ) )
                   Please contact your hosting support to enable this feature.
                  </div>
                 <?php } else { ?>
-                <img src="<?php echo esc_attr($this->get_site_url(true).'?'.$this->prefix.'_captcha=captcha&inAdmin=1'); ?>"  id="captchaimg" alt="security code" border="0"  />
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" id="captchaimg" alt="security code" border="0" />
                 <?php }  ?>
              </td>
             </tr>
